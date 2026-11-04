@@ -1,5 +1,5 @@
 // Vercel Serverless Function：把课表和新安排交给 Gemini，返回重排后的整周课表
-// 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，默认 gemini-3.8-flash）
+// 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，默认 gemini-3.5-flash-lite）
 
 const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划助手。
 任务：根据用户输入的新安排，重排整周课表，并返回【完整】的一周安排。
@@ -21,6 +21,11 @@ const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划
 只输出 JSON：{"events":[{"day":0,"h":9,"len":2,"t":"📖 数学复习","c":"pink"}],"notes":["..."]}`;
 
 module.exports = async (req, res) => {
+  // 手机 App（capacitor://localhost、https://localhost）跨域调用需要 CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(204).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
@@ -29,7 +34,7 @@ module.exports = async (req, res) => {
   if (typeof text !== 'string' || !text.trim() || text.length > 500) {
     return res.status(400).json({ error: 'bad text' });
   }
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash-lite';
+  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const prompt =
     `今天是周${'一二三四五六日'[today] || '?'}（day=${today}）。可排时间 ${hours?.[0] ?? 8}:00–${hours?.[1] ?? 22}:00。\n` +
     `当前课表：${JSON.stringify((events || []).slice(0, 80))}\n` +
@@ -50,7 +55,7 @@ module.exports = async (req, res) => {
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: 'application/json',
-          ...(withThinking ? { thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || 'low' } } : {}),
+          ...(withThinking ? { thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || 'minimal' } } : {}),
         },
       }),
     });
