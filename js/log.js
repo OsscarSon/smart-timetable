@@ -59,7 +59,7 @@
     var txt=inp.value.trim();if(!txt)return;
     addBtn.disabled=true;addBtn.textContent='…';
     try{
-      var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},25000);
+      var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},60000);
       var r=await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
         body:JSON.stringify({text:txt,events:data,today:todayIdx,hours:[H0,H1],study:ST,sports:SP})});
       clearTimeout(tm);
@@ -69,7 +69,7 @@
       data=ev;save();draw();
       say('🤖 AI 已重排');(j.notes||[]).slice(0,4).forEach(function(n){say('💡 '+String(n).slice(0,60))});
     }catch(e){
-      say('🔌 AI 未连接（'+String(e.message||e).slice(0,160)+'），先用本地规则排');
+      say('🔌 AI 未连接（'+(e.name==='AbortError'?'等了 60 秒没回应':String(e.message||e).slice(0,160))+'），先用本地规则排');
       local(txt);
     }
     inp.value='';addBtn.disabled=false;addBtn.textContent='排';
