@@ -1,11 +1,12 @@
 // 通知：网页开着时，到提醒时间、活动开始前几分钟会弹出通知（后台推送之后再做）
 var swReg=null;
-if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').then(function(r){swReg=r}).catch(function(){})}
+if('serviceWorker' in navigator&&!window.Capacitor){navigator.serviceWorker.register('sw.js').then(function(r){swReg=r}).catch(function(){})}
 var ntb=document.getElementById('ntf'),ntm=document.getElementById('ntmsg');
 function ntState(){
   if(!('Notification' in window)){ntb.disabled=true;ntm.textContent='这个浏览器不支持通知。';return}
   ntb.textContent=Notification.permission==='granted'?'🔔 通知已开启（点一下发测试）':'🔔 开启通知'}
 function notify(t,b){
+  if(window.IS_NATIVE)return;                // 手机 App 里由 native.js 用系统通知处理
   if(!('Notification' in window)||Notification.permission!=='granted')return;
   if(swReg&&swReg.showNotification)swReg.showNotification(t,{body:b,tag:t+b});
   else{try{new Notification(t,{body:b})}catch(e){}}}

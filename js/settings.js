@@ -66,6 +66,7 @@ function rTT(){
       if(TTS.list.length<=1){alert('这是唯一的课表，不能删');return}
       if(!t.arch&&liveList().length<=1){alert('至少要保留一个正在用的课表');return}
       if(!confirm('删除课表「'+t.name+'」及里面所有安排、课程、作业？不能恢复。（想保留请用“归档”）'))return;
+      lget(tkOf('mochi-hw',t.id),[]).forEach(function(h){(h.att||[]).forEach(function(a){fileDel(a.id)})});   // 作业附件一起删
       ['mochi-wk','mochi-fx','mochi-dn','mochi-rp','mochi-hw'].forEach(function(b){try{localStorage.removeItem(tkOf(b,t.id))}catch(e){}});
       TTS.list=TTS.list.filter(function(z){return z!==t});ttSave();
       if(act)switchTT(liveList()[0].id);else{rTT();ttSel()}};r.appendChild(dl2);
@@ -82,7 +83,7 @@ document.getElementById('tta').onclick=function(){
 
 // ---- 备份 ----
 document.getElementById('bex').onclick=function(){
-  var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0)o[k]=localStorage.getItem(k)}
+  var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0)o[k]=localStorage.getItem(k)}
   var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));
   a.download='mochi-backup-'+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'.json';
   document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
@@ -91,7 +92,7 @@ document.getElementById('bim').onclick=function(){document.getElementById('bfile
 document.getElementById('bfile').onchange=function(){
   var f=this.files[0];if(!f)return;var fr=new FileReader();
   fr.onload=function(){try{
-    var o=JSON.parse(fr.result),ks=Object.keys(o).filter(function(k){return k.indexOf('mochi-')===0});
+    var o=JSON.parse(fr.result),ks=Object.keys(o).filter(function(k){return k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0});
     if(!ks.length)throw 0;if(!confirm('导入会覆盖目前的内容，确定吗？'))return;
     ks.forEach(function(k){localStorage.setItem(k,String(o[k]))});location.reload()
   }catch(e){document.getElementById('semsg').textContent='这个文件不是有效的备份。'}};
