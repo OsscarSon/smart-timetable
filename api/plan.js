@@ -34,19 +34,22 @@ module.exports = async (req, res) => {
     `运动：${JSON.stringify(sports || []).slice(0, 1500)}\n` +
     `用户的新安排：${text.trim()}\n请返回重排后的完整一周。`;
 
+  const call = (withThinking) =>
+    fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: RULES }] },
+        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          ...(withThinking ? { thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || 'low' } } : {}),
+        },
+      }),
+    });
   try {
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: RULES }] },
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json' },
-        }),
-      }
-    );
+    let r = await call(true);
+    if (r.status === 400) r = await call(false); // 模型不认“思考程度”参数时，退回普通调用
     if (!r.ok) {
       const body = (await r.text()).slice(0, 300);
       return res.status(502).json({ error: 'gemini ' + r.status + ' ' + body });
