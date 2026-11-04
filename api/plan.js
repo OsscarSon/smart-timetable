@@ -1,5 +1,5 @@
 // Vercel Serverless Function：把课表和新安排交给 Gemini，返回重排后的整周课表
-// 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，默认 gemini-2.5-flash-lite）
+// 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，默认 gemini-3.8-flash）
 
 const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划助手。
 任务：根据用户输入的新安排，重排整周课表，并返回【完整】的一周安排。
@@ -43,16 +43,21 @@ module.exports = async (req, res) => {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: RULES }] },
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.4 },
+          generationConfig: { responseMimeType: 'application/json' },
         }),
       }
     );
-    if (!r.ok) return res.status(502).json({ error: 'gemini ' + r.status });
+    if (!r.ok) {
+      const body = (await r.text()).slice(0, 300);
+      return res.status(502).json({ error: 'gemini ' + r.status + ' ' + body });
+    }
     const j = await r.json();
     const raw = j.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-    const out = JSON.parse(raw.replace(/```json|```/g, '').trim());
+    let out;
+    try { out = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch (e) { return res.status(502).json({ error: 'AI 回复不是有效 JSON' }); }
     return res.status(200).json({ events: out.events, notes: out.notes || [] });
   } catch (e) {
-    return res.status(500).json({ error: 'server error' });
+    return res.status(500).json({ error: 'server error: ' + String(e && e.message).slice(0, 120) });
   }
 };
