@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mochi 时间表</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <section class="card side">
+    <div class="hello">
+      <div class="avatar">🐱</div>
+      <div><h1>早安，小主人 ☀️</h1><small id="today"></small></div>
+    </div>
+    <div class="nav">
+      <button class="on" data-v="tt">📅 时间表</button>
+      <button data-v="rm">⏰ 提醒</button>
+      <button data-v="sp">🏃 运动</button>
+      <button>🌿 健康</button>
+      <button data-v="st">📚 学习</button>
+      <button>💗 偏好</button>
+    </div>
+    <div class="msg" id="bn" style="margin-top:8px;color:var(--ink)"></div>
+  </section>
+
+  <!-- Timetable -->
+  <section class="card tt" id="v-tt">
+    <div class="tt-head">
+      <h2>🗓️ 本周课表</h2>
+      <div class="btns"><button id="clr">清空</button></div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+
+  <!-- 学习 -->
+  <section class="card st" id="v-st">
+    <h2>📚 学习计划</h2>
+    <div class="lg"><span class="c-mint">🔁 复习（上午）</span><span class="c-pink">✏️ 做题（下午）</span><span class="c-sky">👀 预习（晚上）</span></div>
+    <div class="chips" id="subs"></div>
+    <div class="row"><span class="msg" id="exl" style="align-self:center;white-space:nowrap"></span><input id="exd" type="date"></div>
+    <div class="row"><input id="sn" placeholder="新增科目，如：历史"><button id="sa">+科目</button></div>
+    <div class="row"><input id="tn" placeholder="加入章节，如：函数与导数"><button id="ta">加入</button></div>
+    <button class="big" id="plan">🪄 一键排进本周课表</button>
+    <div class="msg" id="msg">先选科目，再加入要学的章节～</div>
+    <h2 style="font-size:16px">✅ 本周学习清单</h2><div class="tl" id="wl1"></div>
+    <div class="tl" id="tl"></div>
+  </section>
+
+  <!-- 运动 -->
+  <section class="card st" id="v-sp">
+    <h2>🏃 运动计划</h2>
+    <div class="row"><input id="pn" placeholder="喜欢的运动，如：长跑 / 游泳 / 羽毛球"><button id="pa">加入</button></div>
+    <button class="chip" id="pex" style="align-self:flex-start">🏃 填入长跑示例</button>
+    <div class="tl" id="sl" style="max-height:none"></div>
+    <button class="big" id="pplan">🪄 排进本周课表（学习优先）</button>
+    <div class="msg" id="pmsg">写下现在的成绩和目标，我会排针对性的训练～</div>
+    <h2 style="font-size:16px">✅ 本周训练清单</h2><div class="tl" id="wl2"></div>
+  </section>
+
+  <!-- 提醒 -->
+  <section class="card st" id="v-rm">
+    <h2>⏰ 提醒</h2>
+    <h2 style="font-size:16px">📌 今天的安排</h2><div class="tl" id="wl0"></div>
+    <h2 style="font-size:16px">🔔 我的提醒</h2><div class="tl" id="rml" style="max-height:none"></div>
+    <button class="chip" id="rma" style="align-self:flex-start">＋ 加一条提醒</button>
+    <div class="msg">勾选 = 完成。手机推送通知需要部署成网页应用后才能做 🐱</div>
+  </section>
+
+  <!-- Ai + 记录 -->
+  <section class="bottom">
+    <div class="card ai" id="ai">
+      <div class="bubble" id="bubble">喵～我是你的 AI 小助手！之后我会根据你的作息和精力，帮你把复习排得刚刚好 ✨<br><button class="demo" id="demo">示范：帮我排一周</button></div>
+      <div class="pet">🐱</div><b>Ai</b>
+    </div>
+    <div class="card log">
+      <h2>📝 记录本周特别安排</h2>
+      <input id="inp" hidden><div class="tl" id="lr" style="max-height:130px"></div><div class="row"><button class="chip" id="la">＋ 一条</button><button id="add">排</button></div>
+      <ul id="items" style="max-height:60px"><li class="empty">把这周的临时活动打在这里，我会帮你排进去、挪开冲突～</li></ul>
+    </div>
+  </section>
+</div>
+
+<div class="mask" id="mask"><div class="dlg" onclick="event.stopPropagation()">
+  <h2 id="dt">新增安排</h2>
+  <input id="dn" placeholder="做什么？例如：数学复习" maxlength="20">
+  <div class="mv"><select id="dday"></select><select id="dh"></select></div>
+  <select id="dl"></select>
+  <div class="sw" id="sw"></div>
+  <div class="acts"><button id="dx">取消</button><button class="del" id="dd">删除</button><button class="ok" id="ds">保存</button></div>
+</div></div>
+<script src="js/core.js"></script>
+<script src="js/srs.js"></script>
+<script src="js/timetable.js"></script>
+<script src="js/log.js"></script>
+<script src="js/study.js"></script>
+<script src="js/sport.js"></script>
+<script src="js/remind.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
