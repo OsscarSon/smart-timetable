@@ -11,10 +11,14 @@ js/log.js         记录（逐条）+ 调用 AI 重排（失败则用本地规�
 js/study.js       学习：章节、考试日期、排程
 js/sport.js       运动：现状/目标、训练排程
 js/remind.js      提醒、清单、顶部提示
+js/settings.js    设置：固定课表、课表时间范围、备份/导入
+js/notify.js      网页打开时的通知（提醒 + 活动开始前）
+sw.js             通知用的 service worker
+vercel.json       让后端最多运行 60 秒
 js/app.js         启动与导航
 api/plan.js       后端：把课表交给 Gemini 重排（Vercel Serverless）
 ```
-脚本加载顺序见 index.html 底部（core → srs → timetable → log → study → sport → remind → app），不要打乱。
+脚本加载顺序见 index.html 底部（core → srs → timetable → log → study → sport → remind → settings → notify → app），不要打乱。
 
 ## 部署（免费）
 1. https://aistudio.google.com 申请 Gemini API Key。

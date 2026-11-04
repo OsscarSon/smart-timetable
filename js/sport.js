@@ -34,7 +34,7 @@ document.getElementById('pplan').onclick=function(){
     ty.forEach(function(t){q2.push({n:sp.n,t:t+((run&&foc&&t==='间歇')?'('+foc.k+')':''),long:t==='长距离'||t==='实战'})});
   });
   q2.sort(function(a,b){return (a.long?1:0)-(b.long?1:0)});
-  var d2=todayIdx,ok=0;
+  var d2=startDay(),ok=0;
   q2.slice(0,5).forEach(function(s2){var from=s2.long?Math.max(d2,5):d2;
     for(var k=from;k<7;k++){if(sput(k,s2.long?[17,16,10]:[17,18,16],s2.long?2:1,'🏃 '+s2.n+'·'+s2.t)){d2=k+2;ok++;break}}});
   save();draw();

@@ -39,8 +39,8 @@
     var fresh=ST.topics.filter(function(t){return t.iv===0&&(dleft(t.s)===null||dleft(t.s)>2)});
     var withT=ST.subs.filter(function(s){return ST.topics.some(function(t){return t.s===s})});
     var rot=[];withT.slice().sort(function(a,b){return dd(a)-dd(b)}).forEach(function(s){var D=dleft(s);if(D!==null&&D<=0)return;var r=D===null?1:D<=7?3:D<=14?2:1;for(var k=0;k<r;k++)rot.push(s)});
-    for(var d=todayIdx;d<7;d++){
-      var dn=tn0+d-todayIdx;
+    for(var d=startDay();d<7;d++){
+      var dn=tn0+dayOffset(d);
       var cand=due.filter(function(t){return used.indexOf(t)<0&&t.nx<=dn});
       var pk=cand.filter(function(t){return t.s!==last})[0]||cand[0];
       if(pk&&put(d,[9,10,8],2,'🔁 '+pk.s+'·'+pk.n,'mint')){used.push(pk);last=pk.s;cnt.r++}

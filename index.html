@@ -22,7 +22,7 @@
       <button data-v="sp">🏃 运动</button>
       <button>🌿 健康</button>
       <button data-v="st">📚 学习</button>
-      <button>💗 偏好</button>
+      <button data-v="se">⚙️ 设置</button>
     </div>
     <div class="msg" id="bn" style="margin-top:8px;color:var(--ink)"></div>
   </section>
@@ -30,8 +30,8 @@
   <!-- Timetable -->
   <section class="card tt" id="v-tt">
     <div class="tt-head">
-      <h2>🗓️ 本周课表</h2>
-      <div class="btns"><button id="clr">清空</button></div>
+      <h2 id="wt">🗓️ 本周</h2>
+      <div class="btns"><button id="wp">‹</button><button id="wn0">本周</button><button id="wn">›</button><button id="wcp">复制→下周</button><button id="clr">清空</button></div>
     </div>
     <div class="grid" id="grid"></div>
   </section>
@@ -62,13 +62,29 @@
     <h2 style="font-size:16px">✅ 本周训练清单</h2><div class="tl" id="wl2"></div>
   </section>
 
+  <!-- 设置 -->
+  <section class="card st" id="v-se">
+    <h2>⚙️ 设置</h2>
+    <h2 style="font-size:16px">🏫 固定课表（每周重复，不会被排进别的活动）</h2>
+    <label class="tp"><input type="checkbox" id="fxon"><div class="n">启用固定课表<small>放假时可以先关掉</small></div></label>
+    <div class="tl" id="fxl" style="max-height:none"></div>
+    <div class="row"><button class="chip" id="fxa">＋ 加一节课</button><button class="chip" id="fxw">＋ 周一至周五同一时段</button></div>
+    <h2 style="font-size:16px">🕐 课表时间范围</h2>
+    <div class="mv"><select id="sh0"></select><select id="sh1"></select></div>
+    <h2 style="font-size:16px">💾 备份</h2>
+    <div class="row"><button id="bex">导出备份</button><button id="bim">导入备份</button></div>
+    <input type="file" id="bfile" accept="application/json" hidden>
+    <div class="msg" id="semsg">换手机或清缓存前，先导出备份文件。</div>
+  </section>
+
   <!-- 提醒 -->
   <section class="card st" id="v-rm">
     <h2>⏰ 提醒</h2>
     <h2 style="font-size:16px">📌 今天的安排</h2><div class="tl" id="wl0"></div>
     <h2 style="font-size:16px">🔔 我的提醒</h2><div class="tl" id="rml" style="max-height:none"></div>
     <button class="chip" id="rma" style="align-self:flex-start">＋ 加一条提醒</button>
-    <div class="msg">勾选 = 完成。手机推送通知需要部署成网页应用后才能做 🐱</div>
+    <div class="row"><button id="ntf">🔔 开启通知</button></div>
+    <div class="msg" id="ntmsg">勾选 = 完成。网页要开着才会提醒；真正的后台推送之后再做 🐱</div>
   </section>
 
   <!-- Ai + 记录 -->
@@ -100,6 +116,8 @@
 <script src="js/study.js"></script>
 <script src="js/sport.js"></script>
 <script src="js/remind.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/notify.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

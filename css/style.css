@@ -109,3 +109,7 @@ h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 #items li{background:var(--bg);border-radius:10px;padding:4px 8px}
 #items li.empty{color:var(--soft)}
 .mv{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid .e.fx{background:repeating-linear-gradient(45deg,var(--line),var(--line) 6px,var(--bg) 6px,var(--bg) 12px);color:var(--soft);cursor:default;box-shadow:none;font-weight:600}
+.grid .h small{display:block;font-size:9px;opacity:.85;line-height:1}
+.grid .h{height:36px;align-content:center}
+.tt-head{flex-wrap:wrap;gap:6px}

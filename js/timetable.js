@@ -1,7 +1,8 @@
+  function wtitle(){var a=wkDay(curW,0),b=wkDay(curW,6);document.getElementById('wt').textContent='🗓️ '+(curW===thisW?'本周 ':curW===thisW+1?'下周 ':curW===thisW-1?'上周 ':'')+a.m+'/'+a.d+'–'+b.m+'/'+b.d}
   function draw(){
-    grid.innerHTML='';
+    wtitle();grid.innerHTML='';
     var c=document.createElement('div');c.className='h';grid.appendChild(c);
-    DAYS.forEach(function(n,i){var e=document.createElement('div');e.className='h'+(i===todayIdx?' today':'');e.textContent=n;grid.appendChild(e)});
+    DAYS.forEach(function(n,i){var e=document.createElement('div');e.className='h'+(curW===thisW&&i===todayIdx?' today':'');e.appendChild(document.createTextNode(n));var sm=document.createElement('small'),wd=wkDay(curW,i);sm.textContent=wd.m+'/'+wd.d;e.appendChild(sm);grid.appendChild(e)});
     for(var h=H0;h<H1;h++){
       var t=document.createElement('div');t.className='tm';t.textContent=h+':00';t.style.gridRow=(h-H0+2);t.style.gridColumn=1;grid.appendChild(t);
       for(var k=0;k<7;k++){(function(k,h){
@@ -12,6 +13,11 @@
       var b=document.createElement('button');b.className='e c-'+x.c+(DN[kk(x)]?' dn':'');b.textContent=x.t;
       b.style.gridColumn=x.day+2;b.style.gridRow=(x.h-H0+2)+' / span '+x.len;
       b.onclick=function(){openDlg(x,false)};grid.appendChild(b)});
+    if(SET.fx)FX.forEach(function(x){
+      if(x.h+x.len<=H0||x.h>=H1)return;
+      var s=Math.max(x.h,H0),e2=Math.min(x.h+x.len,H1),b=document.createElement('button');b.className='e fx';b.textContent='🏫 '+x.t;
+      b.style.gridColumn=x.day+2;b.style.gridRow=(s-H0+2)+' / span '+(e2-s);
+      b.onclick=function(){alert('这是固定课表，到“设置”里修改')};grid.appendChild(b)});
     if(typeof rf==='function')rf();
   }
   var mask=document.getElementById('mask'),dn=document.getElementById('dn'),dl=document.getElementById('dl'),sw=document.getElementById('sw');
@@ -50,3 +56,14 @@
       data.push({day:k,h:p[0],len:p[1],t:p[2],c:p[3]})});
     save();draw();
   };
+  // ---- 切换周 ----
+  function go2(w){gotoWeek(w);draw()}
+  document.getElementById('wp').onclick=function(){go2(curW-1)};
+  document.getElementById('wn').onclick=function(){go2(curW+1)};
+  document.getElementById('wn0').onclick=function(){go2(thisW)};
+  document.getElementById('wcp').onclick=function(){
+    var nx=curW+1;if((WK[nx]||[]).length&&!confirm('下一周已有安排，要追加复制进去吗？'))return;
+    WK[nx]=WK[nx]||[];
+    data.forEach(function(x){var y={day:x.day,h:x.h,len:x.len,t:x.t,c:x.c};if(x.a)y.a=x.a;
+      if(!WK[nx].some(function(z){return z.day===y.day&&z.h===y.h&&z.t===y.t}))WK[nx].push(y)});
+    save();go2(nx)};

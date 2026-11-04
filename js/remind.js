@@ -3,11 +3,12 @@
   var RM=[],LG=[{t:'',d:0}];
   try{RM=JSON.parse(localStorage.getItem('mochi-rm')||'[]');var l0=JSON.parse(localStorage.getItem('mochi-lg')||'null');if(l0&&l0.length)LG=l0}catch(e){}
   function put2(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
-  function wl(box,flt){
-    box.innerHTML='';var L=data.filter(flt).sort(function(a,b){return a.day-b.day||a.h-b.h});
+  function wl(box,flt,list,w){
+    var ww=w===undefined?curW:w;
+    box.innerHTML='';var L=(list||data).filter(flt).sort(function(a,b){return a.day-b.day||a.h-b.h});
     if(!L.length){box.appendChild(el('div','msg','还没有安排～'));return}
-    L.forEach(function(x,i){var r=el('label','tp'),cb=el('input');cb.type='checkbox';cb.checked=!!DN[kk(x)];
-      cb.onchange=function(){if(cb.checked)DN[kk(x)]=1;else delete DN[kk(x)];put2('mochi-dn',DN);draw()};
+    L.forEach(function(x,i){var r=el('label','tp'),cb=el('input');cb.type='checkbox';cb.checked=!!DN[kk(x,ww)];
+      cb.onchange=function(){if(cb.checked)DN[kk(x,ww)]=1;else delete DN[kk(x,ww)];put2('mochi-dn',DN);draw()};
       var n=el('div','n',(i+1)+'. 周'+DAYS[x.day]+' '+x.h+':00 '+x.t);if(cb.checked)n.style.textDecoration='line-through';
       r.appendChild(cb);r.appendChild(n);box.appendChild(r)});
   }
@@ -25,11 +26,11 @@
   }
   document.getElementById('rma').onclick=function(){RM.push({t:'',day:todayIdx,tm:'',d:false});put2('mochi-rm',RM);rRm()};
   function bnr(){
-    var n=data.filter(function(x){return x.day===todayIdx&&!DN[kk(x)]}).length+RM.filter(function(m){return !m.d&&+m.day===todayIdx}).length;
+    var n=thisEvents().filter(function(x){return x.day===todayIdx&&!DN[kk(x,thisW)]}).length+RM.filter(function(m){return !m.d&&+m.day===todayIdx}).length;
     var now=pad2(new Date().getHours())+':'+pad2(new Date().getMinutes());
     var od=RM.filter(function(m){return !m.d&&+m.day===todayIdx&&m.tm&&m.tm<=now})[0];
     var ne=nearestExam(),ex=ne?'　📅 '+ne.s+'考试剩 '+ne.d+' 天':'';
     document.getElementById('bn').textContent=(od?'⏰ 该做啦：'+od.t:(n?'📌 今天还有 '+n+' 件事要完成，加油！':'🎉 今天的事都完成啦！'))+ex;
   }
   function pad2(x){return String(x).padStart(2,'0')}
-  rf=function(){wl(document.getElementById('wl0'),function(x){return x.day===todayIdx});wl(document.getElementById('wl1'),function(x){return x.a===1});wl(document.getElementById('wl2'),function(x){return x.a===2});bnr()};
+  rf=function(){wl(document.getElementById('wl0'),function(x){return x.day===todayIdx},thisEvents(),thisW);wl(document.getElementById('wl1'),function(x){return x.a===1});wl(document.getElementById('wl2'),function(x){return x.a===2});bnr()};
