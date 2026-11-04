@@ -60,15 +60,22 @@
     var txt=inp.value.trim();if(!txt)return;
     addBtn.disabled=true;addBtn.textContent='…';
     try{
-      var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},60000);
-      var r=await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
-        body:JSON.stringify({text:txt,events:data,today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,fixed:fixedForAI(),hidden:DAYS.filter(function(n,i){return hiddenDay(i)}).map(function(n){return '周'+n}),week:isoOf(wsDn(curW))+' 起的一周（一周从周'+DAYS[SET.ws]+'开始，列顺序：'+visDays().map(function(i){return DAYS[i]}).join('')+'）',homework:(typeof hwPending==='function'?hwPending():[])})});
-      clearTimeout(tm);
-      if(!r.ok){var ej={};try{ej=await r.json()}catch(x){}throw new Error(r.status+' '+(ej.error||''))}
-      var j=await r.json(),ev=clean(j.events);
+      var body={text:txt,events:data,today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,fixed:fixedForAI(),hidden:DAYS.filter(function(n,i){return hiddenDay(i)}).map(function(n){return '周'+n}),week:isoOf(wsDn(curW))+' 起的一周（一周从周'+DAYS[SET.ws]+'开始，列顺序：'+visDays().map(function(i){return DAYS[i]}).join('')+'）',homework:(typeof hwPending==='function'?hwPending():[])},j,viaLocal=false;
+      try{
+        var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},60000);
+        var r=await fetch(((window.MOCHI_CFG&&MOCHI_CFG.apiBase)||'')+'/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,body:JSON.stringify(body)});
+        clearTimeout(tm);
+        if(!r.ok){var ej={};try{ej=await r.json()}catch(x){}throw new Error(r.status+' '+(ej.error||''))}
+        j=await r.json();
+      }catch(e1){        // 后端不可用 / 没 key / 超额：试试浏览器内置 AI（免 key）
+        if(!(window.LocalAI&&await LocalAI.status()!=='no'))throw e1;
+        say('🧠 云端 AI 不可用，改用浏览器内置 AI（第一次可能要先下载模型）…');
+        try{j=await LocalAI.plan(body,function(p){say('⬇️ 正在下载内置 AI 模型 '+p+'%')});viaLocal=true}
+        catch(e2){throw new Error(String(e1.message||e1).slice(0,60)+'；内置 AI 也失败：'+String(e2.message||e2).slice(0,60))}}
+      var ev=clean(j.events);
       if(!ev)throw new Error('AI 的结果排到了固定时段/隐藏的日子，或格式不对');
       data=ev;save();draw();
-      say('🤖 AI 已重排');(j.notes||[]).slice(0,4).forEach(function(n){say('💡 '+String(n).slice(0,60))});
+      say(viaLocal?'🧠 内置 AI 已重排（小模型，请检查一下结果）':'🤖 AI 已重排');(j.notes||[]).slice(0,4).forEach(function(n){say('💡 '+String(n).slice(0,60))});
     }catch(e){
       say('🔌 AI 未连接（'+(e.name==='AbortError'?'等了 60 秒没回应':String(e.message||e).slice(0,160))+'），先用本地规则排');
       local(txt);

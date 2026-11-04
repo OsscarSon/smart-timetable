@@ -47,7 +47,7 @@ function rFx(){
   FX.slice().sort(function(a,b){return ((a.day-SET.ws+7)%7)-((b.day-SET.ws+7)%7)||a.s-b.s}).forEach(function(x){
     var r=el('div','tp'),n=el('div','n'),pl=perLabel(x.s,x.e);
     n.appendChild(el('div',null,'周'+DAYS[x.day]+' '+tmin(x.s)+'–'+tmin(x.e)+(pl?'（'+pl+'）':'')+' '+(x.type==='考试'?'📝 ':'')+x.t));
-    var sm=[x.room,x.teacher,x.type!=='课'?x.type:'',(x.wk&&x.wk.length)?'第 '+x.wk.join('、')+' 周':''].filter(Boolean).join(' · ');
+    var sm=[(x.bld||'')+(x.room||''),x.teacher,x.type!=='课'?x.type:'',(x.wk&&x.wk.length)?'第 '+x.wk.join('、')+' 周':'',(x.d0!=null||x.d1!=null)?(x.d0!=null?isoOf(x.d0):'…')+' ~ '+(x.d1!=null?isoOf(x.d1):'…'):'',(x.lk&&x.lk.length)?'🔗'+x.lk.length:'',(x.fl&&x.fl.length)?'📎'+x.fl.length:''].filter(Boolean).join(' · ');
     if(sm)n.appendChild(el('small',null,sm));
     n.style.cursor='pointer';n.onclick=function(){openLesson(x)};
     var dl2=el('button',null,'×');dl2.onclick=function(){if(!confirm('删除「'+x.t+'」？'))return;FX=FX.filter(function(z){return z!==x});fxSave();rFx();draw()};
@@ -60,7 +60,45 @@ document.getElementById('fxon').onchange=function(){SET.fx=this.checked;put2('mo
 // ---- 课程弹窗 ----
 var LS={cur:null,days:[],wks:[],col:'sky'},lm=document.getElementById('mask2');
 var lsn=document.getElementById('lsn'),lsp0=document.getElementById('lsp0'),lsp1=document.getElementById('lsp1'),lst0=document.getElementById('lst0'),lst1=document.getElementById('lst1');
-var lsrm=document.getElementById('lsrm'),lstc=document.getElementById('lstc'),lsty=document.getElementById('lsty');
+var lsrm=document.getElementById('lsrm'),lstc=document.getElementById('lstc'),lsty=document.getElementById('lsty'),lsbld=document.getElementById('lsbld'),
+    lsd0=document.getElementById('lsd0'),lsd1=document.getElementById('lsd1'),lstp=document.getElementById('lstp');
+var LK=[],FL=[],NEWF=[],TMP='';                      // 编辑中的链接 / 文件 / 新传的文件（取消时要清掉）/ 临时 id
+function fileUsed(id,except){return FX.some(function(z){return z!==except&&(z.fl||[]).some(function(f){return f.id===id})})}
+function rLk(){
+  var box=document.getElementById('lkl');box.innerHTML='';document.getElementById('lkc').textContent=LK.length?LK.length:'';
+  if(!LK.length)box.appendChild(el('div','msg','还没有链接'));
+  LK.forEach(function(u,i){var r=el('div','tp'),n=el('div','n'),a=el('a',null,u);a.href=u;a.target='_blank';a.rel='noopener';n.appendChild(a);
+    var x=el('button',null,'×');x.onclick=function(){LK.splice(i,1);rLk()};r.appendChild(n);r.appendChild(x);box.appendChild(r)})}
+document.getElementById('lka').onclick=function(){
+  var i=document.getElementById('lki'),u=i.value.trim();if(!u)return;
+  if(!/^https?:\/\//i.test(u))u='https://'+u;if(LK.length>=10||LK.indexOf(u)>=0){i.value='';return}
+  LK.push(u.slice(0,300));i.value='';rLk()};
+function rFl(){
+  var box=document.getElementById('fll');box.innerHTML='';document.getElementById('flc').textContent=FL.length?FL.length:'';
+  if(!FL.length)box.appendChild(el('div','msg','还没有文件'));
+  FL.forEach(function(m,i){var r=el('div','tp'),n=el('div','n',(/^image\//.test(m.type)?'🖼️ ':'📄 ')+m.name);n.appendChild(el('small',null,fmtSize(m.size)));
+    n.style.cursor='pointer';n.onclick=function(){fileOpen(m,TMP)};
+    var x=el('button',null,'×');x.onclick=function(){FL.splice(i,1);var k=NEWF.indexOf(m.id);if(k>=0){NEWF.splice(k,1);fileDel(m.id)}rFl()};
+    r.appendChild(n);r.appendChild(x);box.appendChild(r)})}
+document.getElementById('lsfi').onchange=async function(){
+  var fs=[].slice.call(this.files),msg=document.getElementById('flm');this.value='';
+  for(var i=0;i<fs.length;i++){
+    if(FL.length>=8){msg.textContent='最多 8 个文件';break}
+    try{msg.textContent='正在添加「'+fs[i].name+'」…';var m=await fileAdd(TMP,fs[i]);FL.push(m);NEWF.push(m.id);rFl();msg.textContent=''}
+    catch(e){msg.textContent=String(e.message||e)}}};
+function togglePanel(btn,pn){btn.onclick=function(){var on=document.getElementById(pn).style.display==='none';document.getElementById(pn).style.display=on?'':'none'}}
+togglePanel(document.getElementById('lklb'),'lkp');togglePanel(document.getElementById('flb'),'flp');
+// 模板：存下科目 / 类型 / 楼栋 / 教室 / 老师 / 颜色 / 链接，下次一键套用
+function tpls(){return lget('mochi-tpl',[])}
+function rTp(){lstp.innerHTML='';var o=el('option',null,'不使用模板');o.value='';lstp.appendChild(o);
+  tpls().forEach(function(t,i){var q=el('option',null,t.t+(t.room||t.bld?' · '+(t.bld||'')+(t.room||''):''));q.value=i;lstp.appendChild(q)})}
+lstp.onchange=function(){var t=tpls()[+lstp.value];if(!t)return;
+  lsn.value=t.t;lsty.value=t.type||'课';lsbld.value=t.bld||'';lsrm.value=t.room||'';lstc.value=t.teacher||'';LK=(t.lk||[]).slice();LS.col=t.c||LS.col;lsPaint();rLk()};
+document.getElementById('lstps').onclick=function(){
+  var t=lsn.value.trim();if(!t){lsn.focus();return}
+  var L=tpls().filter(function(x){return x.t!==t});
+  L.unshift({t:t.slice(0,20),type:lsty.value,bld:lsbld.value.trim().slice(0,20),room:lsrm.value.trim().slice(0,20),teacher:lstc.value.trim().slice(0,20),c:LS.col,lk:LK.slice()});
+  put2('mochi-tpl',L.slice(0,20));rTp();lstp.value='0'};
 TYPES.forEach(function(t){var o=el('option',null,t);o.value=t;lsty.appendChild(o)});
 COLS.forEach(function(n){var i=el('i','c-'+n);i.onclick=function(){LS.col=n;lsPaint()};document.getElementById('lssw').appendChild(i)});
 function lsPaint(){[].forEach.call(document.getElementById('lssw').children,function(i,x){i.classList.toggle('on',COLS[x]===LS.col)})}
@@ -80,7 +118,10 @@ function openLesson(x,preDay){
   LS.cur=x||null;LS.col=x?x.c:COLS[FX.length%COLS.length];
   lsFillPer();
   document.getElementById('lst').textContent=x?'修改课程':'添加课程';
-  lsn.value=x?x.t:'';lsrm.value=x?x.room:'';lstc.value=x?x.teacher:'';lsty.value=x?x.type:'课';
+  lsn.value=x?x.t:'';lsrm.value=x?x.room:'';lstc.value=x?x.teacher:'';lsty.value=x?x.type:'课';lsbld.value=x&&x.bld?x.bld:'';
+  lsd0.value=x&&x.d0!=null?isoOf(x.d0):'';lsd1.value=x&&x.d1!=null?isoOf(x.d1):'';
+  LK=x&&x.lk?x.lk.slice():[];FL=x&&x.fl?x.fl.slice():[];NEWF=[];TMP=x?x.id:uid();rLk();rFl();rTp();
+  document.getElementById('lkp').style.display=LK.length?'':'none';document.getElementById('flp').style.display=FL.length?'':'none';document.getElementById('flm').textContent='';
   var def=TT.per[0]||{s:480,e:525};
   lst0.value=min2t(x?x.s:def.s);lst1.value=min2t(x?x.e:def.e);
   var ab=perIdx(x?x.s:def.s,x?x.e:def.e);lsp0.value=ab[0];lsp1.value=ab[1];
@@ -92,23 +133,27 @@ function openLesson(x,preDay){
   document.getElementById('lsww').style.display=TT.cyc>1?'':'none';
   chipSet(document.getElementById('lsw'),wItems,LS.wks,false);
   document.getElementById('lsdel').style.display=x?'':'none';
-  lsPaint();lm.classList.add('show');setTimeout(function(){lsn.focus()},50)}
-function closeLesson(){lm.classList.remove('show')}
-lm.onclick=closeLesson;document.getElementById('lsx').onclick=closeLesson;
+  lsPaint();lm.classList.add('show');lm.scrollTop=0;if(!x)setTimeout(function(){lsn.focus()},50)}
+function closeLesson(keep){lm.classList.remove('show');if(!keep)NEWF.forEach(function(id){fileDel(id)});NEWF=[]}
+lm.onclick=function(){};document.getElementById('lsx').onclick=function(){closeLesson()};
 document.getElementById('lsdel').onclick=function(){
   if(!LS.cur||!confirm('删除「'+LS.cur.t+'」？'))return;
-  FX=FX.filter(function(z){return z!==LS.cur});fxSave();closeLesson();rFx();draw()};
+  var gone=LS.cur;FX=FX.filter(function(z){return z!==gone});(gone.fl||[]).forEach(function(f){if(!fileUsed(f.id))fileDel(f.id)});fxSave();closeLesson(true);rFx();draw()};
 document.getElementById('lsok').onclick=function(){
   var t=lsn.value.trim(),s=t2min(lst0.value),e=t2min(lst1.value);
   if(!t){lsn.focus();return}
   if(isNaN(s)||isNaN(e)||e<=s){alert('请填好开始和结束时间（结束要晚于开始）');return}
   if(!LS.days.length){alert('请至少选一天');return}
   var wk2=(TT.cyc>1&&LS.wks.length&&LS.wks.length<TT.cyc)?LS.wks.slice().sort():null;
-  var base={t:t.slice(0,20),s:s,e:e,room:lsrm.value.trim().slice(0,20),teacher:lstc.value.trim().slice(0,20),type:lsty.value,wk:wk2,c:LS.col};
-  var x=LS.cur,days=LS.days.slice();
+  var d0=lsd0.value?dnFromIso(lsd0.value):null,d1=lsd1.value?dnFromIso(lsd1.value):null;
+  if(d0!=null&&d1!=null&&d1<d0){alert('结束日期不能早于开始日期');return}
+  var base={t:t.slice(0,20),s:s,e:e,room:lsrm.value.trim().slice(0,20),bld:lsbld.value.trim().slice(0,20),teacher:lstc.value.trim().slice(0,20),type:lsty.value,wk:wk2,c:LS.col,
+    d0:d0,d1:d1,lk:LK.slice(),fl:FL.slice()};
+  var x=LS.cur,days=LS.days.slice(),oldFl=x&&x.fl?x.fl.slice():[];
   if(x&&days.indexOf(x.day)>0){days.splice(days.indexOf(x.day),1);days.unshift(x.day)}   // 原来那天优先更新原课程
   days.forEach(function(dv,i){
     if(x&&i===0){for(var k in base)x[k]=base[k];x.day=dv}
     else{var o={id:uid(),day:dv};for(var k2 in base)o[k2]=base[k2];FX.push(o)}});
-  fxSave();closeLesson();rFx();draw()};
+  oldFl.forEach(function(f){if(!FL.some(function(g){return g.id===f.id})&&!fileUsed(f.id))fileDel(f.id)});   // 编辑时被移除的旧文件，没人用了就删
+  fxSave();closeLesson(true);rFx();draw()};
 document.getElementById('fxa').onclick=function(){openLesson(null)};

@@ -3,7 +3,7 @@
 var HW=lget(K_HW,[]);
 var HF={st:'todo',sb:'',q:''};            // st: todo 待办 / all 全部 / done 已完成
 function hwSave(){put2(K_HW,HW)}
-function safeUrl(s){                      // 只允许 http(s)，防止 javascript: 之类的链接
+function safeUrl(s){                      // 只允许 http(s)，其他协议的链接一律丢弃
   s=String(s||'').trim();if(!s)return '';
   try{var u=new URL(/^[a-z][a-z0-9+.-]*:/i.test(s)?s:'https://'+s);return /^https?:$/.test(u.protocol)?u.href:''}catch(e){return ''}}
 function subjCol(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return COLS[h%COLS.length]}
@@ -12,7 +12,7 @@ function subjList(){
   (typeof ST!=='undefined'?ST.subs:[]).forEach(add);FX.forEach(function(x){add(x.t)});HW.forEach(function(h){add(h.sb)});return o}
 function dueLabel(iso){
   var dn=dnFromIso(iso),df=dn-todayDn,x=dnDate(dn);
-  return x.m+'/'+x.d+' 周'+DAYS[x.wd]+(df===0?' · 今天':df===1?' · 明天':df===-1?' · 昨天':df>1&&df<=14?' · '+df+' 天后':'')}
+  return dfmt(dn,'M/D')+' 周'+DAYS[x.wd]+(df===0?' · 今天':df===1?' · 明天':df===-1?' · 昨天':df>1&&df<=14?' · '+df+' 天后':'')}
 function hwDue(){var t=isoOf(todayDn),r={over:0,today:0};HW.forEach(function(h){if(h.done||!h.due)return;if(h.due<t)r.over++;else if(h.due===t)r.today++});return r}
 function hwPending(){                     // 给 AI 排程用：没做完的作业
   return HW.filter(function(h){return !h.done}).slice(0,20).map(function(h){return {t:h.t,sb:h.sb||'',due:h.due||''}})}
@@ -29,6 +29,7 @@ function hwRow(h){
   if(h.sb)ti.appendChild(el('span','tag c-'+subjCol(h.sb),h.sb));
   var tx=el('span',null,h.t);if(h.done)tx.style.textDecoration='line-through';ti.appendChild(tx);n.appendChild(ti);
   if(h.note)n.appendChild(el('small',null,h.note.length>70?h.note.slice(0,70)+'…':h.note));
+  if(h.att&&h.att.length)n.appendChild(el('small',null,'📎 '+h.att.length+' 个附件'));
   n.style.cursor='pointer';n.onclick=function(){openHw(h)};
   r.appendChild(cb);r.appendChild(n);
   var u=safeUrl(h.link);if(u){var a=el('a','lk','🔗');a.href=u;a.target='_blank';a.rel='noopener noreferrer';a.title=u;r.appendChild(a)}
@@ -58,22 +59,41 @@ document.getElementById('hwq').oninput=function(){HF.q=this.value.trim();rHw()};
 
 // ---- 弹窗 ----
 var hm5=document.getElementById('mask5'),hwn=document.getElementById('hwn'),hwsb=document.getElementById('hwsb'),hwdu=document.getElementById('hwdu'),hwno=document.getElementById('hwno'),hwli=document.getElementById('hwli');
-var HC=null;
+var HC=null,HAT=[],HNEW=[],HRM=[],HWID='';
+var hwat=document.getElementById('hwat'),hwfi=document.getElementById('hwfi'),hwam=document.getElementById('hwam');
+function rAt(){
+  hwat.innerHTML='';
+  HAT.forEach(function(m,i){
+    var b=el('button','chip',(/^image\//.test(m.type)?'🖼 ':'📄 ')+m.name+' · '+fmtSize(m.size));
+    b.onclick=function(){fileOpen(m,HWID)};
+    var u=el('u',null,'×');u.onclick=function(e){e.stopPropagation();HAT.splice(i,1);
+      var k=HNEW.indexOf(m.id);if(k>=0){HNEW.splice(k,1);fileDel(m.id)}else HRM.push(m.id);rAt()};
+    b.appendChild(u);hwat.appendChild(b)});
+  hwam.textContent=fileOK()?'':'附件功能没加载（缺少 Dexie 库，检查网络）'}
+hwfi.onchange=async function(){
+  var fs=[].slice.call(hwfi.files);hwfi.value='';
+  for(var i=0;i<fs.length;i++){
+    try{hwam.textContent='处理中…';var m=await fileAdd(HWID,fs[i]);HAT.push(m);HNEW.push(m.id)}
+    catch(e){alert(String(e.message||e))}}
+  rAt()};
+function hwCancel(){HNEW.forEach(fileDel);HNEW=[];closeHw()}   // 取消：这次新加的文件也删掉
 [['今天',0],['明天',1],['下周同一天',7]].forEach(function(p){var b=el('button','chip',p[0]);b.onclick=function(){hwdu.value=isoOf(todayDn+p[1])};document.getElementById('hwqd').appendChild(b)});
 var noDue=el('button','chip','不设截止');noDue.onclick=function(){hwdu.value=''};document.getElementById('hwqd').appendChild(noDue);
 function openHw(h){
   HC=h||null;document.getElementById('hwt').textContent=h?'修改作业':'新作业';
+  HWID=h?h.id:uid();HAT=h&&h.att?h.att.slice():[];HNEW=[];HRM=[];rAt();
   hwn.value=h?h.t:'';hwsb.value=h?(h.sb||''):(HF.sb||'');hwdu.value=h?(h.due||''):isoOf(todayDn+1);hwno.value=h?(h.note||''):'';hwli.value=h?(h.link||''):'';
   var dl3=document.getElementById('hwsl');dl3.innerHTML='';subjList().forEach(function(s){var o=document.createElement('option');o.value=s;dl3.appendChild(o)});
   document.getElementById('hwd').style.display=h?'':'none';
   hm5.classList.add('show');setTimeout(function(){hwn.focus()},50)}
 function closeHw(){hm5.classList.remove('show')}
-hm5.onclick=closeHw;document.getElementById('hwx').onclick=closeHw;
+hm5.onclick=hwCancel;document.getElementById('hwx').onclick=hwCancel;
 document.getElementById('hwa').onclick=function(){openHw(null)};
-document.getElementById('hwd').onclick=function(){if(!HC||!confirm('删除这条作业？'))return;HW=HW.filter(function(z){return z!==HC});hwSave();closeHw();rHw();if(typeof bnr==='function')bnr()};
+document.getElementById('hwd').onclick=function(){if(!HC||!confirm('删除这条作业？'))return;(HC.att||[]).forEach(function(a){fileDel(a.id)});HNEW.forEach(fileDel);HNEW=[];HW=HW.filter(function(z){return z!==HC});hwSave();closeHw();rHw();if(typeof bnr==='function')bnr()};
 document.getElementById('hwok').onclick=function(){
   var t=hwn.value.trim();if(!t){hwn.focus();return}
   var lk=hwli.value.trim();if(lk&&!safeUrl(lk)){alert('链接要以 http:// 或 https:// 开头（或直接写网址）');return}
-  var o=HC||{id:uid(),done:0,ts:Date.now()};
+  var o=HC||{id:HWID,done:0,ts:Date.now()};
   o.t=t.slice(0,60);o.sb=hwsb.value.trim().slice(0,12);o.due=hwdu.value||'';o.note=hwno.value.trim().slice(0,300);o.link=lk;
-  if(!HC)HW.push(o);hwSave();closeHw();rHw();if(typeof bnr==='function')bnr()};
+  o.att=HAT.slice();if(!o.att.length)delete o.att;HRM.forEach(fileDel);HNEW=[];HRM=[];
+  if(!HC)HW.push(o);hwSave();closeHw();if(window.fileFlush)fileFlush();rHw();if(typeof bnr==='function')bnr()};

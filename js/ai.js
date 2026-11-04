@@ -81,7 +81,7 @@
         c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
         c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
         var d=c.toDataURL('image/jpeg',.82);res(d.slice(d.indexOf(',')+1))};
-      im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('这张图片打不开'))};im.src=u})}
+      im.addEventListener('error',function(){URL.revokeObjectURL(u);rej(new Error('这张图片打不开'))});im.src=u})}
   function renderPhoto(notes){
     list.innerHTML='';
     if(!ST.items.length){say(notes.join(' ')||'没识别到课程，换一张更清晰的试试～');ok.style.display='none';rw.style.display='none';return}
@@ -119,7 +119,7 @@
     var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
     rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;q.value=(base+t).slice(0,300)};
     rec.onend=function(){rec=null;mic.textContent='🎤 语音';mic.classList.remove('rec');if(q.value.trim()&&!ST.busy)say('说完了？点「解析」。')};
-    rec.onerror=function(e){say(e.error==='not-allowed'?'没有麦克风权限，请在浏览器里允许':'语音识别失败：'+e.error)};
+    rec.addEventListener('error',function(e){say(e.error==='not-allowed'?'没有麦克风权限，请在浏览器里允许':'语音识别失败：'+e.error)});
     try{rec.start();mic.textContent='⏹ 停止';mic.classList.add('rec');say('在听…')}catch(e){rec=null}};
   window.openAI=openAI;
 })();
