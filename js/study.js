@@ -5,7 +5,7 @@
   ST.ex=ST.ex||{};
   function sv(){try{localStorage.setItem('mochi-st',JSON.stringify(ST))}catch(e){}}
   var tn0=todayDn;
-  function fmt(n){var x=new Date(n*864e5+(new Date().getTimezoneOffset()*6e4));return (x.getMonth()+1)+'/'+x.getDate()}
+  function fmt(n){return dfmt(n,'M/D')}
   function rSt(){
     var sb=document.getElementById('subs');sb.innerHTML='';
     var cs=ST.subs[sel];document.getElementById('exl').textContent=cs?'📅 '+cs+' 考试日':'';document.getElementById('exd').value=(ST.ex&&ST.ex[cs])||'';
@@ -23,9 +23,9 @@
       var d=el('button',null,'🗑');d.onclick=function(){ST.topics=ST.topics.filter(function(x){return x!==t});sv();rSt()};r.appendChild(d);
       tl.appendChild(r)});
   }
-  function rate(t,g){ // 简易间隔算法（之后换成 FSRS）
-    t.iv=nextInterval(t.iv,g,dleft(t.s));
-    t.nx=tn0+t.iv;sv();rSt();
+  function rate(t,g){ // FSRS（ts-fsrs）；没加载到则用简易算法，见 srs.js
+    srsRate(t,g,dleft(t.s),tn0);
+    sv();rSt();
     document.getElementById('msg').textContent=g===0?'没关系，明天再来一次 💪':'下次复习：'+fmt(t.nx)+' ✨';
   }
   document.getElementById('sa').onclick=function(){var i=document.getElementById('sn'),v=i.value.trim();if(v&&ST.subs.indexOf(v)<0){ST.subs.push(v);sel=ST.subs.length-1;sv();rSt()}i.value=''};
@@ -53,7 +53,7 @@
     document.getElementById('msg').textContent=(cnt.r+cnt.q+cnt.p)?'已排好：复习 '+cnt.r+'、做题 '+cnt.q+'、预习 '+cnt.p+' 个时段'+(nearestExam()?'；'+nearestExam().s+'考试还有 '+nearestExam().d+' 天，已加强':'')+'，去时间表看看吧 🐱':'没有可排的内容，先加入章节吧～';
   };
   // ---- 考试日期 ----
-  function dleft(s){var v=ST.ex&&ST.ex[s];if(!v)return null;var p=v.split('-'),e=new Date(+p[0],+p[1]-1,+p[2]),t=new Date();t=new Date(t.getFullYear(),t.getMonth(),t.getDate());var n=Math.round((e-t)/864e5);return n<0?null:n}
+  function dleft(s){var v=ST.ex&&ST.ex[s];if(!v||!isoValid(v))return null;var n=dnFromIso(v)-todayDn;return n<0?null:n}
   function dd(s){var x=dleft(s);return x===null?999:x}
   function nearestExam(){var b=null;ST.subs.forEach(function(s){var x=dleft(s);if(x!==null&&(!b||x<b.d))b={s:s,d:x}});return b}
   document.getElementById('exd').onchange=function(){var cs=ST.subs[sel];if(!cs)return;ST.ex=ST.ex||{};if(this.value)ST.ex[cs]=this.value;else delete ST.ex[cs];sv();rSt()};
