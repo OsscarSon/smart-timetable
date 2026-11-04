@@ -18,6 +18,7 @@
     </div>
     <div class="nav">
       <button class="on" data-v="tt">📅 时间表</button>
+      <button data-v="hw">📝 作业</button>
       <button data-v="rm">⏰ 提醒</button>
       <button data-v="sp">🏃 运动</button>
       <button>🌿 健康</button>
@@ -30,12 +31,23 @@
   <!-- Timetable -->
   <section class="card tt" id="v-tt">
     <div class="tt-head">
-      <h2 id="wt">🗓️ 本周</h2>
+      <h2 id="wt" title="点一下可以跳到某一天">🗓️ 本周</h2>
+      <select id="ttsel" class="ttsel" aria-label="切换课表"></select>
+      <input type="date" id="wjump" class="wjump" tabindex="-1" aria-hidden="true">
       <div class="btns"><button id="wp">‹</button><button id="wn0">本周</button><button id="wn">›</button><button id="wcp">复制→下周</button><button id="clr">清空</button></div>
     </div>
     <div class="grid" id="grid"></div>
   </section>
 
+
+  <!-- 作业 -->
+  <section class="card st" id="v-hw">
+    <h2>📝 作业与任务</h2>
+    <div class="row"><input id="hwq" type="search" placeholder="🔍 搜索标题、科目、备注"></div>
+    <div class="chips" id="hwf"></div>
+    <button class="big" id="hwa">＋ 新作业</button>
+    <div class="tl" id="hwl" style="max-height:none"></div>
+  </section>
 
   <!-- 学习 -->
   <section class="card st" id="v-st">
@@ -65,12 +77,38 @@
   <!-- 设置 -->
   <section class="card st" id="v-se">
     <h2>⚙️ 设置</h2>
+
+    <h2 style="font-size:16px">🎨 外观</h2>
+    <div class="chips" id="thm"></div>
+    <div class="swatches" id="acc"></div>
+
+    <h2 style="font-size:16px">📅 日历</h2>
+    <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
+    <label class="tp"><input type="checkbox" id="hwk"><div class="n">隐藏周末<small>课表只显示周一到周五</small></div></label>
+    <label class="tp"><input type="checkbox" id="h24"><div class="n">24 小时制<small>关闭后显示 8am / 2pm</small></div></label>
+    <div class="mv"><select id="sh0"></select><select id="sh1"></select></div>
+
+    <h2 style="font-size:16px">🗂️ 我的课表</h2>
+    <div class="tl" id="ttl" style="max-height:none"></div>
+    <div class="row"><button class="chip" id="tta">＋ 新建课表</button><button class="chip" id="wzr">🪄 重新运行向导</button></div>
+    <div class="msg">例如：学校、运动、备考各一个。当前课表：<b id="ttn"></b>。每个课表的安排、固定课、重复活动、作业都是分开的。</div>
+
     <h2 style="font-size:16px">🏫 固定课表（每周重复，不会被排进别的活动）</h2>
     <label class="tp"><input type="checkbox" id="fxon"><div class="n">启用固定课表<small>放假时可以先关掉</small></div></label>
+    <div class="mv"><select id="cyc"></select><select id="cyw"></select></div>
+    <h2 style="font-size:14px">⏱ 节次时间</h2>
+    <div class="tl" id="perl" style="max-height:none"></div>
+    <div class="gen">
+      <label>首节开始<input type="time" id="g0" value="08:00"></label>
+      <label>每节(分)<input type="number" id="g1" value="45" min="15" max="180"></label>
+      <label>课间(分)<input type="number" id="g2" value="10" min="0" max="60"></label>
+      <label>共几节<input type="number" id="g3" value="8" min="1" max="16"></label>
+    </div>
+    <div class="row"><button class="chip" id="perg">⚙ 按上面的数字生成</button><button class="chip" id="pera">＋ 加一节</button></div>
+    <h2 style="font-size:14px">📖 课程</h2>
     <div class="tl" id="fxl" style="max-height:none"></div>
-    <div class="row"><button class="chip" id="fxa">＋ 加一节课</button><button class="chip" id="fxw">＋ 周一至周五同一时段</button></div>
-    <h2 style="font-size:16px">🕐 课表时间范围</h2>
-    <div class="mv"><select id="sh0"></select><select id="sh1"></select></div>
+    <div class="row"><button class="chip" id="fxa">＋ 加一节课</button></div>
+
     <h2 style="font-size:16px">💾 备份</h2>
     <div class="row"><button id="bex">导出备份</button><button id="bim">导入备份</button></div>
     <input type="file" id="bfile" accept="application/json" hidden>
@@ -101,22 +139,66 @@
   </section>
 </div>
 
+<!-- 活动弹窗（新增 / 修改 / 重复） -->
 <div class="mask" id="mask"><div class="dlg" onclick="event.stopPropagation()">
   <h2 id="dt">新增安排</h2>
   <input id="dn" placeholder="做什么？例如：数学复习" maxlength="20">
   <div class="mv"><select id="dday"></select><select id="dh"></select></div>
   <select id="dl"></select>
+  <select id="drp"><option value="0">不重复</option><option value="1">每周重复</option><option value="2">每 2 周重复</option><option value="3">每 3 周重复</option><option value="4">每 4 周重复</option></select>
+  <div id="drw" style="display:none"><div class="msg">重复到哪天（留空 = 一直重复）</div><input type="date" id="dun"></div>
   <div class="sw" id="sw"></div>
-  <div class="acts"><button id="dx">取消</button><button class="del" id="dd">删除</button><button class="ok" id="ds">保存</button></div>
+  <div class="acts"><button id="dx">取消</button><button class="del" id="ddo" style="display:none">只删本周</button><button class="del" id="dd">删除</button><button class="ok" id="ds">保存</button></div>
 </div></div>
+
+<!-- 课程弹窗（固定课表） -->
+<div class="mask" id="mask2"><div class="dlg" onclick="event.stopPropagation()">
+  <h2 id="lst">添加课程</h2>
+  <input id="lsn" placeholder="科目，如：数学" maxlength="20">
+  <div class="msg">星期（可多选，一次加多天）</div>
+  <div class="chips" id="lsd"></div>
+  <div class="mv"><select id="lsp0"></select><select id="lsp1"></select></div>
+  <div class="mv"><input type="time" id="lst0"><input type="time" id="lst1"></div>
+  <div class="mv"><input id="lsrm" placeholder="教室" maxlength="20"><input id="lstc" placeholder="老师" maxlength="20"></div>
+  <select id="lsty"></select>
+  <div id="lsww"><div class="msg">哪几周上（不选 = 每周）</div><div class="chips" id="lsw"></div></div>
+  <div class="sw" id="lssw"></div>
+  <div class="acts"><button id="lsx">取消</button><button class="del" id="lsdel">删除</button><button class="ok" id="lsok">保存</button></div>
+</div></div>
+
+<!-- 首次向导 -->
+<div class="mask" id="mask4"><div class="dlg wz" onclick="event.stopPropagation()">
+  <h2 id="wzt">欢迎</h2>
+  <div class="wzb" id="wzb"></div>
+  <div class="msg" id="wzs"></div>
+  <div class="acts"><button id="wzk">跳过</button><button id="wzp">上一步</button><button class="ok" id="wzn">下一步</button></div>
+</div></div>
+
+<!-- 作业弹窗 -->
+<div class="mask" id="mask5"><div class="dlg" onclick="event.stopPropagation()">
+  <h2 id="hwt">新作业</h2>
+  <input id="hwn" placeholder="做什么？例如：习题册 P23" maxlength="60">
+  <input id="hwsb" list="hwsl" placeholder="科目（可选）" maxlength="12"><datalist id="hwsl"></datalist>
+  <input type="date" id="hwdu">
+  <div class="chips" id="hwqd"></div>
+  <textarea id="hwno" placeholder="备注（可选）" rows="2" maxlength="300"></textarea>
+  <input id="hwli" placeholder="链接（可选，如 https://…）" maxlength="300">
+  <div class="acts"><button id="hwx">取消</button><button class="del" id="hwd">删除</button><button class="ok" id="hwok">保存</button></div>
+</div></div>
+
 <script src="js/core.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/recur.js"></script>
 <script src="js/srs.js"></script>
 <script src="js/timetable.js"></script>
 <script src="js/log.js"></script>
 <script src="js/study.js"></script>
 <script src="js/sport.js"></script>
 <script src="js/remind.js"></script>
+<script src="js/hw.js"></script>
+<script src="js/lessons.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/wizard.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/app.js"></script>
 </body>

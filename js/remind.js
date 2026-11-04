@@ -2,14 +2,13 @@
   // ===== 清单 / 提醒 / 记录条目 =====
   var RM=[],LG=[{t:'',d:0}];
   try{RM=JSON.parse(localStorage.getItem('mochi-rm')||'[]');var l0=JSON.parse(localStorage.getItem('mochi-lg')||'null');if(l0&&l0.length)LG=l0}catch(e){}
-  function put2(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
   function wl(box,flt,list,w){
     var ww=w===undefined?curW:w;
     box.innerHTML='';var L=(list||data).filter(flt).sort(function(a,b){return a.day-b.day||a.h-b.h});
     if(!L.length){box.appendChild(el('div','msg','还没有安排～'));return}
     L.forEach(function(x,i){var r=el('label','tp'),cb=el('input');cb.type='checkbox';cb.checked=!!DN[kk(x,ww)];
-      cb.onchange=function(){if(cb.checked)DN[kk(x,ww)]=1;else delete DN[kk(x,ww)];put2('mochi-dn',DN);draw()};
-      var n=el('div','n',(i+1)+'. 周'+DAYS[x.day]+' '+x.h+':00 '+x.t);if(cb.checked)n.style.textDecoration='line-through';
+      cb.onchange=function(){if(cb.checked)DN[kk(x,ww)]=1;else delete DN[kk(x,ww)];put2(K_DN,DN);draw()};
+      var n=el('div','n',(i+1)+'. 周'+DAYS[x.day]+' '+hm(x.h)+' '+x.t+(x.rp?' 🔁':''));if(cb.checked)n.style.textDecoration='line-through';
       r.appendChild(cb);r.appendChild(n);box.appendChild(r)});
   }
   function rRm(){
@@ -29,8 +28,14 @@
     var n=thisEvents().filter(function(x){return x.day===todayIdx&&!DN[kk(x,thisW)]}).length+RM.filter(function(m){return !m.d&&+m.day===todayIdx}).length;
     var now=pad2(new Date().getHours())+':'+pad2(new Date().getMinutes());
     var od=RM.filter(function(m){return !m.d&&+m.day===todayIdx&&m.tm&&m.tm<=now})[0];
-    var ne=nearestExam(),ex=ne?'　📅 '+ne.s+'考试剩 '+ne.d+' 天':'';
+    var ne=nearestExam(),ex=ne?'　📅 '+ne.s+'考试剩 '+ne.d+' 天':'';var hn=(typeof hwDue==='function')?hwDue():null;if(hn&&(hn.over||hn.today))ex+='　📝 作业：'+(hn.over?'逾期 '+hn.over+' 项 ':'')+(hn.today?'今天截止 '+hn.today+' 项':'');
     document.getElementById('bn').textContent=(od?'⏰ 该做啦：'+od.t:(n?'📌 今天还有 '+n+' 件事要完成，加油！':'🎉 今天的事都完成啦！'))+ex;
   }
-  function pad2(x){return String(x).padStart(2,'0')}
-  rf=function(){wl(document.getElementById('wl0'),function(x){return x.day===todayIdx},thisEvents(),thisW);wl(document.getElementById('wl1'),function(x){return x.a===1});wl(document.getElementById('wl2'),function(x){return x.a===2});bnr()};
+  rf=function(){
+    var b0=document.getElementById('wl0');
+    wl(b0,function(x){return x.day===todayIdx},thisEvents(),thisW);
+    var ls=todayLessons();                       // 今天的固定课程放在最前面（只显示，不用勾）
+    if(ls.length){var em=b0.querySelector('.msg');if(em)em.remove();
+      ls.slice().reverse().forEach(function(l){var r=el('div','tp'),n=el('div','n',tmin(l.s)+'–'+tmin(l.e)+' '+(l.type==='考试'?'📝 ':'🏫 ')+l.t);
+        var sm=[l.room,l.teacher].filter(Boolean).join(' · ');if(sm)n.appendChild(el('small',null,sm));r.appendChild(n);b0.insertBefore(r,b0.firstChild)})}
+    wl(document.getElementById('wl1'),function(x){return x.a===1});wl(document.getElementById('wl2'),function(x){return x.a===2});bnr()};

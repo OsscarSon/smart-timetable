@@ -4,7 +4,7 @@
   try{var q=JSON.parse(localStorage.getItem('mochi-st')||'null');if(q&&q.subs)ST=q}catch(e){}
   ST.ex=ST.ex||{};
   function sv(){try{localStorage.setItem('mochi-st',JSON.stringify(ST))}catch(e){}}
-  var tn0=Math.floor(Date.now()/864e5);
+  var tn0=todayDn;
   function fmt(n){var x=new Date(n*864e5+(new Date().getTimezoneOffset()*6e4));return (x.getMonth()+1)+'/'+x.getDate()}
   function rSt(){
     var sb=document.getElementById('subs');sb.innerHTML='';
@@ -39,7 +39,8 @@
     var fresh=ST.topics.filter(function(t){return t.iv===0&&(dleft(t.s)===null||dleft(t.s)>2)});
     var withT=ST.subs.filter(function(s){return ST.topics.some(function(t){return t.s===s})});
     var rot=[];withT.slice().sort(function(a,b){return dd(a)-dd(b)}).forEach(function(s){var D=dleft(s);if(D!==null&&D<=0)return;var r=D===null?1:D<=7?3:D<=14?2:1;for(var k=0;k<r;k++)rot.push(s)});
-    for(var d=startDay();d<7;d++){
+    for(var pp=startPos();pp<7;pp++){
+      var d=posDay(pp);if(hiddenDay(d))continue;
       var dn=tn0+dayOffset(d);
       var cand=due.filter(function(t){return used.indexOf(t)<0&&t.nx<=dn});
       var pk=cand.filter(function(t){return t.s!==last})[0]||cand[0];

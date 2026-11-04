@@ -14,7 +14,10 @@ const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划
 6. 标题 t 不超过 12 个字，开头加一个贴切的 emoji。
 7. 用户的学习章节（study.topics，iv=0 表示还没学过）与考试日期（study.ex）：越接近考试，做题和复习越多；考试当天和前一晚不排新内容。
 8. 用户的运动（sports）含现在成绩 c 与目标 g：针对差距最大的项目安排间歇或节奏训练，隔天练，长距离放周末；学习优先，运动排在剩余空档。
-9. 固定课表 fixed（day、h、len）是上课时间，绝对不能安排任何活动。\n10. notes 是最多 4 条简短中文说明，解释你改了什么、为什么（语气可爱温柔）。
+9. 固定时段 fixed（day、h、len、type）包含上课、考试和重复活动，绝对不能安排任何活动，也不要把它们放进返回的 events。
+10. 用户隐藏的日子（hidden）不要排任何活动。
+11. 作业 homework（t 标题、sb 科目、due 截止日期 YYYY-MM-DD，可能为空）：把写作业的时间排进截止日之前的空档，越近越优先，已逾期的尽快安排；每份作业用“📝 科目·作业”之类的标题。
+12. notes 是最多 4 条简短中文说明，解释你改了什么、为什么（语气可爱温柔）。
 只输出 JSON：{"events":[{"day":0,"h":9,"len":2,"t":"📖 数学复习","c":"pink"}],"notes":["..."]}`;
 
 module.exports = async (req, res) => {
@@ -22,7 +25,7 @@ module.exports = async (req, res) => {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
-  const { text, events, today, hours, study, sports, fixed } = req.body || {};
+  const { text, events, today, hours, study, sports, fixed, hidden, week, homework } = req.body || {};
   if (typeof text !== 'string' || !text.trim() || text.length > 500) {
     return res.status(400).json({ error: 'bad text' });
   }
@@ -32,7 +35,10 @@ module.exports = async (req, res) => {
     `当前课表：${JSON.stringify((events || []).slice(0, 80))}\n` +
     `学习与考试：${JSON.stringify(study || {}).slice(0, 3000)}\n` +
     `运动：${JSON.stringify(sports || []).slice(0, 1500)}\n` +
-    `固定上课时间（不可占用）：${JSON.stringify(fixed || []).slice(0, 1500)}\n` +
+    `本周范围：${String(week || '').slice(0, 120)}\n` +
+    `固定时段（上课/考试/重复活动，不可占用）：${JSON.stringify(fixed || []).slice(0, 2500)}\n` +
+    `隐藏的日子（不要排）：${JSON.stringify(hidden || [])}\n` +
+    `未完成的作业：${JSON.stringify((homework || []).slice(0, 20)).slice(0, 2000)}\n` +
     `用户的新安排：${text.trim()}\n请返回重排后的完整一周。`;
 
   const call = (withThinking) =>

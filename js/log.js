@@ -32,7 +32,7 @@
       data.push(ev);
       var ok=relocate(x);
       data.pop();
-      if(ok)moved.push('「'+x.t+'」→周'+DAYS[x.day]+' '+x.h+':00');
+      if(ok)moved.push('「'+x.t+'」→周'+DAYS[x.day]+' '+hm(x.h));
       else{data=data.filter(function(y){return y!==x});moved.push('「'+x.t+'」排不下，已暂时移除')}
     });
     data.push(ev);
@@ -42,14 +42,14 @@
     var cl=txt.split(/[，,；;。\n]+/).filter(Boolean),n=0,miss=[];
     cl.forEach(function(c){var ev=parse(c);if(!ev){miss.push(c);return}
       var mv=addEvent(ev);n++;
-      say('✅ 周'+DAYS[ev.day]+' '+ev.h+':00 '+ev.t+(mv.length?'；已重排 '+mv.join('、'):''))});
+      say('✅ 周'+DAYS[ev.day]+' '+hm(ev.h)+' '+ev.t+(mv.length?'；已重排 '+mv.join('、'):''))});
     if(miss.length)say('🤔 没看懂时间：'+miss.join('、')+'（请写“周六”“明天”等）');
     if(n){save();draw()}
   }
   function clean(l){
     if(!Array.isArray(l))return null;var out=[];
     for(var i=0;i<l.length;i++){var x=l[i],day=+x.day,h=+x.h,len=+x.len;
-      if(!(day>=0&&day<=6&&h>=H0&&len>=1&&len<=4&&h+len<=H1)||day%1||h%1||len%1||!x.t)return null;
+      if(!(day>=0&&day<=6&&h>=H0&&len>=1&&len<=4&&h+len<=H1)||day%1||h%1||len%1||!x.t||hiddenDay(day))return null;
       for(var j=0;j<len;j++)if(fxHit(day,h+j))return null;
       var o={day:day,h:h,len:len,t:String(x.t).slice(0,14),c:COLS.indexOf(x.c)>=0?x.c:'peach'};
       if(!free2(out,o))return null;out.push(o)}
@@ -62,11 +62,11 @@
     try{
       var ctl=new AbortController(),tm=setTimeout(function(){ctl.abort()},60000);
       var r=await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
-        body:JSON.stringify({text:txt,events:data,today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,fixed:(SET.fx?FX:[])})});
+        body:JSON.stringify({text:txt,events:data,today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,fixed:fixedForAI(),hidden:DAYS.filter(function(n,i){return hiddenDay(i)}).map(function(n){return '周'+n}),week:isoOf(wsDn(curW))+' 起的一周（一周从周'+DAYS[SET.ws]+'开始，列顺序：'+visDays().map(function(i){return DAYS[i]}).join('')+'）',homework:(typeof hwPending==='function'?hwPending():[])})});
       clearTimeout(tm);
       if(!r.ok){var ej={};try{ej=await r.json()}catch(x){}throw new Error(r.status+' '+(ej.error||''))}
       var j=await r.json(),ev=clean(j.events);
-      if(!ev)throw new Error('AI 的结果排到了上课时间或格式不对');
+      if(!ev)throw new Error('AI 的结果排到了固定时段/隐藏的日子，或格式不对');
       data=ev;save();draw();
       say('🤖 AI 已重排');(j.notes||[]).slice(0,4).forEach(function(n){say('💡 '+String(n).slice(0,60))});
     }catch(e){
