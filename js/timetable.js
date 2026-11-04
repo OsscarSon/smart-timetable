@@ -33,13 +33,14 @@
     FXW.forEach(function(x){
       if(cc(x.day)<2||x.h+x.len<=H0||x.h>=H1)return;
       var l=x.les,s=Math.max(x.h,H0),e2=Math.min(x.h+x.len,H1),b=el('button','e fx');
-      b.textContent=(l.type==='考试'?'📝 ':'🏫 ')+x.t+(l.room?'\n'+l.room:'');
+      b.textContent=(l.type==='考试'?'📝 ':'🏫 ')+x.t+(l.room?'\n'+(l.bld||'')+l.room:'');
       b.title=tmin(l.s)+'–'+tmin(l.e)+(l.teacher?' · '+l.teacher:'')+' · '+l.type;
       b.style.whiteSpace='pre-line';
       b.style.background='repeating-linear-gradient(45deg,rgba(128,128,128,.14) 0 6px,transparent 6px 12px),var(--'+l.c+')';
       b.style.gridColumn=cc(x.day);b.style.gridRow=(s-H0+2)+' / span '+(e2-s);
       b.onclick=function(){openLesson(l)};grid.appendChild(b)});
     if(typeof rf==='function')rf();
+    if(typeof drawDay==='function')drawDay();
   }
   var mask=document.getElementById('mask'),dn=document.getElementById('dn'),dl=document.getElementById('dl'),sw=document.getElementById('sw');
   COLS.forEach(function(n){var i=document.createElement('i');i.className='c-'+n;i.onclick=function(){col=n;paint()};sw.appendChild(i)});
@@ -49,14 +50,21 @@
   function lenOpts(day,h,keep){var max=1;while(max<3&&h+max<H1&&!covered(day,h+max,cur))max++;
     dl.innerHTML='';for(var i=1;i<=max;i++){var o=document.createElement('option');o.value=i;o.textContent=i+' 小时';dl.appendChild(o)}
     dl.value=Math.min(keep,max)}
-  dday.onchange=dh.onchange=function(){lenOpts(+dday.value,+dh.value,+dl.value)};
-  drp.onchange=function(){drw.style.display=+drp.value?'':'none'};
+  dday.onchange=dh.onchange=function(){lenOpts(+dday.value,+dh.value,+dl.value);moLabels()};
+  var dxh=document.getElementById('dxh');
+  drp.onchange=function(){var on=drp.value!=='0';drw.style.display=on?'':'none';dxh.parentNode.style.display=on?'':'none'};
+  function moLabels(){                       // “每月第 N 个周X”的文字跟着所选日期变
+    var wd=+dday.value,n=nthOf(dnOf(curW,wd));
+    drp.querySelector('option[value=m]').textContent='每月第 '+n+' 个周'+DAYS[wd];
+    drp.querySelector('option[value=ml]').textContent='每月最后一个周'+DAYS[wd]}
   function openDlg(x,nw){
     cur=x;isNew=nw;col=x.c;dn.value=x.t;
     dday.innerHTML='';for(var p=0;p<7;p++){var wd=posDay(p);if(hiddenDay(wd)&&wd!==x.day)continue;var o=el('option',null,'周'+DAYS[wd]);o.value=wd;dday.appendChild(o)}
     dh.innerHTML='';for(var h=H0;h<H1;h++){var o2=el('option',null,hm(h));o2.value=h;dh.appendChild(o2)}
     dday.value=x.day;dh.value=x.h;lenOpts(x.day,x.h,x.len);
-    var r=x.rp;drp.value=r?String(r.ev):'0';dun.value=r&&r.un!=null?isoOf(r.un):'';drw.style.display=r?'':'none';
+    var r=x.rp;moLabels();drp.value=r?(r.mo?(r.mo===-1?'ml':'m'):String(r.ev)):'0';dun.value=r&&r.un!=null?isoOf(r.un):'';drw.style.display=r?'':'none';
+    dxh.checked=r?!!r.xh:true;dxh.parentNode.style.display=r?'':'none';
+    if(!rrOK()){[].forEach.call(drp.querySelectorAll('option[value=m],option[value=ml]'),function(o){o.disabled=true})}
     var wdt=wkDay(curW,x.day);
     document.getElementById('dt').textContent=(nw?'新增':r?'修改重复活动':'修改')+' · '+wdt.m+'/'+wdt.d+' 周'+DAYS[x.day]+' '+hm(x.h);
     document.getElementById('dd').style.display=nw?'none':'';
@@ -68,22 +76,23 @@
   mask.onclick=close;document.getElementById('dx').onclick=close;
   document.getElementById('ds').onclick=function(){
     var t=dn.value.trim();if(!t){dn.focus();return}
-    var nd=+dday.value,nh=+dh.value,nl=+dl.value,ev=+drp.value,un=dun.value?dnFromIso(dun.value):null;
+    var nd=+dday.value,nh=+dh.value,nl=+dl.value,rv=drp.value,un=dun.value?dnFromIso(dun.value):null,xh=dxh.checked;
+    var ev=(rv==='m'||rv==='ml')?0:+rv,mo=rv==='m'?nthOf(dnOf(curW,nd)):rv==='ml'?-1:0,rep=ev||mo;
     if(!free(nd,nh,nl,cur)){alert('那个时间已经有安排啦～');return}
     var dn0=dnOf(curW,nd);
-    if(ev&&un!==null&&un<dn0){alert('“重复到”的日期不能早于这次活动的日期');return}
+    if(rep&&un!==null&&un<dn0){alert('“重复到”的日期不能早于这次活动的日期');return}
     var r=cur.rp;
     if(r){                                   // 正在编辑一个重复系列
-      if(!ev){                               // 改为不重复：删掉系列，只在本周留一个
+      if(!rep){                              // 改为不重复：删掉系列，只在本周留一个
         RP=RP.filter(function(z){return z!==r});data.push({day:nd,h:nh,len:nl,t:t,c:col})}
       else{
         var shift=dn0-cur.dn;                // 星期改了就整体平移所有出现日期
         r.a0+=shift;r.sk=(r.sk||[]).map(function(v){return v+shift});
-        r.day=nd;r.h=nh;r.len=nl;r.t=t;r.c=col;r.ev=ev;r.un=un}
+        r.day=nd;r.h=nh;r.len=nl;r.t=t;r.c=col;r.ev=ev;r.mo=mo;r.un=un;r.xh=xh;if(!mo)delete r.mo}
       rpSave();save();draw();close();return}
-    if(ev){                                  // 单次活动改为重复
+    if(rep){                                 // 单次活动改为重复
       if(!isNew)data=data.filter(function(z){return z!==cur});
-      RP.push({id:uid(),day:nd,h:nh,len:nl,t:t,c:col,a0:dn0,ev:ev,un:un,sk:[]});rpSave();save();draw();close();return}
+      var nr={id:uid(),day:nd,h:nh,len:nl,t:t,c:col,a0:dn0,ev:ev,un:un,sk:[],xh:xh};if(mo)nr.mo=mo;RP.push(nr);rpSave();save();draw();close();return}
     cur.t=t;cur.c=col;cur.day=nd;cur.h=nh;cur.len=nl;delete cur.a;if(isNew)data.push(cur);save();draw();close()};
   document.getElementById('dd').onclick=function(){
     if(cur.rp){if(!confirm('删除整个重复系列？（只想删这一周，请点“只删本周”）'))return;RP=RP.filter(function(z){return z!==cur.rp});rpSave()}
