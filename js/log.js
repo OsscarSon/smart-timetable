@@ -3,7 +3,7 @@
   var items=document.getElementById('items'),inp=document.getElementById('inp');
   var NUM={'一':1,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'十':10,'两':2};
   function num(x){if(/^\d+$/.test(x))return +x;if(x.length===1)return NUM[x];if(x.length===2&&x[0]==='十')return 10+NUM[x[1]];if(x.length===2&&x[1]==='十')return NUM[x[0]]*10;return 0}
-  function say(t){var e=items.querySelector('.empty');if(e)e.remove();var li=document.createElement('li');li.textContent=t;items.prepend(li)}
+  function say(t){var e=items.querySelector('.empty');if(e)e.remove();var li=document.createElement('li');li.textContent=t;items.prepend(li);while(items.children.length>8)items.removeChild(items.lastChild)}
   function parse(clause){
     var day=-1,m;
     if((m=clause.match(/(?:周|礼拜|星期)([一二三四五六日天1-7])/))){var c=m[1];day=(c==='日'||c==='天'||c==='7')?6:(NUM[c]||+c)-1}
@@ -63,31 +63,44 @@
       var r=await fetch('/api/plan',{method:'POST',headers:{'Content-Type':'application/json'},signal:ctl.signal,
         body:JSON.stringify({text:txt,events:data,today:todayIdx,hours:[H0,H1],study:ST,sports:SP})});
       clearTimeout(tm);
-      if(!r.ok)throw new Error('http');
+      if(!r.ok){var ej={};try{ej=await r.json()}catch(x){}throw new Error(r.status+' '+(ej.error||''))}
       var j=await r.json(),ev=clean(j.events);
       if(!ev)throw new Error('bad');
       data=ev;save();draw();
       say('🤖 AI 已重排');(j.notes||[]).slice(0,4).forEach(function(n){say('💡 '+String(n).slice(0,60))});
     }catch(e){
-      say('🔌 AI 未连接，先用本地规则排（部署后端后即可启用 AI）');
+      say('🔌 AI 未连接（'+String(e.message||e).slice(0,160)+'），先用本地规则排');
       local(txt);
     }
     inp.value='';addBtn.disabled=false;addBtn.textContent='排';
   }
-  // 记录：逐条列表
+  // 记录：逐条列表。勾选 = 这次要排；排完变成 ✅ 已排，不会重复处理
+  function lgSave(){put2('mochi-lg',LG)}
+  function lgFix(){LG.forEach(function(g){if(g.s===undefined)g.s=g.d?2:0})}
+  function ensureEmpty(){var k=LG[LG.length-1];if(!k||k.t.trim()||k.s===2)LG.push({t:'',s:0})}
   function rLg(){
+    lgFix();ensureEmpty();
     var box=document.getElementById('lr');box.innerHTML='';
-    LG.forEach(function(g,i){var r=el('div','lr'+(g.d?' fin':'')),cb=el('input');cb.type='checkbox';cb.checked=!!g.d;
-      cb.onchange=function(){g.d=cb.checked?1:0;put2('mochi-lg',LG);rLg()};
-      var t=el('input');t.type='text';t.value=g.t;t.placeholder=i===0?'周六与朋友打球':'周日有跑步比赛';
-      t.oninput=function(){g.t=t.value;put2('mochi-lg',LG)};
-      t.onkeydown=function(e){if(e.key==='Enter'){LG.push({t:'',d:0});put2('mochi-lg',LG);rLg();box.lastChild.querySelector('input[type=text]').focus()}};
-      r.appendChild(el('span',null,(i+1)+'.'));r.appendChild(cb);r.appendChild(t);box.appendChild(r)});
+    LG.forEach(function(g,i){
+      var r=el('div','lr'+(g.s===2?' fin':'')),c;
+      if(g.s===2)c=el('span',null,'✅');
+      else{c=el('input');c.type='checkbox';c.checked=g.s===1;c.onchange=function(){g.s=c.checked?1:0;lgSave()}}
+      var t=el('input');t.type='text';t.value=g.t;t.disabled=g.s===2;t.placeholder=i===0?'周六与朋友打球':'周日有跑步比赛';
+      t.oninput=function(){g.t=t.value;lgSave()};
+      t.onkeydown=function(e){if(e.key==='Enter'){ensureEmpty();lgSave();rLg();var ins=box.querySelectorAll('input[type=text]');ins[ins.length-1].focus()}};
+      r.appendChild(el('span',null,(i+1)+'.'));r.appendChild(c);r.appendChild(t);box.appendChild(r)});
   }
-  document.getElementById('la').onclick=function(){LG.push({t:'',d:0});put2('mochi-lg',LG);rLg()};
+  document.getElementById('la').onclick=function(){ensureEmpty();lgSave();rLg()};
+  var rowBox=addBtn.parentNode;
+  var allBtn=el('button','chip','全选'),clrBtn=el('button','chip','清除已排');
+  allBtn.onclick=function(){lgFix();LG.forEach(function(g){if(g.s!==2&&g.t.trim())g.s=1});lgSave();rLg()};
+  clrBtn.onclick=function(){lgFix();LG=LG.filter(function(g){return g.s!==2});lgSave();rLg()};
+  rowBox.insertBefore(allBtn,addBtn);rowBox.insertBefore(clrBtn,addBtn);
   addBtn.onclick=function(){
-    var todo=LG.filter(function(g){return !g.d&&g.t.trim()});if(!todo.length)return;
+    lgFix();
+    var todo=LG.filter(function(g){return g.s===1&&g.t.trim()});
+    if(!todo.length){say('👆 先勾选要排的那几条，再按“排”');return}
     inp.value=todo.map(function(g){return g.t.trim()}).join('，');
-    todo.forEach(function(g){g.d=1});
-    LG=LG.filter(function(g,i){return !g.d||g.t.trim()});LG.push({t:'',d:0});put2('mochi-lg',LG);rLg();go();
+    todo.forEach(function(g){g.s=2});lgSave();rLg();go();
   };
+  var lgTitle=document.querySelector('.log h2');if(lgTitle)lgTitle.textContent='📝 记录本周特别安排 · v3';
