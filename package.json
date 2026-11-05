@@ -21,7 +21,7 @@
     "@capacitor/cli": "^7.0.0",
     "dayjs": "1.11.13",
     "rrule": "2.8.1",
-    "ts-fsrs": "4.4.0",
+    "ts-fsrs": "^4.4.0",
     "dexie": "4.0.10",
     "@supabase/supabase-js": "2.45.4",
     "chart.js": "4.4.1",
