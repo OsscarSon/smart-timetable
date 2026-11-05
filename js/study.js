@@ -31,7 +31,7 @@
   document.getElementById('sa').onclick=function(){var i=document.getElementById('sn'),v=i.value.trim();if(v&&ST.subs.indexOf(v)<0){ST.subs.push(v);sel=ST.subs.length-1;sv();rSt()}i.value=''};
   document.getElementById('ta').onclick=function(){var i=document.getElementById('tn'),v=i.value.trim();
     if(!v||!ST.subs.length)return;ST.topics.push({s:ST.subs[sel],n:v.slice(0,20),iv:0,nx:tn0});sv();rSt();i.value=''};
-  function put(day,hs,len,t,c){for(var k=0;k<hs.length;k++)if(free(day,hs[k],len)){data.push({day:day,h:hs[k],len:len,t:t.slice(0,14),c:c,a:1});return true}return false}
+  function put(day,hs,len,t,c){for(var k=0;k<hs.length;k++)if(free(day,hs[k]*60,(hs[k]+len)*60)){data.push({day:day,s:hs[k]*60,e:(hs[k]+len)*60,t:t.slice(0,14),c:c,a:1});return true}return false}
   document.getElementById('plan').onclick=function(){
     data=data.filter(function(x){return x.a!==1});
     var used=[],cnt={r:0,q:0,p:0},last='';

@@ -1,8 +1,6 @@
 // 固定课表：节次时间模板、课程（教室 / 老师 / 类型 / 多周循环）
 // 课程按“当天分钟数”存储，所以改节次时间、删节次都不会弄乱已有课程。
 var TYPES=['课','实验','考试','自习','活动'];
-function min2t(m){return pad2(Math.floor(m/60))+':'+pad2(m%60)}                       // 给 <input type=time>
-function t2min(s){var p=String(s||'').split(':');return p.length>=2&&p[0]!==''&&!isNaN(+p[0])?(+p[0])*60+(+p[1]):NaN}
 function genPer(st,len,gap,n){var o=[],t=st;for(var i=0;i<n;i++){o.push({s:t,e:t+len});t+=len+gap}return o}
 function perIdx(s,e){var a=-1,b=-1;TT.per.forEach(function(p,i){if(p.s===s)a=i;if(p.e===e)b=i});return [a,b]}
 function perLabel(s,e){var ab=perIdx(s,e),a=ab[0],b=ab[1];return (a>=0&&b>=a)?(a===b?'第'+(a+1)+'节':'第'+(a+1)+'–'+(b+1)+'节'):''}
@@ -31,7 +29,7 @@ document.getElementById('pera').onclick=function(){
 var cycS=document.getElementById('cyc'),cywS=document.getElementById('cyw');
 for(var ci=1;ci<=4;ci++){var co=el('option',null,ci===1?'每周都一样':ci+' 周一循环');co.value=ci;cycS.appendChild(co)}
 function rCyc(){
-  cycS.value=TT.cyc||1;cywS.innerHTML='';cywS.style.display=(TT.cyc>1)?'':'none';
+  cycS.value=TT.cyc||1;cywS.innerHTML='';cywS.hidden=!(TT.cyc>1);
   for(var k=1;k<=(TT.cyc||1);k++){var o=el('option',null,'这周是第 '+k+' 周');o.value=k;cywS.appendChild(o)}
   cywS.value=cycIdx(todayDn)}
 cycS.onchange=function(){
@@ -86,7 +84,7 @@ document.getElementById('lsfi').onchange=async function(){
     if(FL.length>=8){msg.textContent='最多 8 个文件';break}
     try{msg.textContent='正在添加「'+fs[i].name+'」…';var m=await fileAdd(TMP,fs[i]);FL.push(m);NEWF.push(m.id);rFl();msg.textContent=''}
     catch(e){msg.textContent=String(e.message||e)}}};
-function togglePanel(btn,pn){btn.onclick=function(){var on=document.getElementById(pn).style.display==='none';document.getElementById(pn).style.display=on?'':'none'}}
+function togglePanel(btn,pn){btn.onclick=function(){var p=document.getElementById(pn);p.hidden=!p.hidden}}
 togglePanel(document.getElementById('lklb'),'lkp');togglePanel(document.getElementById('flb'),'flp');
 // 模板：存下科目 / 类型 / 楼栋 / 教室 / 老师 / 颜色 / 链接，下次一键套用
 function tpls(){return lget('mochi-tpl',[])}
@@ -121,7 +119,7 @@ function openLesson(x,preDay){
   lsn.value=x?x.t:'';lsrm.value=x?x.room:'';lstc.value=x?x.teacher:'';lsty.value=x?x.type:'课';lsbld.value=x&&x.bld?x.bld:'';
   lsd0.value=x&&x.d0!=null?isoOf(x.d0):'';lsd1.value=x&&x.d1!=null?isoOf(x.d1):'';
   LK=x&&x.lk?x.lk.slice():[];FL=x&&x.fl?x.fl.slice():[];NEWF=[];TMP=x?x.id:uid();rLk();rFl();rTp();
-  document.getElementById('lkp').style.display=LK.length?'':'none';document.getElementById('flp').style.display=FL.length?'':'none';document.getElementById('flm').textContent='';
+  document.getElementById('lkp').hidden=!LK.length;document.getElementById('flp').hidden=!FL.length;document.getElementById('flm').textContent='';
   var def=TT.per[0]||{s:480,e:525};
   lst0.value=min2t(x?x.s:def.s);lst1.value=min2t(x?x.e:def.e);
   var ab=perIdx(x?x.s:def.s,x?x.e:def.e);lsp0.value=ab[0];lsp1.value=ab[1];
@@ -130,9 +128,9 @@ function openLesson(x,preDay){
   chipSet(document.getElementById('lsd'),dItems,LS.days,false);
   LS.wks=x&&x.wk?x.wk.slice():[];
   var wItems=[];for(var k=1;k<=(TT.cyc||1);k++)wItems.push([k,'第 '+k+' 周']);
-  document.getElementById('lsww').style.display=TT.cyc>1?'':'none';
+  document.getElementById('lsww').hidden=!(TT.cyc>1);
   chipSet(document.getElementById('lsw'),wItems,LS.wks,false);
-  document.getElementById('lsdel').style.display=x?'':'none';
+  document.getElementById('lsdel').hidden=!x;
   lsPaint();lm.classList.add('show');lm.scrollTop=0;if(!x)setTimeout(function(){lsn.focus()},50)}
 function closeLesson(keep){lm.classList.remove('show');if(!keep)NEWF.forEach(function(id){fileDel(id)});NEWF=[]}
 lm.onclick=function(){};document.getElementById('lsx').onclick=function(){closeLesson()};

@@ -1,5 +1,14 @@
 {
   "appId": "app.mochi.timetable",
   "appName": "Mochi",
-  "webDir": "www"
+  "webDir": "www",
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#FF8F4D"
+    }
+  }
 }

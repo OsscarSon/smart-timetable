@@ -13,7 +13,6 @@ const LIBS = { // data-lib 名 → [npm 包名, 包内文件的候选路径]
   'lz-string':['lz-string',          ['libs/lz-string.min.js']],
   qrcode:   ['qrcode-generator',     ['qrcode.js']],
   lucide:   ['lucide',               ['dist/umd/lucide.min.js']],
-  fullcalendar:['fullcalendar',      ['index.global.min.js']],
 };
 rmSync('www', { recursive: true, force: true });
 mkdirSync('www/vendor', { recursive: true });

@@ -5,8 +5,8 @@
 const QUICK = `你是“Mochi”的录入助手。把用户的一句话解析成要加入时间表的条目，只输出 JSON。
 今天的日期和星期会在提示里给出，请据此把“明天、下周三、周五前”等换算成具体日期 YYYY-MM-DD。
 条目有两种：
-1. 活动：{"type":"event","date":"YYYY-MM-DD","h":15,"len":1,"t":"📚 数学补习","c":"pink","every":0,"until":""}
-   h 是开始的整点(0–23，分钟请四舍五入到整点)；len 是持续整小时数(1–3)；
+1. 活动：{"type":"event","date":"YYYY-MM-DD","s":930,"e":990,"t":"📚 数学补习","c":"pink","every":0,"until":""}
+   s、e 是开始和结束时间，用“当天 0 点起的分钟数”（如 15:30=930，16:30=990），取 5 的倍数；没说结束时间就默认 1 小时；
    every 是每几周重复一次(0=不重复，1=每周，2=每两周…最多 4)；until 是重复截止日期，没说就留空字符串；
    c 只能是 pink、mint、sky、lemon、peach；t 不超过 12 个字，开头加一个贴切的 emoji。
 2. 作业：{"type":"homework","t":"英语作文","sb":"英语","due":"YYYY-MM-DD"}   sb 是科目(可空)，due 没说就留空字符串。
@@ -21,17 +21,12 @@ t 是科目名（不超过 12 个字，保持图片里的原文，不要加 emoj
 看不清的格子不要猜，跳过，并在 notes 说明。单双周之类的特殊标记，在 notes 里说明即可，不要拆成多条。
 输出格式：{"lessons":[{"day":0,"s":480,"e":525,"t":"数学","room":"A301","teacher":"王老师"}],"notes":["最多 4 条简短中文说明"]}`;
 
-const int = (v, lo, hi, d) => { v = Math.round(Number(v)); return Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : d; };
-const str = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n);
-const iso = v => (/^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : '');
-const COLS = ['pink', 'mint', 'sky', 'lemon', 'peach'];
+const { guard, int, inr, str, iso, COLS } = require('./_lib');
 
 module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { mode: m0 } = req.body || {};
+  const who = await guard(req, res, { cost: m0 === 'photo' ? 3 : 1, maxBytes: 5_500_000 });
+  if (!who) return;
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
@@ -70,7 +65,7 @@ module.exports = async (req, res) => {
     // 不信任模型输出：逐项校验、截断，坏的直接丢掉
     if (mode === 'photo') {
       const lessons = (Array.isArray(out.lessons) ? out.lessons : []).slice(0, 80).map(x => ({
-        day: int(x.day, 0, 6, -1), s: int(x.s, 0, 1439, -1), e: int(x.e, 1, 1440, -1),
+        day: inr(x.day, 0, 6, -1), s: inr(x.s, 0, 1439, -1), e: inr(x.e, 1, 1440, -1),
         t: str(x.t, 20), room: str(x.room, 20), teacher: str(x.teacher, 20),
       })).filter(x => x.day >= 0 && x.s >= 0 && x.e > x.s && x.t);
       return res.status(200).json({ lessons, notes });
@@ -78,11 +73,12 @@ module.exports = async (req, res) => {
     const items = (Array.isArray(out.items) ? out.items : []).slice(0, 12).map(x => {
       if (x && x.type === 'homework') return { type: 'homework', t: str(x.t, 60), sb: str(x.sb, 12), due: iso(x.due) };
       if (x && x.type === 'event') return {
-        type: 'event', date: iso(x.date), h: int(x.h, 0, 23, -1), len: int(x.len, 1, 3, 1), t: str(x.t, 20),
+        type: 'event', date: iso(x.date), s: x.s != null ? inr(x.s, 0, 1439, -1) : inr(Number(x.h) * 60, 0, 1439, -1), t: str(x.t, 20),
+        e: x.e != null ? inr(x.e, 1, 1440, -1) : inr(Number(x.h) * 60 + Number(x.len || 1) * 60, 1, 1440, -1),
         c: COLS.includes(x.c) ? x.c : 'pink', every: int(x.every, 0, 4, 0), until: iso(x.until),
       };
       return null;
-    }).filter(x => x && x.t && (x.type === 'homework' || (x.date && x.h >= 0)));
+    }).filter(x => x && x.t && (x.type === 'homework' || (x.date && x.s >= 0 && x.e > x.s)));
     return res.status(200).json({ items, notes });
   } catch (e) {
     return res.status(500).json({ error: 'server error: ' + String(e && e.message).slice(0, 120) });

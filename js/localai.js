@@ -53,13 +53,13 @@
   var iso=function(v){return /^\d{4}-\d{2}-\d{2}$/.test(String(v))?String(v):''};
 
   // ---- 整周重排：输入与 /api/plan 的请求体相同，输出 {events,notes} ----
-  var PLAN_SYS='You are Mochi, a study timetable planner. Reply with JSON only: {"events":[{"day":0,"h":9,"len":2,"t":"title","c":"pink"}],"notes":["..."]}. '+
-    'day 0=Mon..6=Sun; h=start hour (8-21); len=1-3 hours; must end by 22:00; no overlaps on the same day; c is one of pink,mint,sky,lemon,peach; t max 12 chars, start with one emoji. '+
+  var PLAN_SYS='You are Mochi, a study timetable planner. Reply with JSON only: {"events":[{"day":0,"s":540,"e":660,"t":"title","c":"pink"}],"notes":["..."]}. '+
+    'day 0=Mon..6=Sun; s,e=start/end as minutes since midnight (multiples of 5, e.g. 9:00=540), 30-180 minutes long, inside the allowed hours; no overlaps on the same day; c is one of pink,mint,sky,lemon,peach; t max 12 chars, start with one emoji. '+
     'Put the new one-off activity at its requested day/time. Move conflicting old events to free slots nearby (delete only if impossible). Never use any "fixed" slot, never use "hidden" days. '+
     'Hard study in the morning, light stuff after lunch, keep 12:00 and 18:00 free for meals, keep a rest gap, nothing heavy after 21:00. Return the COMPLETE week. notes: max 3 short Chinese sentences, cute and gentle.';
   var PLAN_SCHEMA={type:'object',required:['events','notes'],properties:{
-    events:{type:'array',items:{type:'object',required:['day','h','len','t','c'],properties:{
-      day:{type:'integer'},h:{type:'integer'},len:{type:'integer'},t:{type:'string'},c:{type:'string',enum:COLS}}}},
+    events:{type:'array',items:{type:'object',required:['day','s','e','t','c'],properties:{
+      day:{type:'integer'},s:{type:'integer'},e:{type:'integer'},t:{type:'string'},c:{type:'string',enum:COLS}}}},
     notes:{type:'array',items:{type:'string'}}}};
   async function plan(b,onProg){
     var days='一二三四五六日',
@@ -75,21 +75,21 @@
 
   // ---- 一句话添加：输入 {text,today,wd}，输出 {items,notes}（同样逐项校验）----
   var Q_SYS='You parse one Chinese sentence into timetable items. JSON only: {"items":[...],"notes":["..."]}. '+
-    'Event: {"type":"event","date":"YYYY-MM-DD","h":15,"len":1,"t":"emoji + title (max 12 chars)","c":"pink","every":0,"until":""}; h start hour 0-23, len 1-3, every = repeat every N weeks (0 none, max 4), c in pink,mint,sky,lemon,peach. '+
+    'Event: {"type":"event","date":"YYYY-MM-DD","s":930,"e":990,"t":"emoji + title (max 12 chars)","c":"pink","every":0,"until":""}; s,e = start/end minutes since midnight (e.g. 15:30=930), every = repeat every N weeks (0 none, max 4), c in pink,mint,sky,lemon,peach. '+
     'Homework: {"type":"homework","t":"title","sb":"subject","due":"YYYY-MM-DD or empty"}. '+
     'Convert relative dates (tomorrow, next Wednesday) using today\'s date. Do not invent missing date/time; explain in notes (Chinese, max 2).';
   var Q_SCHEMA={type:'object',required:['items','notes'],properties:{
     items:{type:'array',items:{type:'object',required:['type','t'],properties:{
-      type:{type:'string',enum:['event','homework']},date:{type:'string'},h:{type:'integer'},len:{type:'integer'},t:{type:'string'},
+      type:{type:'string',enum:['event','homework']},date:{type:'string'},s:{type:'integer'},e:{type:'integer'},t:{type:'string'},
       c:{type:'string',enum:COLS},every:{type:'integer'},until:{type:'string'},sb:{type:'string'},due:{type:'string'}}}},
     notes:{type:'array',items:{type:'string'}}}};
   async function quick(b,onProg){
     var o=await ask(Q_SYS,'Today is '+b.today+' (weekday index '+b.wd+', 0=Mon).\nUser said: '+String(b.text||'').slice(0,300),Q_SCHEMA,onProg);
     var items=(Array.isArray(o.items)?o.items:[]).slice(0,12).map(function(x){
       if(x&&x.type==='homework')return {type:'homework',t:str(x.t,60),sb:str(x.sb,12),due:iso(x.due)};
-      if(x&&x.type==='event')return {type:'event',date:iso(x.date),h:int(x.h,0,23,-1),len:int(x.len,1,3,1),t:str(x.t,20),
+      if(x&&x.type==='event')return {type:'event',date:iso(x.date),s:int(x.s,0,1439,-1),e:int(x.e,1,1440,-1),t:str(x.t,20),
         c:COLS.indexOf(x.c)>=0?x.c:'pink',every:int(x.every,0,4,0),until:iso(x.until)};
-      return null}).filter(function(x){return x&&x.t&&(x.type==='homework'||(x.date&&x.h>=0))});
+      return null}).filter(function(x){return x&&x.t&&(x.type==='homework'||(x.date&&x.s>=0&&x.e>x.s))});
     return {items:items,notes:(Array.isArray(o.notes)?o.notes:[]).slice(0,3).map(function(n){return str(n,80)})}}
 
   window.LocalAI={status:status,plan:plan,quick:quick};

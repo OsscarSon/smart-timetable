@@ -3,7 +3,7 @@
   var box=document.getElementById('cloud'),libs=document.getElementById('libs');
   function libLine(){
     var L=[['dayjs',typeof dayjs==='function'],['rrule',!!(window.rrule&&window.rrule.RRule)],['ts-fsrs',typeof FS!=='undefined'&&!!FS],
-      ['Dexie',typeof Dexie==='function'],['Chart.js',typeof Chart==='function'],['Lucide',!!(window.lucide&&window.lucide.createIcons)],['FullCalendar',!!(window.FullCalendar&&FullCalendar.Calendar)],['lz-string',!!window.LZString],['qrcode',typeof qrcode==='function'],['Supabase',!!(window.supabase&&window.supabase.createClient)]];
+      ['Dexie',typeof Dexie==='function'],['Lucide',!!(window.lucide&&window.lucide.createIcons)],['Chart.js',typeof Chart==='function'],['lz-string',!!window.LZString],['qrcode',typeof qrcode==='function'],['Supabase',!!(window.supabase&&window.supabase.createClient)]];
     libs.textContent='开源库：'+L.map(function(x){return x[0]+(x[1]?' ✓':' ✗')}).join('　')+(L.some(function(x){return !x[1]})?'（✗ = 没加载到，对应功能自动退回基础版）':'')}
   libLine();
   function inp(type,ph){var i=el('input');i.type=type;i.placeholder=ph;i.autocomplete=type==='password'?'current-password':'email';return i}

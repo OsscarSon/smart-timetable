@@ -22,7 +22,7 @@ function rSp(){
 function addSp(n,m){if(!n)return;SP.push({n:n.slice(0,10),w:2,m:m||[{k:'',c:'',g:''}]});ssv();rSp()}
 document.getElementById('pa').onclick=function(){var i=document.getElementById('pn');addSp(i.value.trim());i.value=''};
 document.getElementById('pex').onclick=function(){addSp('长跑',[{k:'5k',c:'21:00',g:'20:00'},{k:'10k',c:'48:42',g:'46:00'},{k:'21k',c:'2:05:00',g:''}])};
-function sput(day,hs,len,t){for(var k=0;k<hs.length;k++)if(free(day,hs[k],len)){data.push({day:day,h:hs[k],len:len,t:t.slice(0,14),c:'lemon',a:2});return true}return false}
+function sput(day,hs,len,t){for(var k=0;k<hs.length;k++)if(free(day,hs[k]*60,(hs[k]+len)*60)){data.push({day:day,s:hs[k]*60,e:(hs[k]+len)*60,t:t.slice(0,14),c:'lemon',a:2});return true}return false}
 document.getElementById('pplan').onclick=function(){
   data=data.filter(function(x){return x.a!==2});
   var q2=[],info=[];

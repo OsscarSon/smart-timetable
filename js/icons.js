@@ -2,7 +2,7 @@
 // 库没加载到（离线、CDN 被拦）或找不到某个图标时，保留原来的 emoji，不影响使用。
 (function(){
   var MAP={'📅':'calendar-days','📝':'clipboard-list','⏰':'alarm-clock','✨':'sparkles','📚':'book-open','🏃':'footprints','📊':'bar-chart-3',
-    '🏫':'school','📷':'camera','🗂':'folders','🔗':'link','🎨':'palette','🎌':'flag','☁':'cloud','💾':'save','💌':'send','⚙':'settings'};
+    '🔍':'search','🔔':'bell','🏫':'school','📷':'camera','🗂':'folders','🔗':'link','🎨':'palette','🎌':'flag','☁':'cloud','💾':'save','💌':'send','⚙':'settings'};
   function pascal(n){return n.replace(/(^|-)([a-z0-9])/g,function(m,a,b){return b.toUpperCase()})}
   function has(n){return !!(window.lucide&&lucide.icons&&lucide.icons[pascal(n)])}
   window.applyIcons=function(root){

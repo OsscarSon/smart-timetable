@@ -1,13 +1,32 @@
 {
   "name": "mochi-timetable",
   "private": true,
-  "version": "6.5.0",
+  "version": "7.1.0",
   "description": "Mochi 智能时间表。网页版不需要 npm；只有打包手机 App 才用到下面的脚本。",
   "scripts": {
     "build:www": "node scripts/build-www.mjs",
     "sync": "npm run build:www && npx cap sync",
     "android": "npm run sync && npx cap open android",
     "ios": "npm run sync && npx cap open ios",
+    "android:widget": "node scripts/android-widget.mjs",
     "check": "node scripts/check.mjs"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0",
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/ios": "^7.0.0",
+    "@capacitor/local-notifications": "^7.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "dayjs": "1.11.13",
+    "rrule": "2.8.1",
+    "ts-fsrs": "4.4.0",
+    "dexie": "4.0.10",
+    "@supabase/supabase-js": "2.45.4",
+    "chart.js": "4.4.1",
+    "lz-string": "1.5.0",
+    "qrcode-generator": "1.4.4",
+    "lucide": "0.263.1"
   }
 }

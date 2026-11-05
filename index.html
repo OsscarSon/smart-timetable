@@ -4,41 +4,70 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mochi 时间表</title>
-<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<meta name="description" content="Mochi 智能时间表：AI 整周重排、拍照导入课表、一句话添加、复习与运动计划。">
+<meta name="theme-color" content="#fff4ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1613" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#ff8f4d">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mochi">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="app">
 
-  <!-- 顶部问候条 -->
-  <section class="card side">
-    <div class="hello">
-      <button class="burger" id="burger" aria-label="打开菜单"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
-      <div class="avatar">🐱</div>
-      <div><h1 id="greet">早安，小主人 ☀️</h1><small id="today"></small></div>
-    </div>
-    <div class="msg" id="bn" style="margin-top:8px;color:var(--ink)"></div>
-  </section>
+  <!-- 顶栏：菜单 + 问候 / 日期 + 搜索 + 今天 -->
+  <header class="top" id="top">
+    <button class="burger" id="burger" aria-label="打开菜单"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <div class="top-t"><h1 id="greet">早安，小主人 ☀️</h1><small id="today"></small></div>
+    <button class="ibtn" id="srchb" aria-label="搜索">🔍</button>
+    <button class="tdp" id="tdp" aria-label="回到今天"><b id="tdn"></b><span>今天</span></button>
+  </header>
 
-  <!-- 课表：日视图（默认）/ 周视图 -->
+  <!-- 课表：日视图（窄屏默认）/ 周视图；≥768px 时左周视图 + 右当天详情 -->
   <section class="card tt vm-day" id="v-tt">
-    <div class="tt-head">
-      <h2 id="wt" title="点一下可以跳到某一天">🗓️ 本周</h2>
-      <select id="ttsel" class="ttsel" aria-label="切换课表"></select>
-      <input type="date" id="wjump" class="wjump" tabindex="-1" aria-hidden="true">
-      <div class="seg" role="group" aria-label="视图"><button id="vmd" class="on">日</button><button id="vmw">周</button></div>
-      <div class="btns"><button id="wp" aria-label="上一周">‹</button><button id="wn0">今天</button><button id="wn" aria-label="下一周">›</button><button id="wcp" class="wkonly">复制→下周</button><button id="clr" class="wkonly">清空</button></div>
+    <div class="tt-main">
+      <div class="tt-head">
+        <h2 id="wt" title="点一下可以跳到某一天">🗓️ 本周</h2>
+        <select id="ttsel" class="ttsel" aria-label="切换课表"></select>
+        <input type="date" id="wjump" class="wjump" tabindex="-1" aria-hidden="true">
+        <div class="seg" id="vseg" role="group" aria-label="视图"><button id="vmd" class="on">日</button><button id="vmw">周</button></div>
+        <div class="btns">
+          <button id="wp" aria-label="上一周">‹</button><button id="wn0" class="now">今天</button><button id="wn" aria-label="下一周">›</button>
+          <button id="wmore" aria-label="更多操作" aria-haspopup="true" aria-expanded="false">⋯</button>
+        </div>
+        <div class="pop" id="wpop" hidden>
+          <button id="wcp">复制本周手动安排 → 下周</button>
+          <button id="clr" class="dng">清空本周手动安排…</button>
+        </div>
+      </div>
+      <div class="grid wk" id="grid"></div>
     </div>
-    <div class="dnow" id="dnow"></div>
-    <div class="dstrip dayv" id="dstrip"></div>
-    <div class="dlist dayv" id="dlist"></div>
-    <div class="grid" id="grid"></div>
-    <div class="fcwrap wkonly" id="fc" style="display:none"></div>
-    <button class="fab sm" id="aifab" aria-label="AI 添加">✨</button>
-    <button class="fab" id="fab" aria-label="添加安排">＋</button>
+    <div class="tt-side">
+      <div class="side-day">
+        <div class="bnr" id="bn"></div>
+        <div class="dnow" id="dnow"></div>
+        <div class="dstrip dayv" id="dstrip"></div>
+        <div class="dlist dayv" id="dlist"></div>
+      </div>
+      <div class="side-rm">
+        <h3 class="hss">🔔 我的提醒</h3>
+        <div class="tl full" id="rml"></div>
+        <button class="chip as" id="rma">＋ 加一条提醒</button>
+      </div>
+      <div class="side-hw" id="sidehw"></div>
+    </div>
+    <button class="fab" id="fab" aria-label="添加" aria-haspopup="true" aria-expanded="false">＋</button>
+    <div class="fabm" id="fabm" hidden>
+      <button id="fm0"><i>✍️</i>手动添加</button>
+      <button id="fm1"><i>✨</i>一句话 AI</button>
+      <button id="fm2"><i>📷</i>拍照导入课表</button>
+    </div>
   </section>
 
   <!-- 作业 -->
@@ -47,7 +76,7 @@
     <div class="row"><input id="hwq" type="search" placeholder="🔍 搜索标题、科目、备注"></div>
     <div class="chips" id="hwf"></div>
     <button class="big" id="hwa">＋ 新作业</button>
-    <div class="tl" id="hwl" style="max-height:none"></div>
+    <div class="tl full" id="hwl"></div>
   </section>
 
   <!-- 学习 -->
@@ -55,12 +84,12 @@
     <h2>📚 学习计划</h2>
     <div class="lg"><span class="c-mint">🔁 复习（上午）</span><span class="c-pink">✏️ 做题（下午）</span><span class="c-sky">👀 预习（晚上）</span></div>
     <div class="chips" id="subs"></div>
-    <div class="row"><span class="msg" id="exl" style="align-self:center;white-space:nowrap"></span><input id="exd" type="date"></div>
+    <div class="row"><span class="msg nw" id="exl"></span><input id="exd" type="date"></div>
     <div class="row"><input id="sn" placeholder="新增科目，如：历史"><button id="sa">+科目</button></div>
     <div class="row"><input id="tn" placeholder="加入章节，如：函数与导数"><button id="ta">加入</button></div>
     <button class="big" id="plan">🪄 一键排进本周课表</button>
     <div class="msg" id="msg">先选科目，再加入要学的章节～</div>
-    <h2 style="font-size:16px">✅ 本周学习清单</h2><div class="tl" id="wl1"></div>
+    <h3 class="hs">✅ 本周学习清单</h3><div class="tl" id="wl1"></div>
     <div class="tl" id="tl"></div>
   </section>
 
@@ -68,133 +97,130 @@
   <section class="card st" id="v-sp">
     <h2>🏃 运动计划</h2>
     <div class="row"><input id="pn" placeholder="喜欢的运动，如：长跑 / 游泳 / 羽毛球"><button id="pa">加入</button></div>
-    <button class="chip" id="pex" style="align-self:flex-start">🏃 填入长跑示例</button>
-    <div class="tl" id="sl" style="max-height:none"></div>
+    <button class="chip as" id="pex">🏃 填入长跑示例</button>
+    <div class="tl full" id="sl"></div>
     <button class="big" id="pplan">🪄 排进本周课表（学习优先）</button>
     <div class="msg" id="pmsg">写下现在的成绩和目标，我会排针对性的训练～</div>
-    <h2 style="font-size:16px">✅ 本周训练清单</h2><div class="tl" id="wl2"></div>
+    <h3 class="hs">✅ 本周训练清单</h3><div class="tl" id="wl2"></div>
   </section>
 
-  <!-- 设置 -->
+  <!-- 设置：先是分类列表（#seidx），点进去才是各个二级页面 -->
   <section class="card st" id="v-se">
-    <h2>⚙️ 设置</h2>
+    <h2 id="seh">⚙️ 设置</h2>
+    <div class="se-idx" id="seidx"></div>
 
-    <div class="sec" data-sec="look" data-t="外观与日历">
-    <h2 style="font-size:16px">🎨 外观</h2>
-    <div class="chips" id="thm"></div>
-    <div class="swatches" id="acc"></div>
+    <div class="sec" data-sec="look" data-t="外观与显示">
+      <h3 class="hs">🎨 外观</h3>
+      <div class="chips" id="thm"></div>
+      <div class="swatches" id="acc"></div>
 
-    <h2 style="font-size:16px">📅 日历</h2>
-    <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
-    <label class="tp"><input type="checkbox" id="hwk"><div class="n">隐藏周末<small>课表只显示周一到周五</small></div></label>
-    <label class="tp"><input type="checkbox" id="fcon"><div class="n">新版周视图（FullCalendar）<small>连续时间轴、当前时间线；关闭 = 方块网格</small></div></label>
-    <label class="tp"><input type="checkbox" id="h24"><div class="n">24 小时制<small>关闭后显示 8am / 2pm</small></div></label>
-    <div class="mv"><select id="sh0"></select><select id="sh1"></select></div>
+      <h3 class="hs">📅 日历</h3>
+      <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
+      <label class="tp"><input type="checkbox" id="hwk"><div class="n">隐藏周末<small>课表只显示周一到周五</small></div></label>
+      <label class="tp"><input type="checkbox" id="h24"><div class="n">24 小时制<small>关闭后显示 8am / 2pm</small></div></label>
+      <div class="mv"><select id="sh0" class="sel" aria-label="课表开始时间"></select><select id="sh1" class="sel" aria-label="课表结束时间"></select></div>
 
+      <h3 class="hs">👀 视图</h3>
+      <label class="tp"><div class="n">视图密度<small>周视图每小时的高度、日视图卡片的松紧</small></div><select id="vdens" class="sel"><option value="compact">紧凑</option><option value="std">标准</option><option value="roomy">宽松</option></select></label>
+      <label class="tp"><div class="n">周视图时间吸附<small>点空白处新增时，开始时间对齐到几分钟</small></div><select id="vsnap" class="sel"><option value="15">15 分钟</option><option value="30">30 分钟</option></select></label>
+      <label class="tp"><input type="checkbox" id="vwkc"><div class="n">折叠周末列<small>周视图里把周六、周日收窄（点周视图左上角的按钮也能切换）</small></div></label>
+      <label class="tp"><input type="checkbox" id="vsr"><div class="n">列表里显示教室</div></label>
+      <label class="tp"><input type="checkbox" id="vst"><div class="n">列表里显示老师</div></label>
     </div>
-    <div class="sec" data-sec="tables" data-t="我的课表">
-    <h2 style="font-size:16px">🗂️ 我的课表</h2>
-    <div class="tl" id="ttl" style="max-height:none"></div>
-    <div class="row"><button class="chip" id="tta">＋ 新建课表</button><button class="chip" id="wzr">🪄 重新运行向导</button></div>
-    <div class="msg">例如：学校、运动、备考各一个。当前课表：<b id="ttn"></b>。每个课表的安排、固定课、重复活动、作业都是分开的。</div>
 
-    </div>
-    <div class="sec" data-sec="fixed" data-t="固定课表">
-    <h2 style="font-size:16px">🏫 固定课表（每周重复，不会被排进别的活动）</h2>
-    <label class="tp"><input type="checkbox" id="fxon"><div class="n">启用固定课表<small>放假时可以先关掉</small></div></label>
-    <div class="mv"><select id="cyc"></select><select id="cyw"></select></div>
-    <h2 style="font-size:14px">⏱ 节次时间</h2>
-    <div class="tl" id="perl" style="max-height:none"></div>
-    <div class="gen">
-      <label>首节开始<input type="time" id="g0" value="08:00"></label>
-      <label>每节(分)<input type="number" id="g1" value="45" min="15" max="180"></label>
-      <label>课间(分)<input type="number" id="g2" value="10" min="0" max="60"></label>
-      <label>共几节<input type="number" id="g3" value="8" min="1" max="16"></label>
-    </div>
-    <div class="row"><button class="chip" id="perg">⚙ 按上面的数字生成</button><button class="chip" id="pera">＋ 加一节</button></div>
-    <h2 style="font-size:14px">📖 课程</h2>
-    <div class="tl" id="fxl" style="max-height:none"></div>
-    <div class="row"><button class="chip" id="fxa">＋ 加一节课</button><button class="chip" id="fxph">📷 拍照导入课表</button></div>
+    <div class="sec" data-sec="tt" data-t="课表与课程">
+      <h3 class="hs">🗂️ 我的课表</h3>
+      <div class="tl full" id="ttl"></div>
+      <div class="row"><button class="chip" id="tta">＋ 新建课表</button><button class="chip" id="wzr">🪄 重新运行向导</button></div>
+      <div class="msg">例如：学校、运动、备考各一个。当前课表：<b id="ttn"></b>。每个课表的安排、固定课、重复活动、作业都是分开的。</div>
 
+      <h3 class="hs">🏫 固定课表</h3>
+      <div class="msg">每周重复；这些时段不会被排进别的活动。</div>
+      <label class="tp"><input type="checkbox" id="fxon"><div class="n">启用固定课表<small>放假时可以先关掉</small></div></label>
+      <div class="mv"><select id="cyc" class="sel" aria-label="课表循环"></select><select id="cyw" class="sel" aria-label="这周是第几周"></select></div>
+      <div class="msg">轮换只影响固定课程。重复活动按各自的起始日期计算，不会因为这里切换轮换周数而错位。</div>
+      <h4 class="hsss">⏱ 节次时间</h4>
+      <div class="tl full" id="perl"></div>
+      <div class="gen">
+        <label>首节开始<input type="time" id="g0" value="08:00"></label>
+        <label>每节(分)<input type="number" id="g1" value="45" min="15" max="180"></label>
+        <label>课间(分)<input type="number" id="g2" value="10" min="0" max="60"></label>
+        <label>共几节<input type="number" id="g3" value="8" min="1" max="16"></label>
+      </div>
+      <div class="row"><button class="chip" id="perg">⚙ 按上面的数字生成</button><button class="chip" id="pera">＋ 加一节</button></div>
+      <h4 class="hsss">📖 课程</h4>
+      <div class="tl full" id="fxl"></div>
+      <div class="row"><button class="chip" id="fxa">＋ 加一节课</button><button class="chip" id="fxph">📷 拍照导入课表</button></div>
     </div>
+
     <div class="sec" data-sec="hol" data-t="假期">
-    <h2 style="font-size:16px">🎌 假期</h2>
-    <div class="tl" id="hol" style="max-height:none"></div>
-    <div class="row"><input id="holn" placeholder="名称，如：学期假" maxlength="12"></div>
-    <div class="row"><input type="date" id="hola"><input type="date" id="holb"></div>
-    <div class="row"><button class="chip" id="holadd">＋ 加入假期（结束日期可留空 = 只放一天）</button></div>
-    <label class="tp"><input type="checkbox" id="fxh"><div class="n">假期里隐藏固定课表<small>放假期间课表不显示课程，也不发上课提醒</small></div></label>
-
+      <h3 class="hs">🎌 假期</h3>
+      <div class="tl full" id="hol"></div>
+      <div class="row"><input id="holn" placeholder="名称，如：学期假" maxlength="12"></div>
+      <div class="row"><input type="date" id="hola"><input type="date" id="holb"></div>
+      <div class="row"><button class="chip" id="holadd">＋ 加入假期（结束日期可留空 = 只放一天）</button></div>
+      <label class="tp"><input type="checkbox" id="fxh"><div class="n">假期里隐藏固定课表<small>放假期间课表不显示课程，也不发上课提醒</small></div></label>
     </div>
-    <div class="sec" data-sec="cloud" data-t="账号与云同步">
-    <h2 style="font-size:16px">☁️ 账号与云同步</h2>
-    <div id="cloud"></div>
-    <div class="msg" id="libs"></div>
 
+    <div class="sec" data-sec="notify" data-t="通知与提醒">
+      <h3 class="hs">🔔 提醒时间</h3>
+      <label class="tp"><div class="n">课前 / 活动前提醒<small>上课、活动开始前多久提醒</small></div><select id="nlead" class="sel"></select></label>
+      <label class="tp"><input type="checkbox" id="nhw"><div class="n">作业截止提醒<small>作业截止当天提醒一次</small></div></label>
+      <label class="tp"><div class="n">截止当天几点提醒</div><input type="time" id="nhwt" class="sel"></label>
+      <label class="tp"><input type="checkbox" id="nhwe"><div class="n">截止前一晚 20:00 也提醒</div></label>
+      <h3 class="hs">🔊 提示方式</h3>
+      <label class="tp"><div class="n">声音 / 振动<small>手机 App：改了之后新排的提醒生效；网页版由浏览器决定</small></div><select id="nsnd" class="sel"><option value="sound">声音 + 振动</option><option value="vib">仅振动</option><option value="quiet">静音（只在通知栏显示）</option></select></label>
+      <div class="row"><button id="ntf">🔔 开启通知</button><button class="chip" id="ntt">发一条测试通知</button></div>
+      <div class="msg" id="ntmsg">网页版：页面开着才会提醒。装成手机 App 后会用系统闹钟，App 关掉也会响。</div>
+      <div class="row" id="ntexr" hidden><button class="chip" id="ntex">⏰ 检查「精确闹钟」权限</button></div>
+      <details class="guide">
+        <summary>手机收不到准时提醒？看这里</summary>
+        <ol>
+          <li><b>允许通知</b>：系统设置 → 应用 → Mochi → 通知，全部打开。</li>
+          <li><b>精确闹钟</b>（Android 12 及以上）：系统设置 → 应用 → Mochi → 「闹钟和提醒」，打开。也可以点上面的“检查精确闹钟权限”。</li>
+          <li><b>电池优化</b>：系统设置 → 电池 → Mochi → 选“不受限制”或“允许后台活动”。</li>
+          <li><b>自启动 / 后台弹出</b>（部分国产手机）：小米在“应用设置 → 自启动”；华为在“应用启动管理”里关掉自动管理并全部允许；OPPO / vivo 在“电池 → 后台耗电管理”里允许；三星在“电池 → 后台使用限制”里把 Mochi 移出休眠名单。</li>
+          <li>设置完成后重新打开一次 Mochi，提醒会重新排好。</li>
+        </ol>
+      </details>
     </div>
-    <div class="sec" data-sec="share" data-t="分享与导出">
-    <h2 style="font-size:16px">📤 分享与导出</h2>
-    <div class="row" style="flex-wrap:wrap"><button class="chip" id="shl">🔗 分享课表</button><button class="chip" id="ics">📅 导出日历 (.ics)</button></div>
-    <div class="msg" id="shmsg">分享 = 把当前课表的固定课程压成一个链接 / 二维码，朋友打开就能导入为新课表。.ics 可导入 Google / Apple 日历。</div>
-    <div id="shqr" class="shqr"></div>
 
+    <div class="sec" data-sec="cloud" data-t="账号与同步">
+      <h3 class="hs">☁️ 账号与云同步</h3>
+      <div id="cloud"></div>
+      <div class="msg" id="libs"></div>
     </div>
-    <div class="sec" data-sec="backup" data-t="备份">
-    <h2 style="font-size:16px">💾 备份</h2>
-    <div class="row"><button id="bex">导出备份</button><button id="bim">导入备份</button></div>
-    <input type="file" id="bfile" accept="application/json" hidden>
-    <div class="msg" id="semsg">换手机或清缓存前，先导出备份文件。</div>
-    </div>
-  </section>
 
-  <!-- 提醒 -->
-  <section class="card st" id="v-rm">
-    <h2>⏰ 提醒</h2>
-    <h2 style="font-size:16px">📌 今天的安排</h2><div class="tl" id="wl0"></div>
-    <h2 style="font-size:16px">🔔 我的提醒</h2><div class="tl" id="rml" style="max-height:none"></div>
-    <button class="chip" id="rma" style="align-self:flex-start">＋ 加一条提醒</button>
-    <div class="row"><button id="ntf">🔔 开启通知</button></div>
-    <div class="msg" id="ntmsg">勾选 = 完成。网页要开着才会提醒；真正的后台推送之后再做 🐱</div>
+    <div class="sec" data-sec="data" data-t="数据：分享与备份">
+      <h3 class="hs">📤 分享与导出</h3>
+      <div class="row wrap"><button class="chip" id="shl">🔗 分享课表</button><button class="chip" id="ics">📅 导出日历 (.ics)</button></div>
+      <div class="msg" id="shmsg">分享 = 把当前课表的固定课程压成一个链接 / 二维码，朋友打开就能导入为新课表。.ics 可导入 Google / Apple 日历（假期会自动排除）。</div>
+      <div id="shqr" class="shqr"></div>
+      <h3 class="hs">💾 备份</h3>
+      <div class="row wrap"><button id="bex">导出备份</button><button class="chip" id="bexf">导出（含附件）</button><button id="bim">导入备份</button></div>
+      <input type="file" id="bfile" accept="application/json" hidden>
+      <div class="msg" id="semsg">普通备份只含文字数据，<b>不含作业 / 课程附件</b>；要连附件一起带走，请用“导出（含附件）”（文件会比较大）。</div>
+    </div>
   </section>
 
   <!-- 统计 -->
   <section class="card st" id="v-sta">
     <h2>📊 统计</h2>
     <div class="msg" id="stsum"></div>
-    <h2 style="font-size:16px">📝 作业</h2>
+    <h3 class="hs">📝 作业</h3>
     <div class="chbox"><canvas id="ch1"></canvas></div>
-    <h2 style="font-size:16px">🗓️ 这一周每天的安排时长（小时）</h2>
+    <h3 class="hs">🗓️ 这一周每天的安排时长（小时）</h3>
     <div class="chbox"><canvas id="ch2"></canvas></div>
     <div class="msg" id="stmsg"></div>
   </section>
 
-  <!-- 更多 -->
+  <!-- 更多：只留入口 -->
   <section class="card st" id="v-more">
     <h2>更多</h2>
-    <button class="mrow" data-go="gd"><span>📖</span><div><b>功能表</b><small>全部功能和使用方法</small></div><i>›</i></button>
-    <button class="mrow" data-go="sta"><span>📊</span><div><b>统计</b><small>作业完成率、每天安排时长</small></div><i>›</i></button>
-    <button class="mrow" data-go="st"><span>📚</span><div><b>学习计划</b><small>章节、考试日期、复习排程</small></div><i>›</i></button>
+    <button class="mrow" id="mr-ai"><span>✨</span><div><b>AI 助手</b><small>一句话添加 · 拍照导入课表 · 整周重排</small></div><i>›</i></button>
     <button class="mrow" data-go="sp"><span>🏃</span><div><b>运动计划</b><small>训练安排</small></div><i>›</i></button>
-    <button class="mrow" data-go="se"><span>⚙️</span><div><b>设置</b><small>外观、课表、假期、云同步、备份</small></div><i>›</i></button>
-  </section>
-
-  <section class="card st" id="v-gd">
-    <h2>📖 功能表</h2>
-    <input id="gdq" class="gdq" placeholder="搜索功能，例如：提醒、分享、重复…">
-    <div id="gdl"></div>
-  </section>
-
-  <!-- Ai + 记录（在「更多」里显示） -->
-  <section class="bottom" id="v-bt">
-    <div class="card ai" id="ai">
-      <div class="bubble" id="bubble">喵～我是你的 AI 小助手！之后我会根据你的作息和精力，帮你把复习排得刚刚好 ✨<br><button class="demo" id="demo">示范：帮我排一周</button></div>
-      <div class="pet">🐱</div><b>Ai</b>
-    </div>
-    <div class="card log">
-      <h2>📝 记录本周特别安排</h2>
-      <input id="inp" hidden><div class="tl" id="lr" style="max-height:130px"></div><div class="row"><button class="chip" id="la">＋ 一条</button><button id="add">排</button></div>
-      <ul id="items" style="max-height:60px"><li class="empty">把这周的临时活动打在这里，我会帮你排进去、挪开冲突～</li></ul>
-    </div>
+    <button class="mrow" id="mr-srch"><span>🔍</span><div><b>搜索</b><small>课程、活动、作业、提醒</small></div><i>›</i></button>
+    <button class="mrow" data-go="se"><span>⚙️</span><div><b>设置</b><small>外观、课表、通知、假期、同步、备份（也可点左上角 ≡）</small></div><i>›</i></button>
   </section>
 </div>
 
@@ -206,7 +232,8 @@
 <nav class="tabbar" aria-label="主导航"><div class="in">
   <button class="on" data-v="tt"><span>📅</span>课表</button>
   <button data-v="hw"><span>📝</span>作业</button>
-  <button data-v="rm"><span>⏰</span>提醒</button>
+  <button data-v="st"><span>📚</span>学习</button>
+  <button data-v="sta"><span>📊</span>统计</button>
   <button data-v="more"><span>✨</span>更多</button>
 </div></nav>
 
@@ -217,16 +244,19 @@
     <div class="ed-card"><label class="er name"><input id="dn" placeholder="做什么？例如：数学复习" maxlength="20"></label></div>
     <div class="ed-card">
       <label class="er"><span>星期</span><select id="dday"></select></label>
-      <label class="er"><span>开始时间</span><select id="dh"></select></label>
-      <label class="er"><span>持续时间</span><select id="dl"></select></label>
+      <div class="ed-2">
+        <label class="er"><span>开始时间</span><input type="time" id="dh" step="300"></label>
+        <label class="er"><span>结束时间</span><input type="time" id="de" step="300"></label>
+      </div>
+      <div class="er"><span>时长（点一下 = 从开始时间往后算）</span><div class="chips" id="ddur"></div></div>
     </div>
     <div class="ed-card">
       <label class="er"><span>重复</span><select id="drp"><option value="0">不重复</option><option value="1">每周重复</option><option value="2">每 2 周重复</option><option value="3">每 3 周重复</option><option value="4">每 4 周重复</option><option value="m">每月第几个周几</option><option value="ml">每月最后一个周几</option></select></label>
-      <div class="er" id="drw" style="display:none"><span>重复到哪天（留空 = 一直重复）</span><input type="date" id="dun"></div>
-      <label class="er tgl" style="display:none"><input type="checkbox" id="dxh"><div class="n">假期里不出现<small>在 设置 → 假期 里添加假期</small></div></label>
+      <div class="er" id="drw" hidden><span>重复到哪天（留空 = 一直重复）</span><input type="date" id="dun"></div>
+      <label class="er tgl" id="dxr" hidden><input type="checkbox" id="dxh"><div class="n">假期里不出现<small>在 设置 → 假期 里添加假期</small></div></label>
     </div>
     <div class="ed-card"><div class="er"><span>颜色</span><div class="sw" id="sw"></div></div></div>
-    <div class="ed-card"><button class="er-btn" id="ddo" style="display:none">只删本周</button><button class="er-btn" id="dd">删除</button></div>
+    <div class="ed-card"><button class="er-btn" id="ddo" hidden>只删本周</button><button class="er-btn" id="dd">删除</button></div>
   </div>
 </div></div>
 
@@ -245,13 +275,13 @@
       <button class="ed-card tile" id="lklb">🔗 链接<small id="lkc"></small></button>
       <button class="ed-card tile" id="flb">📎 文件<small id="flc"></small></button>
     </div>
-    <div class="ed-card" id="lkp" style="display:none">
-      <div class="tl" id="lkl" style="max-height:none;padding:6px 14px"></div>
+    <div class="ed-card" id="lkp" hidden>
+      <div class="tl full pad" id="lkl"></div>
       <div class="er"><span>添加链接</span><div class="row"><input id="lki" placeholder="https://…" maxlength="300"><button id="lka">＋</button></div></div>
     </div>
-    <div class="ed-card" id="flp" style="display:none">
-      <div class="tl" id="fll" style="max-height:none;padding:6px 14px"></div>
-      <div class="er"><span>添加照片 / 文件</span><label class="chip" style="cursor:pointer;align-self:flex-start">📎 选择文件<input type="file" id="lsfi" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" hidden></label><div class="msg" id="flm"></div></div>
+    <div class="ed-card" id="flp" hidden>
+      <div class="tl full pad" id="fll"></div>
+      <div class="er"><span>添加照片 / 文件</span><label class="chip as pt">📎 选择文件<input type="file" id="lsfi" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" hidden></label><div class="msg" id="flm"></div></div>
     </div>
     <div class="ed-card">
       <div class="er"><span>星期（可多选，一次加多天）</span><div class="chips" id="lsd"></div></div>
@@ -282,15 +312,32 @@
   <div class="acts"><button id="wzk">跳过</button><button id="wzp">上一步</button><button class="ok" id="wzn">下一步</button></div>
 </div></div>
 
-<!-- AI 添加弹窗 -->
-<div class="mask" id="mask6"><div class="dlg" onclick="event.stopPropagation()">
-  <h2>✨ AI 添加</h2>
-  <textarea id="aiq" rows="3" maxlength="300" placeholder="说一句话就行，例如：下周三下午三点数学补习，每周重复 / 周五前交英语作文"></textarea>
-  <div class="row" style="flex-wrap:wrap"><button class="chip" id="aimic">🎤 语音</button><label class="chip" style="cursor:pointer">📷 拍照导入课表<input type="file" id="aiimg" accept="image/*" hidden></label></div>
+<!-- AI 助手：一句话 / 拍照课表 / 整周重排 -->
+<div class="mask" id="mask6"><div class="dlg aid" onclick="event.stopPropagation()">
+  <h2>✨ AI 助手</h2>
+  <div class="seg wide" id="aitabs" role="tablist"><button data-t="quick" class="on" role="tab">一句话</button><button data-t="photo" role="tab">拍照课表</button><button data-t="plan" role="tab">整周重排</button></div>
+  <div class="aip" data-p="quick">
+    <textarea id="aiq" rows="3" maxlength="300" placeholder="说一句话就行，例如：下周三下午三点半数学补习，每周重复 / 周五前交英语作文"></textarea>
+    <div class="row wrap"><button class="chip" id="aimic">🎤 语音</button></div>
+  </div>
+  <div class="aip" data-p="photo" hidden>
+    <div class="msg">拍一张课表或选一张截图，我来识别每一节课。识别结果会先给你核对，确认后才会写入。</div>
+    <label class="chip as pt">📷 拍照 / 选择课表图片<input type="file" id="aiimg" accept="image/*" hidden></label>
+  </div>
+  <div class="aip" data-p="plan" hidden>
+    <textarea id="aipl" rows="4" maxlength="400" placeholder="这周有什么特别安排？一行一条，例如：&#10;周六下午三点和朋友打球&#10;周日早上有跑步比赛"></textarea>
+    <div class="msg">我会把它们放进对应时间，把冲突的旧安排挪到空档，并按你的作息重排整周。</div>
+  </div>
   <div class="msg" id="aimsg"></div>
-  <div class="tl" id="ail" style="max-height:240px"></div>
-  <label class="tp" id="airw" style="display:none"><input type="checkbox" id="airep"><div class="n">先清空现有的固定课表<small>勾选 = 用识别结果替换；不勾 = 追加</small></div></label>
-  <div class="acts"><button id="aix">关闭</button><button class="ok" id="aigo">解析</button><button class="ok" id="aiok" style="display:none">加入</button></div>
+  <div class="tl" id="ail"></div>
+  <label class="tp" id="airw" hidden><input type="checkbox" id="airep"><div class="n">先清空现有的固定课表<small>勾选 = 用识别结果替换；不勾 = 追加</small></div></label>
+  <div class="acts"><button id="aix">关闭</button><button class="ok" id="aigo">解析</button><button class="ok" id="aiok" hidden>加入</button></div>
+</div></div>
+
+<!-- 搜索 -->
+<div class="mask" id="mask7"><div class="dlg srch" onclick="event.stopPropagation()">
+  <div class="row"><input id="sq" type="search" placeholder="搜索课程、教室、活动、作业、提醒" aria-label="搜索"><button class="chip" id="sx">关闭</button></div>
+  <div class="tl full" id="srl"></div>
 </div></div>
 
 <!-- 作业弹窗 -->
@@ -303,7 +350,7 @@
   <textarea id="hwno" placeholder="备注（可选）" rows="2" maxlength="300"></textarea>
   <input id="hwli" placeholder="链接（可选，如 https://…）" maxlength="300">
   <div class="chips" id="hwat"></div>
-  <div class="row"><label class="chip" style="cursor:pointer">📎 添加照片 / 文件<input type="file" id="hwfi" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" hidden></label></div>
+  <div class="row"><label class="chip pt">📎 添加照片 / 文件<input type="file" id="hwfi" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" hidden></label></div>
   <div class="msg" id="hwam"></div>
   <div class="acts"><button id="hwx">取消</button><button class="del" id="hwd">删除</button><button class="ok" id="hwok">保存</button></div>
 </div></div>
@@ -318,17 +365,16 @@
 <script data-lib="supabase" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script data-lib="chart.js" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <script data-lib="lz-string" src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
-<script data-lib="fullcalendar" src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script data-lib="lucide" src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
+<script src="js/api.js"></script>
 <script src="js/core.js"></script>
 <script src="js/dates.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/recur.js"></script>
 <script src="js/srs.js"></script>
 <script src="js/timetable.js"></script>
-<script src="js/fcview.js"></script>
 <script src="js/dayview.js"></script>
 <script src="js/localai.js"></script>
 <script src="js/log.js"></script>
@@ -345,12 +391,12 @@
 <script src="js/ai.js"></script>
 <script src="js/share.js"></script>
 <script src="js/stats.js"></script>
+<script src="js/notifyset.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/native.js"></script>
-<script src="js/guide.js"></script>
+<script src="js/search.js"></script>
 <script src="js/app.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/icons.js"></script>
-<script src="js/widget.js"></script>
 </body>
 </html>

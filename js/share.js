@@ -12,26 +12,41 @@
     if(o.loc)L.push('LOCATION:'+esc(o.loc));if(o.desc)L.push('DESCRIPTION:'+esc(o.desc));
     if(o.rr)L.push('RRULE:'+o.rr);(o.ex||[]).forEach(function(dn){L.push('EXDATE:'+dts(dn,o.s))});
     L.push('END:VEVENT');return L.map(fold).join('\r\n')}
+  // 假期里的出现日期（EXDATE）：把假期区间逐天过一遍，凡是落在“规则会出现的日子”上的就排除
+  function holDays(match){
+    var out=[];if(typeof HOL==='undefined')return out;
+    HOL.forEach(function(h){var hi=Math.min(h.b,h.a+800);for(var dn=h.a;dn<=hi;dn++)if(match(dn))out.push(dn)});
+    return out}
   function buildIcs(){
     var out=[],n=0,cyc=TT.cyc||1,anc=TT.anc!=null?TT.anc:mondayDn(todayDn);
-    FX.forEach(function(l){                       // 固定课程：每周 / 每 N 周重复
-      var ks=(cyc>1&&l.wk&&l.wk.length)?l.wk:[1];
+    FX.forEach(function(l){                       // 固定课程：每周 / 每 N 周重复；尊重学期起止日期和假期
+      var ks=(cyc>1&&l.wk&&l.wk.length)?l.wk:[0],step=(cyc>1&&l.wk&&l.wk.length)?cyc:1;
       ks.forEach(function(k){
-        out.push(ev({id:l.id+'-'+k,dn:anc+(k-1)*7+l.day,s:l.s,e:l.e,t:l.t,loc:l.room,
-          desc:[l.teacher,l.type!=='课'?l.type:''].filter(Boolean).join(' · '),rr:'FREQ=WEEKLY;INTERVAL='+cyc}));n++})});
+        var first=anc+(k?(k-1)*7:0)+l.day;
+        if(l.d0!=null&&first<l.d0)first+=Math.ceil((l.d0-first)/(7*step))*7*step;
+        var rr='FREQ=WEEKLY;INTERVAL='+step+(l.d1!=null?';UNTIL='+dts(l.d1,23*60+59):'');
+        if(l.d1!=null&&first>l.d1)return;
+        var ex=SET.fxh?holDays(function(dn){return dn>=first&&(dn-first)%(7*step)===0&&(l.d1==null||dn<=l.d1)}):[];
+        out.push(ev({id:l.id+'-'+k,dn:first,s:l.s,e:l.e,t:l.t,loc:[(l.bld||'')+(l.room||'')].filter(Boolean).join(''),
+          desc:[l.teacher,l.type!=='课'?l.type:''].filter(Boolean).join(' · '),rr:rr,ex:ex}));n++})});
     RP.forEach(function(r){                       // 重复活动
       var rr=r.mo?'FREQ=MONTHLY;BYDAY='+(r.mo===-1?'-1':r.mo)+DOW[r.day]:'FREQ=WEEKLY;INTERVAL='+(r.ev||1);
       if(r.un!=null)rr+=';UNTIL='+dts(r.un,23*60+59);
-      out.push(ev({id:r.id,dn:r.a0,s:r.h*60,e:(r.h+r.len)*60,t:r.t,rr:rr,ex:r.sk}));n++});
+      var ex=(r.sk||[]).slice();
+      if(r.xh)holDays(function(dn){
+        if(dn<r.a0||(r.un!=null&&dn>r.un)||dnDate(dn).wd!==r.day)return false;
+        if(r.mo)return r.mo===-1?dnDate(dn+7).m!==dnDate(dn).m:nthOf(dn)===r.mo;
+        return (dn-r.a0)%(7*(r.ev||1))===0}).forEach(function(dn){ex.push(dn)});
+      out.push(ev({id:r.id,dn:r.a0,s:r.s,e:r.e,t:r.t,rr:rr,ex:ex}));n++});
     WK[curW]=data;
     Object.keys(WK).forEach(function(w){          // 手动安排（每一周）
-      (WK[w]||[]).forEach(function(x,i){out.push(ev({id:'m'+w+'-'+i+'-'+x.day+'-'+x.h,dn:dnOf(+w,x.day),s:x.h*60,e:(x.h+x.len)*60,t:x.t}));n++})});
+      (WK[w]||[]).forEach(function(x,i){out.push(ev({id:'m'+w+'-'+i+'-'+x.day+'-'+x.s,dn:dnOf(+w,x.day),s:x.s,e:x.e,t:x.t}));n++})});
     return {n:n,text:['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Mochi//Timetable//ZH','CALSCALE:GREGORIAN','X-WR-CALNAME:'+esc(TT.name)].concat(out).concat(['END:VCALENDAR']).join('\r\n')+'\r\n'}}
   document.getElementById('ics').onclick=function(){
     var r=buildIcs();if(!r.n){shmsg.textContent='还没有可导出的内容～';return}
     var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.text],{type:'text/calendar;charset=utf-8'}));
     a.download='mochi-'+TT.name+'.ics';document.body.appendChild(a);a.click();a.remove();
-    shmsg.textContent='已导出 '+r.n+' 项（重复课程写成了重复规则；假期没有排除，导入后可在日历里删掉）。'};
+    shmsg.textContent='已导出 '+r.n+' 项（重复课程写成了重复规则；已按学期起止日期截断，设置了“假期里不出现”的课程 / 活动已把假期日期排除）。'};
 
   // ---------- 分享 ----------
   function baseUrl(){var b=(window.MOCHI_CFG&&MOCHI_CFG.apiBase)||'';return (b||(location.origin+location.pathname)).split('#')[0]}

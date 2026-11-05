@@ -1,50 +1,41 @@
-# 🐱 Mochi 智能时间表
+# 🐱 Mochi 智能时间表（v7）
+
+AI 整周重排 · 拍照导入课表 · 一句话 / 语音添加 · 分钟级时间 · 周视图 · 课前 / 作业提醒 · Android 桌面小组件（源码）· 可离线的 PWA。
+
+> v7 的改动对照 `docs/v7-progress.md`（逐项说明做了什么、怎么验证的、哪些没做）。
+
+## v7.1：v7 + v6.5 合并说明
+- 以 v7 为主体（它在分钟制数据、周视图、设置页拆分、接口限流、云同步分块、搜索、通知、商店素材等方面已经包含并超过 v6.5），把 v6.5 里 v7 没有的东西并进来：**Lucide 图标**（`js/icons.js`，库没加载到就保留 emoji）、你手改的两处 `addEventListener('error')` 和 `safeUrl` 注释。
+- 两边重复的功能择优保留一个：周视图用 v7 自己的（按分钟存数据，v6.5 的 FullCalendar 版本只认整点，所以去掉）；桌面小组件用 v7 的（带系统倒计时和安装脚本）；离线缓存用 v7 的 `sw.js`（不依赖外部 CDN）；manifest 与图标用 v7 的（更全）。
+- `docs/改进完成情况.md` 改名为 `docs/v7-progress.md`（GitHub 网页上传对中文文件名有时不友好）。
 
 ## 文件结构
 ```
 index.html        页面骨架（底部有脚本加载顺序，不要打乱）
-css/style.css     样式
+manifest.json     PWA 清单（名称、图标、主题色、standalone）
+sw.js             Service Worker：离线缓存 + 通知点击（/api/ 永不缓存）
+icons/            应用图标（192 / 512 / maskable / apple-touch / svg）
+css/style.css     样式（≥768px 双栏、颜色变量、对比度达标）
 js/hook.js        监听 localStorage 写入（云同步、手机通知都靠它，必须最先加载）
 js/config.js      Supabase 地址 / key、手机 App 的 API 地址（部署时填）
-js/sync.js        账号 + 云同步（Supabase）：数据按键同步，附件放 Storage
-js/core.js        共用常量、设置、真实日期工具、多课表数据加载
-js/dates.js       dayjs 封装（格式化、加减天/周、日期校验）
-js/theme.js       亮色/暗色/跟随系统 + 主题色
-js/recur.js       重复活动（含 rrule：每月第几个周几）、假期、固定课程 → 当周占位
-js/srs.js         复习算法：ts-fsrs（FSRS），没加载到时退回简易算法
-js/timetable.js   课表网格 + 新增/修改/移动
-js/log.js         记录（逐条）+ 调用 AI 重排（失败则用本地规则）
-js/study.js       学习：章节、考试日期、排程
-js/sport.js       运动：现状/目标、训练排程
-js/remind.js      提醒、清单、顶部提示
-js/store.js       本地附件（Dexie / IndexedDB）+ 上传云端
-js/hw.js          作业页：分组、科目标签、搜索筛选、链接、附件
-js/lessons.js     固定课表：节次模板、课程（教室/老师/类型/多周循环）
-js/settings.js    设置：外观、日历、多课表与归档、备份/导入
-js/holidays.js    设置页的“假期”界面
-js/account.js     设置页的“账号与云同步”面板 + 开源库加载状态
-js/wizard.js      首次向导
-js/notify.js      网页打开时的通知
-js/native.js      手机 App（Capacitor）：系统本地通知（网页里不做任何事）
-js/dayview.js     课表日视图：日期条、当天列表、进行中/下一项倒计时、日/周切换
-scripts/check.mjs  一键检查（语法 / 引用 / 库登记）
-js/widget.js      手机 App：把今天 / 明天的安排写给 Android 桌面小组件
-js/icons.js       图标：开源库 Lucide（失败时保留 emoji）
-native/android-widget/  Android 桌面小组件的原生代码 + 安装说明
-js/fcview.js      周视图：开源库 FullCalendar（失败时退回方块网格）
-js/guide.js       📖 功能表（全部功能 + 使用方法 + 开源项目清单，直接改里面的数组；index.html 太旧时会自动补页面）
-js/menu.js        ≡ 左侧菜单（分组大圆角卡片）+ 设置页分区显示
-js/localai.js     🧠 本机 AI 备用（Chrome Gemini Nano / WebLLM）：云端不可用时自动接手文字排课 / 一句话添加
-js/ai.js          ✨ AI 添加：一句话 / 语音 → 活动、作业；课表照片 → 固定课程（先预览，确认后才写入）
-js/share.js       分享课表（链接 + 二维码）、导出 .ics、打开分享链接时导入
-js/stats.js       统计页（Chart.js）
-js/app.js         启动与导航（底部标签栏）
-sw.js             通知用的 service worker
-api/plan.js       后端：把课表交给 Gemini 重排（Vercel Serverless，已开 CORS）
-api/ai.js         后端：AI 添加（文字解析 / 课表照片识别），输出逐项校验后才返回
-supabase/schema.sql   Supabase 建表 + 行级安全（RLS）+ 附件存储桶，运行一次
-scripts/build-www.mjs 打包手机 App 前生成 www/（库换成本地文件）
-capacitor.config.json / package.json   手机 App 打包用
+js/sync.js        账号 + 云同步（Supabase）：按键同步；冲突检测 / 合并；cloud.token()
+js/api.js         调用 /api/*：自动带登录令牌，统一错误提示
+js/core.js        常量、设置、日期工具、按周存储、分钟级占用判断 free()
+js/timetable.js   周视图（线格 + 红线 + 吸顶日期头）+ 全屏编辑页
+js/dayview.js     日视图、进行中 / 下一项倒计时、＋菜单、空状态
+js/notifyset.js   生成提醒清单（网页 / 手机共用）+ 设置页「通知与提醒」
+js/notify.js      网页版通知            js/native.js  手机 App 系统通知 + 小组件数据推送
+js/ai.js          ✨ AI 助手：一句话 / 拍照课表 / 整周重排（三个标签，一个入口）
+js/log.js         整周重排的逻辑 + 本地规则兜底（认“三点半 / 一个半小时”）
+js/search.js      全局搜索            js/menu.js    ≡ 菜单 + 设置二级页
+js/wizard.js      首次向导            js/theme.js   主题 + 对比度自适应
+js/…              其余（hw / lessons / settings / study / sport / stats / share / holidays / recur / localai 等）
+api/_lib.js       后端共用：登录校验、限流、CORS 白名单、请求大小限制
+api/plan.js       整周重排（Gemini）   api/ai.js  一句话 / 拍照识别（Gemini）
+android-widget/   Android 桌面小组件（Java 源码，见下）
+scripts/          build-www.mjs（打包 www/）· android-widget.mjs（装小组件）· check.mjs（发布前自检）
+store/            商店素材：图标、宣传图、4 张手机截图、简介与隐私政策草稿
+supabase/schema.sql   Supabase 建表 + 行级安全 + 附件存储桶，运行一次
 ```
 
 ## 开源库（index.html 里用固定版本的 CDN 引入）
@@ -61,32 +52,25 @@ capacitor.config.json / package.json   手机 App 打包用
 
 **部署后先打开 设置 页，最下面“开源库”一行会显示每个库 ✓ / ✗。** 有 ✗ 说明那个 CDN 链接没加载到（版本号或路径不对、或网络问题），去 index.html 改成能用的版本即可。
 
-## 部署（免费）
-1. https://aistudio.google.com 申请 Gemini API Key。
-2. 把整个文件夹传到 GitHub 仓库（保持结构）→ https://vercel.com 导入，环境变量：`GEMINI_API_KEY`（必填）、`GEMINI_MODEL`（可选，默认 `gemini-3.5-flash-lite`；拍照识别需要支持图片输入的模型）。
-3. **云同步（可选）**：
-   1. https://supabase.com 新建项目。
-   2. SQL Editor 里把 `supabase/schema.sql` 整段运行一次。
-   3. Project Settings → API，把 **Project URL** 和 **anon public key** 填进 `js/config.js`（anon key 是公开的，安全靠 RLS；**绝不要**填 service_role key）。
-   4. Authentication → URL Configuration：Site URL 填你的 Vercel 网址。想免邮件确认，可在 Providers → Email 里关掉 “Confirm email”。
-   5. 重新部署，设置页 → “账号与云同步”注册 / 登录。第一次在新设备登录时，如果云端和本机都有数据，会让你选“用云端”还是“用本机”。
-4. 手机打开网址 →“添加到主屏幕”。
+## 部署
+1. **Gemini API Key（上架前必须看下面「两件事」）**：https://aistudio.google.com 申请。
+2. 整个文件夹传到 GitHub → https://vercel.com 导入。环境变量见 `.env.example`，最少要配：`GEMINI_API_KEY`、`SUPABASE_URL`、`SUPABASE_ANON_KEY`（后端要用它校验登录令牌）。
+3. **云同步（现在也是 AI 的“登录门槛”）**：
+   1. https://supabase.com 新建项目；SQL Editor 里运行一次 `supabase/schema.sql`。
+   2. Project Settings → API：把 **Project URL** 和 **anon public key** 填进 `js/config.js`，同一组值也填进 Vercel 的 `SUPABASE_URL` / `SUPABASE_ANON_KEY`。（anon key 是公开的，安全靠 RLS；**绝不要**填 service_role key。）
+   3. Authentication → URL Configuration：Site URL 填你的 Vercel 网址。
+4. 重新部署；手机打开网址 → 安装 / 添加到主屏幕（现在有 manifest 和图标，可作为 PWA 安装，断网也能打开）。
 
-## v6.3：桌面小组件 + Lucide 图标
-- **Android 桌面小组件**（`native/android-widget/`，用 Android 自带 `AppWidgetProvider` + Capacitor 官方 Preferences 插件）：显示今天还没结束的 5 项，今天没了显示明天；点一下打开 App。数据由 `js/widget.js` 写入，数据变化 / 进出后台时立刻刷新，系统每 30 分钟也会刷新。**原生代码没有在 Android Studio 里编译过**（我只用假的 Android 类让 javac 检查了语法和类型），第一次加进工程如果报错，把报错发给我。安装步骤见该文件夹的 README。没用 Jetpack Glance，是因为 Capacitor 默认工程没有 Kotlin / Compose，加进去要改很多 Gradle 配置，出错风险更大。
-- **Lucide**（ISC，固定 0.263.1）：底部标签栏、≡ 菜单、更多页的 emoji 换成统一线条图标；库没加载到或找不到某个图标时保留 emoji。设置页“开源库”行会显示 Lucide ✓ / ✗。
-- 打包手机 App 多装一个：`npm i @capacitor/preferences`，`npm i -D lucide`。
+### 后端接口的保护（v7）
+- `/api/plan`、`/api/ai` 默认**必须带登录令牌**（配了 Supabase 环境变量即生效）；没登录的用户会看到提示，并自动退回浏览器内置 AI / 本地规则。
+- 限流：每账号每分钟 6 次、每天 60 次（拍照识别算 3 次）；匿名按 IP 更严；`AI_GLOBAL_PER_DAY` 设全站每日总量，防止账单被刷。多实例下要精确计数，请配 Upstash Redis（`UPSTASH_REDIS_REST_URL / _TOKEN`），否则是每个实例各算各的（尽力而为）。
+- `ALLOWED_ORIGINS` 限制允许调用的网页来源；手机 App 的 `capacitor://localhost`、`https://localhost` 自动放行。
+- 请求大小：plan ≤ 200 KB，ai ≤ 5.5 MB；模型输出逐项严格校验，越界值直接丢弃。
+- 想完全开放（自建、不接 Supabase）：不配 Supabase 变量，或设 `REQUIRE_AUTH=0`，此时只按 IP 限流——**公开上架不要这样做**。
 
-## v6.2：两个开源库
-- **FullCalendar**（MIT，`index.global.min.js`，固定 6.1.15）：周视图改成连续时间轴 + 当前时间红线，固定课程按真实分钟显示（如 08:00–08:45）。点事件 / 空白处仍打开原来的编辑页。设置 → 外观与日历 里可关掉；库没加载到时自动退回方块网格。手动活动目前仍按整点（分钟级是下一步）。
-- **Workbox**（Apache-2.0，从 Google CDN 载入）：`sw.js` 里做离线缓存（页面 / 脚本 / 样式 / 图片先用缓存、后台更新，`/api/` 不缓存）。加上 `manifest.json` 与 `icons/`，Android Chrome 可以“安装应用”。
-- 打包手机 App：`npm i -D fullcalendar` 后再 `npm run build:www`（脚本已加入 fullcalendar，并会复制 manifest 与 icons）。
-- 这次没法联网，**FullCalendar / Workbox 本身没有在真实 CDN 上跑过**；我用模拟库验证了事件映射、点击、隐藏周末和出错退回。首次部署后请看一眼：设置页“开源库”那一行里 FullCalendar 应显示 ✓。
-
-## v6.1：全屏编辑页 + ≡ 菜单（参考 Smart Timetable）
-- **≡ 左侧菜单**：点左上角三条横线（或从屏幕左边缘向右划）展开，分组卡片：学习 / 运动 / 统计、固定课表 / 拍照导入 / 我的课表、分享与导出、外观 / 假期、云同步 / 备份。点一行只打开设置里对应的那一个分区（不再是一整页长设置）。
-- **全屏编辑页**：新增活动、添加 / 修改课程都改成全屏分组卡片（顶部 ✕ 与「保存」）。课程新增：**楼栋、链接、文件、学期起止日期**（留空 = 不限）、**模板**（把一节课存成模板，下次一键套用）。文件沿用作业附件的存储（本机 IndexedDB，登录云同步后上传）。
-- 选型：Material Web Components 已进入维护模式（Google 不再加新功能）；Ionic / Framework7 要整体改写成它们的组件体系，对这个无构建的纯 JS 项目太重。所以菜单和编辑页用原生 CSS/JS 实现（图标用 Material 的 ≡ 和 ✕ SVG，Apache-2.0；其余用 emoji）。
+### 上架前必须做的两件事（代码改不了，要你去做）
+1. **Gemini 改用付费层**：免费层的数据可能被 Google 用于改进产品，而拍照导入会把用户的课表照片发过去。去 Google Cloud 控制台新建项目 → 开启结算（Billing）→ 在这个项目里启用 Generative Language API 并创建 API Key（AI Studio 里把 Key 绑定到这个已开通结算的项目），再填进 `GEMINI_API_KEY`。同时在隐私政策里写明照片和文字会发送给 Gemini 处理（`store/privacy-policy-draft.md` 已写）。用 `AI_GLOBAL_PER_DAY` 给自己设一个成本上限。
+2. **账号删除入口**：Google Play 要求「允许创建账号的 App，必须在 App 内提供删除账号和数据的入口」，并提供一个网页链接。目前 App 只有“退出登录（可清本机）”，**没有删除云端账号**。需要补：一个后端接口（用 service_role key，只放在服务端）删除 `auth.users` 记录和 `user_data` / 附件，再在「账号与同步」里加按钮。这一项我没有做。
 
 ## v6：免 key 的内置 AI 备用
 - 云端 AI（Vercel + Gemini）失败时（没部署、没 key、超额、断网），App 会自动改在本机跑小模型：免 key、免额度、数据不出设备。
@@ -98,48 +82,45 @@ capacitor.config.json / package.json   手机 App 打包用
 - 没有 WebGPU 的浏览器（部分 iOS / Firefox）会自动跳过。模型较小，排得复杂时可能不如云端准，也比较耗电 / 内存。
 - 默认云端模型改为 `gemini-3.5-flash-lite`（`GEMINI_MODEL` 可覆盖；`GEMINI_THINKING` 可填 minimal / medium / high）。
 
-## 新功能（v4–v5）
-- **日视图**：打开就是当天列表 + 倒计时；右上角「日 / 周」可切回原来的 7 列格子。左右滑动换天，右下角 ＋ 手动添加，✨ 用 AI 添加。
-- **✨ AI 添加**：说 / 打一句话（如“下周三下午三点数学补习，每周重复”）→ 预览 → 勾选 → 加入。设置 → 固定课表 → 「📷 拍照导入课表」可以拍课表照片识别。AI 只解析，**不会直接改数据**；没部署后端时这个功能不可用，手动添加照常。
-  - 语音用浏览器自带的 Web Speech API；手机 App（WebView）里通常不支持，按钮会自动隐藏。
-  - 活动时间只支持整点，AI 会把分钟四舍五入。
-  - 图片在浏览器里先压到最长边 1600px 再上传（Vercel 请求体上限约 4.5MB）。
-- **分享与导出**（设置页）：分享 = 固定课程压成链接 / 二维码，对方打开后导入为一个**新课表**，不改动对方现有课表。导出 .ics 时固定课程和重复活动写成重复规则；**假期不会被排除**，单双周课程按“第几周”各写一条。
-- **统计**（更多 → 统计）。
+## 分钟级时间与数据格式（v7）
+- 活动、重复活动都用 `s`（开始）和 `e`（结束）表示“当天 0 点起的分钟数”。旧数据（`h` + `len` 整点）在第一次打开时自动换算，完成标记也一并迁移。
+- 活动按周存储：每一周一个键 `mochi-wk:<课表id>:<周号>`（旧的“所有周一个键”`mochi-wk` 第一次打开时自动拆开并删除）。两台设备改不同的周不再互相覆盖。
+- 云同步冲突：本机有没推上去的改动、云端同时被别的设备改过 → 弹一次提示让你选“用云端 / 保留本机”（列出是哪几项）；“完成记录”自动合并；云端单方面的改动静默拿下。
+- AI 的输入输出同步改为 `s/e` 分钟；服务端也认旧格式（`h/len`）做兼容，但会严格校验范围。
 
-## 云同步怎么工作（要知道的限制）
-- 本机每个 `mochi-*` 键对应云端一行，**按键、最后修改者赢**。`mochi-wk` 是“所有周”存成一个键，所以**两台设备同时改课表，后保存的那台会覆盖另一台**（不会合并到格子级别）。平时一台一台用没问题。
-- 附件文件上传到私有存储桶 `hw-files`（路径 `用户id/文件id`），只有本人能读写。附件清单跟着作业数据同步；换设备点开附件时才下载。
-- 退出登录时可选择是否清除本机数据（公用电脑建议清除）。
-- “导出备份”只包含文字数据，**不含附件文件**（附件靠云同步）。
+## 通知（v7）
+- 设置 → 通知与提醒：课前 / 活动前 N 分钟（不提醒 / 5 / 10 / 15 / 30 / 60）、作业截止当天几点提醒、截止前一晚 20:00 也提醒、提示方式（声音 + 振动 / 仅振动 / 静音）、发测试通知、检查精确闹钟权限、以及一份“收不到准时提醒”的排查指南（通知权限、精确闹钟、电池优化、各品牌自启动）。
+- 手机 App 里提示方式靠 Android 通知渠道实现（每种方式一个渠道，渠道建好后系统不允许程序再改；用户也能在系统设置里改渠道）。网页版由浏览器 / 系统决定声音，静音可用，“仅振动”只能做到“加振动”。
+- 提醒清单由 `buildAlarms()` 统一生成：网页版每 30 秒检查一次，手机 App 把未来 7 天排进系统通知队列（iOS 最多 60 条，Android 120 条）。
+
+## 手机 App（Capacitor）与 Android 桌面小组件
+需要电脑装 Node.js；Android 要 Android Studio，iOS 要 Mac + Xcode + 开发者账号。
+```bash
+npm i                    # package.json 已列好依赖（Capacitor 7、各开源库的固定版本）
+# 在 js/config.js 里填 apiBase = 你的 Vercel 网址（App 里没有同域后端）
+npm run build:www        # 生成 www/（库换成本地文件，App 能离线启动）
+npx cap add android      # 第一次
+npm run android:widget   # 把桌面小组件装进 android/（幂等，可重复运行）
+npx cap sync
+npx cap open android     # 用 Android Studio 运行 / 打 AAB（Build → Generate Signed Bundle）
+```
+- **桌面小组件**（`android-widget/`，Java，不需要给 Capacitor 工程加 Kotlin）：4×2，可缩放。显示当前 / 下一节 + 系统倒计时控件，下面列出后面几项；今天没安排了就显示明天。网页端 `native.js` 在数据变化 / 回到前台时把今天和明天的数据交给原生插件 `MochiWidget`，小组件自己按时间算“进行中 / 下一项”，并在下一个开始 / 结束时刻用非精确闹钟刷新（另有系统每 30 分钟周期刷新）。长按桌面 → 小组件 → Mochi。
+- **这部分代码我在没有 Android SDK 的环境里写的，没有编译、没有在真机运行过**；第一次请用 Android Studio 打开看 Gradle 有没有报错，并在真机上验证小组件、通知渠道、精确闹钟。
+- 包名 `app.mochi.timetable` 一旦发布就不能改。
+- 发布前运行 `npm run check`：检查所有脚本语法、页面引用、`sw.js` 预缓存清单、图标是否齐全。
 
 ## 复杂重复与假期
 - 新增 / 修改活动 → “重复”里选 **每月第 N 个周几** 或 **每月最后一个周几**（N 按你点的那天算）。
 - 设置 → **假期**：加入起止日期。重复活动勾上“假期里不出现”就会自动跳过；另有开关可在假期里隐藏固定课表。
 - 旧的重复活动不受影响（不会被自动排除假期，需要的话打开活动勾选）。
 
-## 手机 App（Capacitor）
-需要电脑上装 Node.js；Android 要 Android Studio，iOS 要 Mac + Xcode + 开发者账号。
-```bash
-npm init -y   # 如果还没有 package.json 就跳过（项目里已带）
-npm i @capacitor/core @capacitor/local-notifications @capacitor/preferences
-npm i -D @capacitor/cli @capacitor/android @capacitor/ios dayjs rrule ts-fsrs dexie @supabase/supabase-js chart.js lz-string qrcode-generator fullcalendar lucide
-npx cap add android      # 或 npx cap add ios
-# 在 js/config.js 里填 apiBase = 你的 Vercel 网址（App 里没有同域后端）
-npm run android          # 生成 www/ → cap sync → 打开 Android Studio（iOS 用 npm run ios）
-```
-- 提醒用**系统本地通知**：每次数据变化 / 回到前台，会把未来 7 天的提醒、活动、课程重新排进系统队列，App 关掉也会响，**不需要自己的推送服务器**。iOS 最多排 64 条，所以只排最近的 60 条。
-- Android 12+ 的“精确闹钟”权限、国产手机的“自启动 / 电池优化”可能影响准时性，需要在系统里放行。
-- 真正的服务器推送（别人给你发消息那种）需要 FCM / APNs，这里没做，也用不上。
-- `build-www.mjs` 找不到某个库文件时会告诉你缺哪个包；库的 dist 路径若因版本不同而变，改脚本顶部的 `LIBS` 表即可。
-
 ## 数据存放（localStorage，key 都以 mochi- 开头）
-- `mochi-set` 设置、`mochi-tts` 课表列表、`mochi-hol` 假期
-- 每个课表各有：`mochi-wk`、`mochi-fx`、`mochi-rp`、`mochi-hw`、`mochi-dn`；第一个课表“学校”沿用旧 key，其余末尾加 `-课表id`
+- `mochi-set` 设置、`mochi-tts` 课表列表、`mochi-hol` 假期、`mochi-rm` 提醒
+- 每个课表各有：`mochi-fx`、`mochi-rp`、`mochi-hw`、`mochi-dn`，以及按周的 `mochi-wk:<课表id>:<周号>`；第一个课表“学校”的前四个沿用旧 key，其余末尾加 `-课表id`
 - 学习章节在 `mochi-st`；FSRS 的记忆状态存在每个章节的 `fc` 字段里
-- `mochi-sync-*` 是同步内部状态，不会被同步，也不进备份
-- 附件文件在 IndexedDB 库 `mochi-files`
+- `mochi-sync-*` 是同步 / 本机内部状态，不会被同步，也不进备份
+- 附件文件在 IndexedDB 库 `mochi-files`；“导出备份”默认不含附件，“导出（含附件）”会把附件编码进同一个 JSON（文件会很大）
 
 ## 注意
 - Key 只放 Vercel 环境变量，不要写进前端文件（Supabase 的 anon key 除外，它本来就是公开的）。
-- 后端没部署或 AI 出错时，页面自动退回本地规则排程。
+- 后端没部署、没登录、超额或 AI 出错时，页面自动退回浏览器内置 AI，再退回本地规则。

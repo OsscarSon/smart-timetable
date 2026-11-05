@@ -1,23 +1,33 @@
-// Service worker：① 系统通知点击；② 开源库 Workbox（Apache-2.0）做离线缓存。
-// Workbox 从 Google 的 CDN 载入；载入失败时只保留通知功能，不影响使用。
-try{
-  importScripts('https://storage.googleapis.com/workbox-cdn/releases/7.3.0/workbox-sw.js');
-  if(self.workbox){
-    workbox.core.setCacheNameDetails({prefix:'mochi'});
-    // 页面 / 脚本 / 样式：联网时永远取最新（避免新旧文件混在一起），断网才用缓存。
-    // 图片 / 字体 / manifest：先用缓存、后台更新。后端接口 /api/ 不缓存。
-    var ok=new workbox.cacheableResponse.CacheableResponsePlugin({statuses:[0,200]});
-    workbox.routing.registerRoute(function(c){
-      return c.request.method==='GET'&&!/\/api\//.test(c.url.pathname)&&['document','script','style'].indexOf(c.request.destination)>=0},
-      new workbox.strategies.NetworkFirst({cacheName:'mochi-pages-v65',networkTimeoutSeconds:4,plugins:[ok]}));
-    workbox.routing.registerRoute(function(c){
-      return c.request.method==='GET'&&!/\/api\//.test(c.url.pathname)&&['image','font','manifest'].indexOf(c.request.destination)>=0},
-      new workbox.strategies.StaleWhileRevalidate({cacheName:'mochi-assets-v65',plugins:[ok,
-        new workbox.expiration.ExpirationPlugin({maxEntries:60,maxAgeSeconds:30*24*3600})]}));
+// Service Worker：让网页版能离线打开，并负责通知点击。
+// 策略：本站文件 = 先给缓存、后台更新（下次打开就是新版）；CDN 脚本 / 字体 = 缓存优先；/api/ 一律走网络，绝不缓存。
+const VER = 'mochi-v7.1';
+const SHELL = ['./', 'index.html', 'manifest.json', 'css/style.css',
+  'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  ...['hook', 'config', 'sync', 'api', 'core', 'dates', 'theme', 'recur', 'srs', 'timetable', 'dayview', 'localai', 'icons', 'log', 'study', 'sport', 'remind', 'store', 'hw',
+      'lessons', 'settings', 'wizard', 'holidays', 'account', 'ai', 'share', 'stats', 'notifyset', 'notify', 'native', 'search', 'app', 'menu'].map(n => 'js/' + n + '.js')];
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(VER).then(c => Promise.all(SHELL.map(u => c.add(u).catch(() => {})))).then(() => self.skipWaiting()));
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== VER).map(k => caches.delete(k)))).then(() => self.clients.claim()));
+});
+self.addEventListener('fetch', e => {
+  const r = e.request, u = new URL(r.url);
+  if (r.method !== 'GET' || u.pathname.startsWith('/api/') || u.protocol.indexOf('http') !== 0) return;
+  const same = u.origin === self.location.origin;
+  const cdn = /(^|\.)(jsdelivr\.net|googleapis\.com|gstatic\.com)$/.test(u.hostname);
+  if (!same && !cdn) return;
+  if (cdn) {   // 缓存优先
+    e.respondWith(caches.open(VER).then(c => c.match(r).then(hit => hit || fetch(r).then(res => { if (res && (res.ok || res.type === 'opaque')) c.put(r, res.clone()); return res; }))));
+    return;
   }
-}catch(e){}
-self.addEventListener('install',function(){self.skipWaiting()});
-self.addEventListener('activate',function(e){e.waitUntil(caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return /^mochi-static/.test(k)}).map(function(k){return caches.delete(k)}))}).then(function(){return self.clients.claim()}))});
-self.addEventListener('notificationclick',function(e){
+  e.respondWith(caches.open(VER).then(c => c.match(r, { ignoreSearch: true }).then(hit => {
+    const net = fetch(r).then(res => { if (res && res.ok) c.put(r, res.clone()); return res; }).catch(() => hit);
+    return hit || net;
+  })));
+});
+self.addEventListener('notificationclick', e => {
   e.notification.close();
-  e.waitUntil(clients.matchAll({type:'window'}).then(function(l){return l.length?l[0].focus():clients.openWindow('./')}))});
+  e.waitUntil(clients.matchAll({ type: 'window' }).then(l => l.length ? l[0].focus() : clients.openWindow('./')));
+});

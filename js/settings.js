@@ -26,8 +26,10 @@ function rebucketAll(o,n){
   if(o===n)return;
   function nw(w,wd){var dn=w*7-3+o+((wd-o+7)%7);return Math.floor((dn+3-n)/7)}
   TTS.list.forEach(function(t){
-    var kw=tkOf('mochi-wk',t.id),kd=tkOf('mochi-dn',t.id),W=lget(kw,null),D=lget(kd,null);
-    if(W){var N={};Object.keys(W).forEach(function(w){(W[w]||[]).forEach(function(e){var w2=nw(+w,e.day);(N[w2]=N[w2]||[]).push(e)})});put2(kw,N)}
+    var W=weeksOf(t.id),kd=tkOf('mochi-dn',t.id),D=lget(kd,null),N={};
+    Object.keys(W).forEach(function(w){W[w].forEach(function(e){var w2=nw(+w,e.day);(N[w2]=N[w2]||[]).push(e)})});
+    weekKeysOf(t.id).forEach(function(k){localStorage.removeItem(k)});
+    Object.keys(N).forEach(function(w){put2(wkKeyOf(t.id,w),N[w])});
     if(D){var M={};Object.keys(D).forEach(function(k){var m=k.match(/^(-?\d+)-(\d)-(.*)$/);if(!m){M[k]=D[k];return}M[nw(+m[1],+m[2])+'-'+m[2]+'-'+m[3]]=D[k]});put2(kd,M)}
   })}
 var wsel=document.getElementById('wsel');
@@ -41,6 +43,18 @@ var sh0=document.getElementById('sh0'),sh1=document.getElementById('sh1');
 [6,7,8].forEach(function(h){var o=el('option',null,'从 '+h+':00 开始');o.value=h;sh0.appendChild(o)});sh0.value=SET.h0;
 [22,23,24].forEach(function(h){var o=el('option',null,'到 '+h+':00 结束');o.value=h;sh1.appendChild(o)});sh1.value=SET.h1;
 sh0.onchange=sh1.onchange=function(){SET.h0=+sh0.value;SET.h1=+sh1.value;saveSet();location.reload()};
+
+
+// ---- 视图：密度 / 吸附 / 折叠周末 / 列表里显示的字段 ----
+(function(){
+  var dn=document.getElementById('vdens'),sn=document.getElementById('vsnap'),wc=document.getElementById('vwkc'),sr=document.getElementById('vsr'),st=document.getElementById('vst');
+  dn.value=SET.dens||'std';sn.value=String(SET.snap||15);wc.checked=!!SET.wkc;sr.checked=SET.sr!==false;st.checked=SET.st!==false;
+  dn.onchange=function(){SET.dens=dn.value;saveSet();location.reload()};
+  sn.onchange=function(){SET.snap=+sn.value;saveSet()};
+  wc.onchange=function(){SET.wkc=wc.checked;saveSet();draw()};
+  sr.onchange=function(){SET.sr=sr.checked;saveSet();draw()};
+  st.onchange=function(){SET.st=st.checked;saveSet();draw()};
+})();
 
 // ---- 多课表与归档 ----
 function cntLessons(t){return lget(tkOf('mochi-fx',t.id),[]).length}
@@ -67,7 +81,7 @@ function rTT(){
       if(!t.arch&&liveList().length<=1){alert('至少要保留一个正在用的课表');return}
       if(!confirm('删除课表「'+t.name+'」及里面所有安排、课程、作业？不能恢复。（想保留请用“归档”）'))return;
       lget(tkOf('mochi-hw',t.id),[]).forEach(function(h){(h.att||[]).forEach(function(a){fileDel(a.id)})});   // 作业附件一起删
-      ['mochi-wk','mochi-fx','mochi-dn','mochi-rp','mochi-hw'].forEach(function(b){try{localStorage.removeItem(tkOf(b,t.id))}catch(e){}});
+      ['mochi-fx','mochi-dn','mochi-rp','mochi-hw'].forEach(function(b){try{localStorage.removeItem(tkOf(b,t.id))}catch(e){}});weekKeysOf(t.id).forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{localStorage.removeItem(tkOf('mochi-wk',t.id))}catch(e){}
       TTS.list=TTS.list.filter(function(z){return z!==t});ttSave();
       if(act)switchTT(liveList()[0].id);else{rTT();ttSel()}};r.appendChild(dl2);
     return r}
@@ -81,19 +95,38 @@ document.getElementById('tta').onclick=function(){
   TTS.list.push(t);ttSave();
   if(confirm('已创建「'+t.name+'」。现在切换过去吗？'))switchTT(t.id);else{rTT();ttSel()}};
 
-// ---- 备份 ----
+// ---- 备份（可选连附件一起导出）----
+function backupObj(){var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0)o[k]=localStorage.getItem(k)}return o}
+function b64Of(blob){return new Promise(function(ok,no){var r=new FileReader();r.onload=function(){var s=String(r.result);ok(s.slice(s.indexOf(',')+1))};r.onerror=no;r.readAsDataURL(blob)})}
+function saveJson(o,name){
+  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+function bname(x){return 'mochi-backup'+(x||'')+'-'+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'.json'}
 document.getElementById('bex').onclick=function(){
-  var o={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0)o[k]=localStorage.getItem(k)}
-  var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));
-  a.download='mochi-backup-'+d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+'.json';
-  document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);
-  document.getElementById('semsg').textContent='已导出，请把文件存好（例如传到云盘）。'};
+  saveJson(backupObj(),bname());
+  document.getElementById('semsg').textContent='已导出（不含附件）。请把文件存好，例如传到云盘。'};
+document.getElementById('bexf').onclick=async function(){
+  var msg=document.getElementById('semsg');
+  if(typeof FDB==='undefined'||!FDB){msg.textContent='附件功能没加载（缺少 Dexie 库），只能导出普通备份。';return}
+  try{
+    msg.textContent='正在打包附件…';var o=backupObj(),L=await FDB.files.toArray(),F=[];
+    for(var i=0;i<L.length;i++){var r=L[i];if(!r.blob)continue;F.push({id:r.id,hw:r.hw,name:r.name,type:r.type,size:r.size,data:await b64Of(r.blob)})}
+    o.__files=F;saveJson(o,bname('-附件'));
+    msg.textContent='已导出，含 '+F.length+' 个附件。文件可能比较大，请存好。'
+  }catch(e){msg.textContent='导出失败：'+String(e.message||e).slice(0,80)}};
 document.getElementById('bim').onclick=function(){document.getElementById('bfile').click()};
 document.getElementById('bfile').onchange=function(){
-  var f=this.files[0];if(!f)return;var fr=new FileReader();
-  fr.onload=function(){try{
+  var f=this.files[0];if(!f)return;var fr=new FileReader(),inp=this;
+  fr.onload=async function(){try{
     var o=JSON.parse(fr.result),ks=Object.keys(o).filter(function(k){return k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0});
     if(!ks.length)throw 0;if(!confirm('导入会覆盖目前的内容，确定吗？'))return;
+    if(Array.isArray(o.__files)&&o.__files.length&&typeof FDB!=='undefined'&&FDB){
+      for(var i=0;i<o.__files.length;i++){var x=o.__files[i];
+        var bin=atob(x.data),u8=new Uint8Array(bin.length);for(var j=0;j<bin.length;j++)u8[j]=bin.charCodeAt(j);
+        await FDB.files.put({id:x.id,hw:x.hw||'',name:x.name,type:x.type,size:x.size,blob:new Blob([u8],{type:x.type}),ts:Date.now(),up:0})}}
+    // 旧备份里是“所有周一个键”，导入时先清掉现有的按周键，避免新旧混在一起
+    if(ks.some(function(k){return /^mochi-wk(-|$)/.test(k)||k.indexOf('mochi-wk:')===0}))
+      TTS.list.forEach(function(t){weekKeysOf(t.id).forEach(function(k){localStorage.removeItem(k)})});
     ks.forEach(function(k){localStorage.setItem(k,String(o[k]))});location.reload()
-  }catch(e){document.getElementById('semsg').textContent='这个文件不是有效的备份。'}};
+  }catch(e){document.getElementById('semsg').textContent='这个文件不是有效的备份。'}inp.value=''};
   fr.readAsText(f)};
