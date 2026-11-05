@@ -112,6 +112,9 @@
     <div class="sec" data-sec="look" data-t="外观与显示">
       <h3 class="hs">🎨 外观</h3>
       <div class="chips" id="thm"></div>
+      <h3 class="hs">🌐 语言 / Language</h3>
+      <div class="chips" id="lng"></div>
+      <div class="msg">切换后会刷新页面。选择只保存在本机，不参与云同步。</div>
       <div class="swatches" id="acc"></div>
 
       <h3 class="hs">📅 日历</h3>
@@ -357,6 +360,9 @@
 
 <script src="js/hook.js"></script>
 <script src="js/config.js"></script>
+<script src="js/lang-ui.js"></script>
+<script src="js/lang-msg.js"></script>
+<script src="js/i18n.js"></script>
 <!-- 开源库（固定版本）。data-lib 供手机 App 打包脚本换成本地文件；加载失败时对应功能自动退回基础版 -->
 <script data-lib="dayjs" src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js"></script>
 <script data-lib="rrule" src="https://cdn.jsdelivr.net/npm/rrule@2.8.1/dist/es5/rrule.min.js"></script>
@@ -397,6 +403,7 @@
 <script src="js/search.js"></script>
 <script src="js/app.js"></script>
 <script src="js/menu.js"></script>
+<script src="js/undo.js"></script>
 <script src="js/icons.js"></script>
 </body>
 </html>
