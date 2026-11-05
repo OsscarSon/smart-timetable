@@ -171,10 +171,17 @@
   <!-- 更多 -->
   <section class="card st" id="v-more">
     <h2>更多</h2>
+    <button class="mrow" data-go="gd"><span>📖</span><div><b>功能表</b><small>全部功能和使用方法</small></div><i>›</i></button>
     <button class="mrow" data-go="sta"><span>📊</span><div><b>统计</b><small>作业完成率、每天安排时长</small></div><i>›</i></button>
     <button class="mrow" data-go="st"><span>📚</span><div><b>学习计划</b><small>章节、考试日期、复习排程</small></div><i>›</i></button>
     <button class="mrow" data-go="sp"><span>🏃</span><div><b>运动计划</b><small>训练安排</small></div><i>›</i></button>
     <button class="mrow" data-go="se"><span>⚙️</span><div><b>设置</b><small>外观、课表、假期、云同步、备份</small></div><i>›</i></button>
+  </section>
+
+  <section class="card st" id="v-gd">
+    <h2>📖 功能表</h2>
+    <input id="gdq" class="gdq" placeholder="搜索功能，例如：提醒、分享、重复…">
+    <div id="gdl"></div>
   </section>
 
   <!-- Ai + 记录（在「更多」里显示） -->
@@ -340,6 +347,7 @@
 <script src="js/stats.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/native.js"></script>
+<script src="js/guide.js"></script>
 <script src="js/app.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/icons.js"></script>

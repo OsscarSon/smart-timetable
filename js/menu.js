@@ -17,6 +17,7 @@
 
   // ---- 菜单内容 ----
   var G=[
+    [['📖','功能表','全部功能和使用方法',function(){go('gd')}]],
     [['📚','学习计划','章节、考试日期、复习排程',function(){go('st')}],
      ['🏃','运动计划','训练安排',function(){go('sp')}],
      ['📊','统计','作业完成率、每天安排时长',function(){go('sta')}]],
@@ -44,7 +45,7 @@
       g.forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);
         d.appendChild(t);d.appendChild(el('small',null,it[2]));b.appendChild(i);b.appendChild(d);b.onclick=it[3];box.appendChild(b)});
       dw.appendChild(box)});
-    dw.appendChild(el('div','dw-ft','Mochi 时间表 · v6.1'))}
+    dw.appendChild(el('div','dw-ft','Mochi 时间表 · v6.4'))}
   function openMenu(){build();if(window.applyIcons)applyIcons(dw);dw.classList.add('show');mk.classList.add('show');dw.setAttribute('aria-hidden','false')}
   function closeMenu(){dw.classList.remove('show');mk.classList.remove('show');dw.setAttribute('aria-hidden','true')}
   window.openMenu=openMenu;window.closeMenu=closeMenu;

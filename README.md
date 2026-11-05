@@ -32,6 +32,7 @@ js/widget.js      手机 App：把今天 / 明天的安排写给 Android 桌面�
 js/icons.js       图标：开源库 Lucide（失败时保留 emoji）
 native/android-widget/  Android 桌面小组件的原生代码 + 安装说明
 js/fcview.js      周视图：开源库 FullCalendar（失败时退回方块网格）
+js/guide.js       📖 功能表（全部功能 + 使用方法，直接改里面的数组）
 js/menu.js        ≡ 左侧菜单（分组大圆角卡片）+ 设置页分区显示
 js/localai.js     🧠 本机 AI 备用（Chrome Gemini Nano / WebLLM）：云端不可用时自动接手文字排课 / 一句话添加
 js/ai.js          ✨ AI 添加：一句话 / 语音 → 活动、作业；课表照片 → 固定课程（先预览，确认后才写入）

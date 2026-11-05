@@ -39,9 +39,12 @@
           var s=i.dateStr,dn=dnFromIso(s.slice(0,10)),h=parseInt(s.slice(11,13),10);if(dn===null||isNaN(h))return;
           h=Math.max(H0,Math.min(H1-1,h));openDlg({day:dnDate(dn).wd,h:h,len:1,t:'',c:'pink'},true)}
       });
-      cal.render();show(true)
+      show(true);cal.render();                                     // 先显示再渲染：容器隐藏时 FullCalendar 量不到宽度，各列会缩成一团
+      setTimeout(function(){try{if(cal)cal.updateSize()}catch(e){}},60)
     }catch(e){cal=null;show(false)}                              // 任何出错都退回方块网格
   };
+  // 容器从隐藏变可见（切回课表页 / 旋转屏幕 / 改窗口大小）时重新量尺寸
+  if(window.ResizeObserver)new ResizeObserver(function(){if(cal){try{cal.updateSize()}catch(e){}}}).observe(box);
   // 设置里的开关
   var sw=document.getElementById('fcon');
   if(sw){sw.checked=SET.fc!==0;sw.onchange=function(){SET.fc=sw.checked?1:0;put2('mochi-set',SET);draw()}}

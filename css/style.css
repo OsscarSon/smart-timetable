@@ -302,3 +302,12 @@ h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 .tabbar button span svg{width:22px;height:22px;display:block}
 .dw-r i svg{width:18px;height:18px}
 .mrow span svg{width:24px;height:24px;color:var(--pri)}
+
+/* 功能表 */
+.gdq{width:100%;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:9px 12px;font:inherit;font-size:14px}
+.gd-g{font-weight:800;font-size:15px;margin:12px 0 2px}
+.gd-i{background:var(--bg);border-radius:14px;padding:8px 12px;margin:6px 0}
+.gd-i summary{cursor:pointer;font-weight:800;font-size:14px}
+.gd-w{color:var(--soft);font-size:12px;margin-top:4px}
+.gd-i p{margin:6px 0 2px;font-size:14px;line-height:1.55}
+.gd-i[hidden],.gd-g[hidden]{display:none}
