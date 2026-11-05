@@ -76,7 +76,7 @@ function drawDay(){
   document.getElementById('vmd').classList.toggle('on',VM!=='week');document.getElementById('vmw').classList.toggle('on',VM==='week');
   greet();drawNow();drawStrip();drawList()}
 
-function setVM(m){VM=m;try{localStorage.setItem('mochi-sync-vm',m)}catch(e){}drawDay()}
+function setVM(m){VM=m;try{localStorage.setItem('mochi-sync-vm',m)}catch(e){}drawDay();if(window.fcDraw)fcDraw()}
 document.getElementById('vmd').onclick=function(){setVM('day')};
 document.getElementById('vmw').onclick=function(){setVM('week')};
 document.getElementById('fab').onclick=addOnDay;

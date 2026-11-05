@@ -1,0 +1,29 @@
+{
+  "name": "Mochi 时间表",
+  "short_name": "Mochi",
+  "description": "可爱又靠谱的智能时间表",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff4ec",
+  "theme_color": "#ff8f4d",
+  "lang": "zh",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

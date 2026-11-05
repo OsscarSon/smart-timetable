@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mw_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/mochi_widget_bg">
+
+    <TextView
+        android:id="@+id/mw_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#FF8F4D"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:paddingBottom="4dp" />
+
+    <TextView android:id="@+id/mw_row1" style="@style/MochiWidgetRow" />
+    <TextView android:id="@+id/mw_row2" style="@style/MochiWidgetRow" />
+    <TextView android:id="@+id/mw_row3" style="@style/MochiWidgetRow" />
+    <TextView android:id="@+id/mw_row4" style="@style/MochiWidgetRow" />
+    <TextView android:id="@+id/mw_row5" style="@style/MochiWidgetRow" />
+</LinearLayout>

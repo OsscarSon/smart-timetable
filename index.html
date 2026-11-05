@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mochi 时间表</title>
 <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff8f4d">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -33,6 +36,7 @@
     <div class="dstrip dayv" id="dstrip"></div>
     <div class="dlist dayv" id="dlist"></div>
     <div class="grid" id="grid"></div>
+    <div class="fcwrap wkonly" id="fc" style="display:none"></div>
     <button class="fab sm" id="aifab" aria-label="AI 添加">✨</button>
     <button class="fab" id="fab" aria-label="添加安排">＋</button>
   </section>
@@ -83,6 +87,7 @@
     <h2 style="font-size:16px">📅 日历</h2>
     <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
     <label class="tp"><input type="checkbox" id="hwk"><div class="n">隐藏周末<small>课表只显示周一到周五</small></div></label>
+    <label class="tp"><input type="checkbox" id="fcon"><div class="n">新版周视图（FullCalendar）<small>连续时间轴、当前时间线；关闭 = 方块网格</small></div></label>
     <label class="tp"><input type="checkbox" id="h24"><div class="n">24 小时制<small>关闭后显示 8am / 2pm</small></div></label>
     <div class="mv"><select id="sh0"></select><select id="sh1"></select></div>
 
@@ -306,6 +311,8 @@
 <script data-lib="supabase" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script data-lib="chart.js" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <script data-lib="lz-string" src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+<script data-lib="fullcalendar" src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script data-lib="lucide" src="https://cdn.jsdelivr.net/npm/lucide@0.263.1/dist/umd/lucide.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/core.js"></script>
@@ -314,6 +321,7 @@
 <script src="js/recur.js"></script>
 <script src="js/srs.js"></script>
 <script src="js/timetable.js"></script>
+<script src="js/fcview.js"></script>
 <script src="js/dayview.js"></script>
 <script src="js/localai.js"></script>
 <script src="js/log.js"></script>
@@ -334,5 +342,7 @@
 <script src="js/native.js"></script>
 <script src="js/app.js"></script>
 <script src="js/menu.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/widget.js"></script>
 </body>
 </html>

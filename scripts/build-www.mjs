@@ -12,11 +12,13 @@ const LIBS = { // data-lib 名 → [npm 包名, 包内文件的候选路径]
   'chart.js':['chart.js',            ['dist/chart.umd.js']],
   'lz-string':['lz-string',          ['libs/lz-string.min.js']],
   qrcode:   ['qrcode-generator',     ['qrcode.js']],
+  lucide:   ['lucide',               ['dist/umd/lucide.min.js']],
+  fullcalendar:['fullcalendar',      ['index.global.min.js']],
 };
 rmSync('www', { recursive: true, force: true });
 mkdirSync('www/vendor', { recursive: true });
-for (const f of ['index.html', 'sw.js']) cpSync(f, join('www', f));
-for (const d of ['css', 'js']) cpSync(d, join('www', d), { recursive: true });
+for (const f of ['index.html', 'sw.js', 'manifest.json']) cpSync(f, join('www', f));
+for (const d of ['css', 'js', 'icons']) cpSync(d, join('www', d), { recursive: true });
 
 let html = readFileSync('www/index.html', 'utf8');
 for (const [name, [pkg, cands]] of Object.entries(LIBS)) {

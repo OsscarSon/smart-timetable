@@ -27,6 +27,11 @@ js/wizard.js      首次向导
 js/notify.js      网页打开时的通知
 js/native.js      手机 App（Capacitor）：系统本地通知（网页里不做任何事）
 js/dayview.js     课表日视图：日期条、当天列表、进行中/下一项倒计时、日/周切换
+scripts/check.mjs  一键检查（语法 / 引用 / 库登记）
+js/widget.js      手机 App：把今天 / 明天的安排写给 Android 桌面小组件
+js/icons.js       图标：开源库 Lucide（失败时保留 emoji）
+native/android-widget/  Android 桌面小组件的原生代码 + 安装说明
+js/fcview.js      周视图：开源库 FullCalendar（失败时退回方块网格）
 js/menu.js        ≡ 左侧菜单（分组大圆角卡片）+ 设置页分区显示
 js/localai.js     🧠 本机 AI 备用（Chrome Gemini Nano / WebLLM）：云端不可用时自动接手文字排课 / 一句话添加
 js/ai.js          ✨ AI 添加：一句话 / 语音 → 活动、作业；课表照片 → 固定课程（先预览，确认后才写入）
@@ -65,6 +70,17 @@ capacitor.config.json / package.json   手机 App 打包用
    4. Authentication → URL Configuration：Site URL 填你的 Vercel 网址。想免邮件确认，可在 Providers → Email 里关掉 “Confirm email”。
    5. 重新部署，设置页 → “账号与云同步”注册 / 登录。第一次在新设备登录时，如果云端和本机都有数据，会让你选“用云端”还是“用本机”。
 4. 手机打开网址 →“添加到主屏幕”。
+
+## v6.3：桌面小组件 + Lucide 图标
+- **Android 桌面小组件**（`native/android-widget/`，用 Android 自带 `AppWidgetProvider` + Capacitor 官方 Preferences 插件）：显示今天还没结束的 5 项，今天没了显示明天；点一下打开 App。数据由 `js/widget.js` 写入，数据变化 / 进出后台时立刻刷新，系统每 30 分钟也会刷新。**原生代码没有在 Android Studio 里编译过**（我只用假的 Android 类让 javac 检查了语法和类型），第一次加进工程如果报错，把报错发给我。安装步骤见该文件夹的 README。没用 Jetpack Glance，是因为 Capacitor 默认工程没有 Kotlin / Compose，加进去要改很多 Gradle 配置，出错风险更大。
+- **Lucide**（ISC，固定 0.263.1）：底部标签栏、≡ 菜单、更多页的 emoji 换成统一线条图标；库没加载到或找不到某个图标时保留 emoji。设置页“开源库”行会显示 Lucide ✓ / ✗。
+- 打包手机 App 多装一个：`npm i @capacitor/preferences`，`npm i -D lucide`。
+
+## v6.2：两个开源库
+- **FullCalendar**（MIT，`index.global.min.js`，固定 6.1.15）：周视图改成连续时间轴 + 当前时间红线，固定课程按真实分钟显示（如 08:00–08:45）。点事件 / 空白处仍打开原来的编辑页。设置 → 外观与日历 里可关掉；库没加载到时自动退回方块网格。手动活动目前仍按整点（分钟级是下一步）。
+- **Workbox**（Apache-2.0，从 Google CDN 载入）：`sw.js` 里做离线缓存（页面 / 脚本 / 样式 / 图片先用缓存、后台更新，`/api/` 不缓存）。加上 `manifest.json` 与 `icons/`，Android Chrome 可以“安装应用”。
+- 打包手机 App：`npm i -D fullcalendar` 后再 `npm run build:www`（脚本已加入 fullcalendar，并会复制 manifest 与 icons）。
+- 这次没法联网，**FullCalendar / Workbox 本身没有在真实 CDN 上跑过**；我用模拟库验证了事件映射、点击、隐藏周末和出错退回。首次部署后请看一眼：设置页“开源库”那一行里 FullCalendar 应显示 ✓。
 
 ## v6.1：全屏编辑页 + ≡ 菜单（参考 Smart Timetable）
 - **≡ 左侧菜单**：点左上角三条横线（或从屏幕左边缘向右划）展开，分组卡片：学习 / 运动 / 统计、固定课表 / 拍照导入 / 我的课表、分享与导出、外观 / 假期、云同步 / 备份。点一行只打开设置里对应的那一个分区（不再是一整页长设置）。
@@ -105,8 +121,8 @@ capacitor.config.json / package.json   手机 App 打包用
 需要电脑上装 Node.js；Android 要 Android Studio，iOS 要 Mac + Xcode + 开发者账号。
 ```bash
 npm init -y   # 如果还没有 package.json 就跳过（项目里已带）
-npm i @capacitor/core @capacitor/local-notifications
-npm i -D @capacitor/cli @capacitor/android @capacitor/ios dayjs rrule ts-fsrs dexie @supabase/supabase-js
+npm i @capacitor/core @capacitor/local-notifications @capacitor/preferences
+npm i -D @capacitor/cli @capacitor/android @capacitor/ios dayjs rrule ts-fsrs dexie @supabase/supabase-js chart.js lz-string qrcode-generator fullcalendar lucide
 npx cap add android      # 或 npx cap add ios
 # 在 js/config.js 里填 apiBase = 你的 Vercel 网址（App 里没有同域后端）
 npm run android          # 生成 www/ → cap sync → 打开 Android Studio（iOS 用 npm run ios）

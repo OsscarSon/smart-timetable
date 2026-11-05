@@ -39,6 +39,7 @@
       b.style.background='repeating-linear-gradient(45deg,rgba(128,128,128,.14) 0 6px,transparent 6px 12px),var(--'+l.c+')';
       b.style.gridColumn=cc(x.day);b.style.gridRow=(s-H0+2)+' / span '+(e2-s);
       b.onclick=function(){openLesson(l)};grid.appendChild(b)});
+    if(window.fcDraw)fcDraw();
     if(typeof rf==='function')rf();
     if(typeof drawDay==='function')drawDay();
   }
