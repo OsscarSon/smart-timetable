@@ -9,7 +9,6 @@ function wzStep(){
   document.getElementById('wzn').textContent=WZ.i===WZN?'开始使用':'下一步';
   document.getElementById('wzk').hidden=WZ.i===WZN;
   if(WZ.i===0){
-    if(window.MochiNext)MochiNext.mountWizardChoices(wzb);
     var lg=el('div','chips');mkLangChips(lg);wzb.appendChild(lg);
     wzb.appendChild(el('div','msg','先做最重要的一件事：把课表放进来。（后面几步都可以先跳过）'));
     [['photo','📷','拍照导入课表','拍一张课表，AI 帮你识别（需要登录账号）'],['lesson','✍️','手动添加第一节课','自己填，最稳'],['none','🐱','先逛逛','之后随时能在“更多”里导入']].forEach(function(o){
@@ -22,7 +21,7 @@ function wzStep(){
     var hw=el('input');hw.type='checkbox';hw.checked=WZ.hw;hw.onchange=function(){WZ.hw=hw.checked};wzb.appendChild(wzField('隐藏周末',hw));
     var h=el('input');h.type='checkbox';h.checked=WZ.h24;h.onchange=function(){WZ.h24=h.checked};wzb.appendChild(wzField('24 小时制',h))}
   if(WZ.i===2){
-    wzb.appendChild(el('div','msg',(window.MochiNext&&MochiNext.modes().indexOf('study')<0)?'如果你有固定轮班或时段，可以设定时间；没有则直接下一步。这不会强制建立课程。':'填一下学校每节课的时间，生成后可以在设置里微调。不用学校课表的话直接下一步。'));
+    wzb.appendChild(el('div','msg','填一下学校每节课的时间，生成后可以在设置里微调。不用学校课表的话直接下一步。'));
     var s=el('input');s.type='time';s.value=WZ.per.s;s.onchange=function(){WZ.per.s=s.value};wzb.appendChild(wzField('首节开始',s));
     [['l','每节多少分钟',15,180],['g','课间多少分钟',0,60],['n','一天几节',1,16]].forEach(function(f){
       var n=el('input');n.type='number';n.min=f[2];n.max=f[3];n.value=WZ.per[f[0]];n.oninput=function(){WZ.per[f[0]]=+n.value};wzb.appendChild(wzField(f[1],n))});
@@ -37,17 +36,17 @@ function wzStep(){
 }
 function wzApply(){
   var t0=t2min(WZ.per.s);
-  if((!window.MochiNext||MochiNext.modes().indexOf('study')>=0)&&!isNaN(t0)&&WZ.per.l>=15&&WZ.per.n>=1)TT.per=genPer(t0,WZ.per.l,Math.max(0,WZ.per.g||0),Math.min(16,WZ.per.n));
+  if(!isNaN(t0)&&WZ.per.l>=15&&WZ.per.n>=1)TT.per=genPer(t0,WZ.per.l,Math.max(0,WZ.per.g||0),Math.min(16,WZ.per.n));
   if(WZ.cyc!==TT.cyc){TT.cyc=WZ.cyc;TT.anc=mondayDn(todayDn)}
   rebucketAll(SET.ws,WZ.ws);SET.ws=WZ.ws;SET.hw=WZ.hw;SET.h24=WZ.h24;SET.wiz=true;
   ttSave();saveSet();
   try{if(WZ.goal!=='none')localStorage.setItem('mochi-sync-after',WZ.goal);else localStorage.removeItem('mochi-sync-after')}catch(e){}}
-function wzDone(){wzApply();location.reload()}
+function wzDone(){wzApply();try{localStorage.setItem('mochi-mode-after-wizard','1')}catch(e){}location.reload()}
 function showWiz(){
   WZ={i:0,goal:'photo',ws:SET.ws,hw:SET.hw,h24:SET.h24,cyc:TT.cyc||1,per:{s:min2t((TT.per[0]||{s:480}).s),l:45,g:10,n:Math.max(1,Math.min(16,TT.per.length||8))}};
   wzStep();wzm.classList.add('show')}
 document.getElementById('wzn').onclick=function(){if(WZ.i===WZN){wzDone();return}WZ.i++;wzStep()};
 document.getElementById('wzp').onclick=function(){if(WZ.i>0){WZ.i--;wzStep()}};
-document.getElementById('wzk').onclick=function(){SET.wiz=true;saveSet();wzm.classList.remove('show')};
+document.getElementById('wzk').onclick=function(){SET.wiz=true;saveSet();wzm.classList.remove('show');if(window.MochiNext)MochiNext.openModes()};
 document.getElementById('wzr').onclick=showWiz;
 if(FRESH&&!SET.wiz)showWiz();

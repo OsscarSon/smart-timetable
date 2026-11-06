@@ -1,6 +1,6 @@
 // 启动：渲染各页面 + 底部标签栏（课表 / 作业 / 学习 / 统计 / 更多）
 draw();ttSel();rSt();rSp();rRm();rFx();rPer();rTT();rHw();rf();
-var V=['tt','hw','st','sp','bt','di','se','sta','more','life'],SUB={se:1},GRP={hw:'hw',st:'hw',sp:'sp',bt:'sp',di:'sp'},LAST={hw:'hw',sp:'sp'};
+var V=['tt','hw','st','sp','bt','di','se','sta','more'],SUB={se:1},GRP={hw:'hw',st:'hw',sp:'sp',bt:'sp',di:'sp'},LAST={hw:'hw',sp:'sp'};
 function showView(v){
   V.forEach(function(k){document.getElementById('v-'+k).style.display=k===v?(k==='tt'?'':'flex'):'none'});
   var tab=SUB[v]?'more':GRP[v]||v;if(GRP[v])LAST[GRP[v]]=v;

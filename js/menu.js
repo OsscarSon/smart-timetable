@@ -63,7 +63,7 @@
     var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);
     fill(dw,true);
-    dw.appendChild(el('div','dw-ft','Mochi Schedule · v8.8'))}
+    dw.appendChild(el('div','dw-ft','Mochi Schedule · v8.8.1'))}
   // 「更多」页：同一份清单，不再是 4 行
   var mv=document.getElementById('v-more');
   function buildMore(){
