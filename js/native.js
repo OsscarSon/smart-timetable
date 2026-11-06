@@ -28,6 +28,7 @@
     rpBlocks(w).forEach(function(b){if(b.dn===dn&&!DN[kk(b,w)])out.push({s:b.s,e:b.e,t:b.t,l:''})});
     fxBlocks(w).forEach(function(b){if(b.dn===dn){var l=b.les;out.push({s:b.s,e:b.e,t:b.t,l:[(l.bld||'')+(l.room||''),l.teacher].filter(Boolean).join(' · ')})}});
     return out.sort(function(a,b){return a.s-b.s})}
+  window.NATIVE_DAYITEMS=dayItems;   // 手机日历同步（syscal.js）也用它
   function pushWidget(){
     if(!WG)return;
     try{WG.update({json:JSON.stringify({v:1,gen:Date.now(),h24:!!SET.h24,

@@ -8,6 +8,7 @@ function drawStats(){
   sum.textContent=all?'作业共 '+all+' 份：完成 '+done+'（'+Math.round(done/all*100)+'%）'+(over?'，逾期 '+over:'')+'。这一周共安排 '+tot+' 小时。':'还没有作业记录。这一周共安排 '+tot+' 小时。';
   if(typeof Chart!=='function'){msg.textContent='Chart.js 没加载到，图表暂时显示不了（设置页最下面能看到开源库状态）。';return}
   msg.textContent='时长是课表页当前翻到的那一周（含固定课程和重复活动）。';
+  try{Chart.defaults.font.family=getComputedStyle(document.body).fontFamily}catch(e){}   // 图表里的汉字也用文楷
   function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
   var ink=cv('--ink'),line=cv('--line');
   ['ch1','ch2'].forEach(function(k){if(CHS[k]){CHS[k].destroy();CHS[k]=null}});

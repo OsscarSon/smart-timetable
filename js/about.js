@@ -37,6 +37,9 @@
     ['Chart.js','MIT',['统计图表','Statistics charts','Carta statistik'],'https://github.com/chartjs/Chart.js'],
     ['lz-string','MIT',['把课表压缩成分享链接','Compresses timetables into share links','Mampatkan jadual untuk pautan kongsi'],'https://github.com/pieroxy/lz-string'],
     ['qrcode-generator','MIT',['生成分享二维码','Share QR codes','Kod QR kongsi'],'https://github.com/kazuhikoarase/qrcode-generator'],
+    ['LXGW WenKai 霞鹜文楷','OFL-1.1',['界面中文字体','Chinese interface font','Fon Cina antara muka'],'https://github.com/lxgw/LxgwWenKai'],
+    ['@capacitor-community/speech-recognition','MIT',['手机 App 里的语音输入','Voice input in the phone app','Input suara dalam app telefon'],'https://github.com/capacitor-community/speech-recognition'],
+    ['@ebarooni/capacitor-calendar','MIT',['读写手机系统日历','Read and write the phone calendar','Baca & tulis kalendar telefon'],'https://github.com/ebarooni/capacitor-calendar'],
     ['Lucide','ISC',['界面图标','Interface icons','Ikon antara muka'],'https://github.com/lucide-icons/lucide'],
     ['Capacitor','MIT',['打包成 Android / iOS App','Packages the web app as Android / iOS','Membungkus sebagai app Android / iOS'],'https://github.com/ionic-team/capacitor'],
     ['Transformers.js + opus-mt','Apache-2.0 / CC-BY-4.0',['浏览器内的开源翻译模型（Helsinki-NLP）','On-device open-source translation model (Helsinki-NLP)','Model terjemahan sumber terbuka dalam pelayar (Helsinki-NLP)'],'https://github.com/huggingface/transformers.js']

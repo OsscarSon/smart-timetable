@@ -122,13 +122,31 @@
       rpSave();save();hwSave();if(typeof rHw==='function')rHw();draw();if(typeof bnr==='function')bnr();Undo.toast('已加入 '+pick.length+' 项',snap)}
     close()};
 
-  // ---- 语音（浏览器自带 Web Speech API；不支持的环境直接隐藏按钮）----
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null;
-  if(!SR)mic.hidden=true;
-  function stopMic(){if(rec){try{rec.stop()}catch(e){}}}
+  // ---- 语音：手机 App 用开源插件 @capacitor-community/speech-recognition（弹出系统语音识别窗口）；
+  //      网页用浏览器自带 Web Speech API；两个都没有就隐藏按钮 ----
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null,LNG={en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US';
+  function nativeSR(){var C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))return null;
+    return (C.Plugins&&C.Plugins.SpeechRecognition)||(C.registerPlugin?C.registerPlugin('SpeechRecognition'):null)}
+  var NSR=nativeSR(),nbusy=false;
+  if(!SR&&!NSR)mic.hidden=true;
+  function stopMic(){if(nbusy&&NSR){try{NSR.stop()}catch(e){}}if(rec){try{rec.stop()}catch(e){}}}
+  async function nativeListen(){
+    if(nbusy){stopMic();return}
+    try{
+      var av=await NSR.available();if(av&&av.available===false){say('这台手机没有可用的语音识别（需要 Google 语音服务）');return}
+      var p=await NSR.checkPermissions();if(!p||p.speechRecognition!=='granted')p=await NSR.requestPermissions();
+      if(!p||p.speechRecognition!=='granted'){say('没有麦克风权限，请在手机设置里允许');return}
+      nbusy=true;mic.textContent='⏹ 停止';mic.classList.add('rec');say('在听…');
+      var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
+      var r=await NSR.start({language:LNG,maxResults:1,partialResults:false,popup:true}),t=r&&r.matches&&r.matches[0]||'';
+      if(t)q.value=(base+t).slice(0,300);
+    }catch(e){say('语音识别失败：'+(e&&e.message||e))}
+    nbusy=false;mic.textContent='🎤 语音';mic.classList.remove('rec');
+    if(q.value.trim()&&!S.busy)say('说完了？点「解析」。')}
   mic.onclick=function(){
+    if(NSR){nativeListen();return}
     if(rec){stopMic();return}
-    rec=new SR();rec.lang={en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US';rec.interimResults=true;rec.continuous=false;
+    rec=new SR();rec.lang=LNG;rec.interimResults=true;rec.continuous=false;
     var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
     rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;q.value=(base+t).slice(0,300)};
     rec.onend=function(){rec=null;mic.textContent='🎤 语音';mic.classList.remove('rec');if(q.value.trim()&&!S.busy)say('说完了？点「解析」。')};

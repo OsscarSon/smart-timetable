@@ -21,7 +21,8 @@
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-weight:600}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito","LXGW WenKai",-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-weight:500}
+/* 字重说明：文楷只有 常规 400 / 粗体 700。正文写 500 → 英文数字用 Nunito 600，汉字用文楷常规；写 600 会让汉字跳到粗体，所以这里别用 600。 */
 .app{max-width:var(--appw);margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
 .card{background:var(--card);border-radius:24px;box-shadow:var(--shadow);border:2px solid var(--line)}
 h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
@@ -140,7 +141,7 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .dempty{display:flex;flex-direction:column;align-items:center;gap:10px;padding:36px 0;color:var(--soft);font-size:14px}
 .lc{display:grid;grid-template-columns:48px 1fr;gap:10px;align-items:stretch}
 .lc .tmc{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;font-size:14px}
-.lc .tmc small{color:var(--soft);font-size:12px;font-weight:600}
+.lc .tmc small{color:var(--soft);font-size:12px;font-weight:500}
 .lc .cd{display:flex;align-items:center;gap:8px;min-height:54px;padding:10px 12px;border-radius:14px;cursor:pointer;box-shadow:inset 4px 0 0 rgba(0,0,0,.16)}
 .lc .cd.fxc{background-image:repeating-linear-gradient(45deg,rgba(128,128,128,.12) 0 6px,transparent 6px 12px)}
 .lc .tx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -182,8 +183,8 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .er select option{color:#222}
 .er.name input{font-size:24px;color:var(--ink);padding:10px 0}
 .er.name input::placeholder{color:var(--soft);opacity:.7}
-.er input::placeholder{color:var(--soft);opacity:.6;font-weight:600}
-.er .row input{border:2px solid var(--line);background:var(--bg);color:var(--ink);font-size:14px;padding:8px 10px;border-radius:14px;font-weight:600}
+.er input::placeholder{color:var(--soft);opacity:.6;font-weight:500}
+.er .row input{border:2px solid var(--line);background:var(--bg);color:var(--ink);font-size:14px;padding:8px 10px;border-radius:14px;font-weight:500}
 .er.tgl{flex-direction:row;align-items:center;gap:10px}
 .er.tgl .n{flex:1;font-size:15px}.er.tgl small{display:block;color:var(--soft);font-size:12px}
 .er.tgl input{width:20px;accent-color:var(--pri)}
@@ -274,7 +275,7 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .wk-c.td{background-color:rgba(255,143,77,.08)}
 .wk-e{position:absolute;display:flex;flex-direction:column;gap:1px;border:0;border-radius:8px;padding:2px 4px;font:inherit;font-size:12px;font-weight:800;color:var(--ink);text-align:left;line-height:1.2;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.14);z-index:1}
 .wk-e .et{word-break:break-all;overflow:hidden}
-.wk-e .tm2{font-size:12px;font-weight:600;opacity:.8;white-space:nowrap}
+.wk-e .tm2{font-size:12px;font-weight:500;opacity:.8;white-space:nowrap}
 .wk-e.fx{background-image:repeating-linear-gradient(45deg,rgba(128,128,128,.14) 0 6px,transparent 6px 12px);box-shadow:inset 3px 0 0 var(--pri),0 1px 3px rgba(0,0,0,.1)}
 .wk-e.rp{box-shadow:inset 0 0 0 2px var(--pri2),0 1px 3px rgba(0,0,0,.1)}
 .wk-e.dn{opacity:.45;text-decoration:line-through}

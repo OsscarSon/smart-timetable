@@ -59,6 +59,9 @@ supabase/schema.sql   Supabase 建表 + 行级安全 + 附件存储桶，运行�
 | Chart.js | 统计页图表 | 统计页只显示文字摘要 |
 | lz-string | 分享链接压缩 / 解压 | 不能生成或打开分享链接 |
 | qrcode-generator | 分享二维码 | 只提供链接，不显示二维码 |
+| @capacitor-community/speech-recognition（手机 App 才用） | 语音输入：弹出系统语音识别窗口 | 网页用浏览器自带语音；都没有就隐藏按钮 |
+| @ebarooni/capacitor-calendar（手机 App 才用，装的是 `latest-7`，对应 Capacitor 7） | 设置 → 数据：写入 / 导入手机系统日历 | 网页版看不到这一块 |
+| 霞鹜文楷 LXGW WenKai（字体，OFL-1.1） | 界面中文字体（常规 + 粗体），按字切片加载 | 退回系统中文字体 |
 
 **部署后先打开 设置 页，最下面“开源库”一行会显示每个库 ✓ / ✗。** 有 ✗ 说明那个 CDN 链接没加载到（版本号或路径不对、或网络问题），去 index.html 改成能用的版本即可。
 
@@ -104,7 +107,8 @@ supabase/schema.sql   Supabase 建表 + 行级安全 + 附件存储桶，运行�
 - 提醒清单由 `buildAlarms()` 统一生成：网页版每 30 秒检查一次，手机 App 把未来 7 天排进系统通知队列（iOS 最多 60 条，Android 120 条）。
 
 ## 手机 App（Capacitor）与 Android 桌面小组件
-需要电脑装 Node.js；Android 要 Android Studio，iOS 要 Mac + Xcode + 开发者账号。
+需要电脑装 Node.js（20 以上）；Android 要 Android Studio，iOS 要 Mac + Xcode + 开发者账号。
+**图省事：`npm run android:setup` 一条命令做完下面前几步（后端网址默认是 smart-timetable-kappa.vercel.app，可用 `-- --api=网址` 改），再照 `BUILD-ANDROID.md` 在 Android Studio 里点几下就能出 APK。**
 ```bash
 npm i                    # package.json 已列好依赖（Capacitor 7、各开源库的固定版本）
 # 在 js/config.js 里填 apiBase = 你的 Vercel 网址（App 里没有同域后端）

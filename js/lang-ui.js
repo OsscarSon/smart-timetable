@@ -1,6 +1,11 @@
 // 翻译字典 1/2：页面（index.html）和菜单、设置、向导里的文字。格式：L(中文原文, 英文, 马来文)
 (function(){var A=(window.I18N=window.I18N||[]);function L(z,e,m){A.push([z,e,m])}
 L("Mochi 时间表","Mochi Timetable","Jadual Mochi");
+L("📲 手机日历（只有手机 App）","📲 Phone calendar (phone app only)","📲 Kalendar telefon (app telefon sahaja)");
+L("📤 写入手机日历（未来 4 周）","📤 Write to phone calendar (next 4 weeks)","📤 Tulis ke kalendar telefon (4 minggu akan datang)");
+L("📥 从手机日历导入","📥 Import from phone calendar","📥 Import dari kalendar telefon");
+L("🗑️ 删掉写入过的","🗑️ Remove what Mochi wrote","🗑️ Buang yang ditulis Mochi");
+L("写入 = 把未来 4 周的课程和活动放进手机的系统日历（Google 日历等）；再写一次会先删掉上次写入的，不会重复。导入 = 把系统日历里未来 4 周的非全天事件加成 Mochi 的活动。","Write = put the next 4 weeks of lessons and activities into the phone's calendar (Google Calendar etc.); writing again first removes what was written last time, so nothing is duplicated. Import = add non-all-day events from the phone's calendar (next 4 weeks) to Mochi as activities.","Tulis = letak pelajaran dan aktiviti 4 minggu akan datang ke kalendar telefon (Google Calendar dll.); tulis lagi akan buang yang ditulis sebelum ini, jadi tiada pendua. Import = tambah acara bukan sepanjang hari dari kalendar telefon (4 minggu akan datang) ke Mochi sebagai aktiviti.");
 L("打开菜单","Open menu","Buka menu");
 L("早安，小主人 ☀️","Good morning ☀️","Selamat pagi ☀️");
 L("点一下可以跳到某一天","Tap to jump to a date","Ketik untuk lompat ke tarikh");
