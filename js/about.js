@@ -9,7 +9,7 @@
     intro:['给学生用的时间表：排课、作业、复习、运动都在一个地方，AI 帮你少打字。数据默认只存在你的设备上，登录账号后才会同步。','A timetable for students: classes, homework, revision and sport in one place, with AI to save typing. Your data stays on your device unless you sign in to sync.','Jadual untuk pelajar: kelas, kerja rumah, ulang kaji dan sukan di satu tempat, dengan AI untuk jimat menaip. Data kekal pada peranti anda kecuali anda log masuk untuk segerak.'],
     fh:['功能','Features','Ciri'],
     lh:['用到的开源项目','Open-source projects used','Projek sumber terbuka'],
-    note:['AI 整理 / 问答用的是云端 Gemini（不是开源，需要登录账号）；浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Cloud AI (Gemini) is not open source and needs a signed-in account. Browser built-in translation is a browser feature.','AI awan (Gemini) bukan sumber terbuka dan perlu akaun. Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
+    note:['AI 整理 / 问答：文字类请求按顺序用 Groq / Cerebras / Mistral / Gemini 的免费额度（都不是开源，需要登录）；拍照识别只用 Gemini。浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Text AI requests use the free tiers of Groq, Cerebras, Mistral and Gemini in turn (none are open source; sign-in required); photo import uses Gemini only. Browser built-in translation is a browser feature.','Permintaan AI teks guna tahap percuma Groq, Cerebras, Mistral dan Gemini secara bergilir (bukan sumber terbuka; perlu log masuk); import foto guna Gemini sahaja. Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
     close:['关闭','Close','Tutup']
   };
   var F=[
@@ -42,6 +42,9 @@
     ['@ebarooni/capacitor-calendar','MIT',['读写手机系统日历','Read and write the phone calendar','Baca & tulis kalendar telefon'],'https://github.com/ebarooni/capacitor-calendar'],
     ['Lucide','ISC',['界面图标','Interface icons','Ikon antara muka'],'https://github.com/lucide-icons/lucide'],
     ['Capacitor','MIT',['打包成 Android / iOS App','Packages the web app as Android / iOS','Membungkus sebagai app Android / iOS'],'https://github.com/ionic-team/capacitor'],
+    ['SortableJS','MIT',['拖动排序（科目、护肤步骤、运动卡片）','Drag-and-drop ordering (subjects, skincare steps, sport cards)','Susun seret (subjek, langkah kulit, kad sukan)'],'https://github.com/SortableJS/Sortable'],
+    ['Fuse.js','Apache-2.0',['模糊搜索（打错字也能找到）','Fuzzy search (finds results despite typos)','Carian kabur (jumpa walaupun salah taip)'],'https://github.com/krisk/Fuse'],
+    ['Open Food Facts','ODbL',['开源食品营养数据库（饮食栏查热量）','Open food & nutrition database (diet tab lookups)','Pangkalan data makanan terbuka (carian diet)'],'https://world.openfoodfacts.org'],
     ['Transformers.js + opus-mt','Apache-2.0 / CC-BY-4.0',['浏览器内的开源翻译模型（Helsinki-NLP）','On-device open-source translation model (Helsinki-NLP)','Model terjemahan sumber terbuka dalam pelayar (Helsinki-NLP)'],'https://github.com/huggingface/transformers.js']
   ];
   var m=null;

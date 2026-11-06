@@ -11,6 +11,8 @@ const LIBS = { // data-lib 名 → [npm 包名, 包内文件的候选路径]
   supabase: ['@supabase/supabase-js',['dist/umd/supabase.js']],
   'chart.js':['chart.js',            ['dist/chart.umd.js']],
   'lz-string':['lz-string',          ['libs/lz-string.min.js']],
+  sortable: ['sortablejs',           ['Sortable.min.js']],
+  fuse:     ['fuse.js',              ['dist/fuse.min.js']],
   qrcode:   ['qrcode-generator',     ['qrcode.js']],
   ical:     ['ical.js',              ['build/ical.min.js']],
   lucide:   ['lucide',               ['dist/umd/lucide.min.js']],

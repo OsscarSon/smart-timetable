@@ -76,7 +76,7 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .tp.rm input[type=text]{flex:1 1 120px}
 .lr{display:flex;align-items:center;gap:5px;font-size:14px}
 .lr input[type=text]{flex:1;min-width:0;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:5px 7px;font:inherit;font-size:14px}
-.lr.fin input[type=text]{opacity:.5;text-decoration:line-through}
+.lr.fin input[type=text]{opacity:.5}
 /* 底部 Ai + 记录 */
 .row{display:flex;gap:6px}
 .row input{flex:1;min-width:0;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:8px 10px;font:inherit;font-size:14px}
@@ -148,7 +148,7 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .lc .tx b{font-size:15px;font-weight:800;word-break:break-word}
 .lc .tx small{font-size:12px;opacity:.75}
 .lc .ck{flex:0 0 auto;width:26px;height:26px;padding:0;border-radius:50%;border:2px solid var(--ink);opacity:.45;background:transparent;color:var(--ink);font:inherit;font-size:14px;display:grid;place-items:center;cursor:pointer}
-.lc.dn .cd{opacity:.5}.lc.dn .tx b{text-decoration:line-through}.lc.dn .ck{opacity:.9}
+.lc.dn .cd{opacity:.45;filter:saturate(.5)}.lc.dn .tx b{opacity:.6;font-weight:600}.lc.dn .ck{opacity:.9;color:var(--pri-ink)}
 .lc.now .cd{outline:2px solid var(--pri);outline-offset:1px}
 
 .mrow{display:flex;align-items:center;gap:12px;border:0;background:var(--bg);color:var(--ink);font:inherit;text-align:left;border-radius:16px;padding:12px 14px;cursor:pointer}
@@ -274,11 +274,12 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
     repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--hr)/2 - 1px),rgba(128,128,128,.12) calc(var(--hr)/2 - 1px),rgba(128,128,128,.12) calc(var(--hr)/2))}
 .wk-c.td{background-color:rgba(255,143,77,.08)}
 .wk-e{position:absolute;display:flex;flex-direction:column;gap:1px;border:0;border-radius:8px;padding:2px 4px;font:inherit;font-size:12px;font-weight:800;color:var(--ink);text-align:left;line-height:1.2;overflow:hidden;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.14);z-index:1}
-.wk-e .et{word-break:break-all;overflow:hidden}
-.wk-e .tm2{font-size:12px;font-weight:500;opacity:.8;white-space:nowrap}
+.wk-e .et{word-break:normal;overflow-wrap:normal;hyphens:none;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.wk-e .et.cjk{word-break:break-all}
+.wk-e .tm2{font-size:12px;font-weight:500;opacity:.8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .wk-e.fx{background-image:repeating-linear-gradient(45deg,rgba(128,128,128,.14) 0 6px,transparent 6px 12px);box-shadow:inset 3px 0 0 var(--pri),0 1px 3px rgba(0,0,0,.1)}
 .wk-e.rp{box-shadow:inset 0 0 0 2px var(--pri2),0 1px 3px rgba(0,0,0,.1)}
-.wk-e.dn{opacity:.45;text-decoration:line-through}
+.wk-e.dn{opacity:.45;filter:saturate(.5)}
 .wk-c.mini .wk-e{padding:0}.wk-c.mini .wk-e .et,.wk-c.mini .wk-e .tm2{display:none}
 .vm-week .tt-main{padding-bottom:56px}
 
@@ -483,3 +484,40 @@ body[data-view]:not([data-view="tt"]) .fab,body[data-view]:not([data-view="tt"])
 
 /* 弹窗是纵向 flex 且有最大高度：内容超高时，文字块不许被压扁（否则文字溢出，会被下一行盖住） */
 .dlg>.msg,.dlg>h2,.dlg>h3,.dlg.ab>*{flex-shrink:0}
+
+/* v8.4 科目库 */
+.er.name{position:relative}.er.name input{padding-right:48px}
+.sb-open{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:0;background:var(--bg);font-size:20px;cursor:pointer}
+.sb-row{display:flex;align-items:center;gap:6px;width:100%;background:none;border:0;font:inherit;color:var(--ink);text-align:left;cursor:pointer;padding:0 6px 0 14px;min-height:54px}
+.sb-pick{flex:1;display:flex;align-items:center;gap:12px;background:none;border:0;font:inherit;font-size:17px;color:var(--ink);text-align:left;cursor:pointer;min-height:54px;min-width:0}
+.sb-n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-dot{width:16px;height:16px;border-radius:50%;background:var(--line);flex:none}
+.sb-ck{color:var(--pri-ink);font-weight:800}
+.sb-ed{border:0;background:none;font-size:18px;width:44px;height:44px;cursor:pointer;color:var(--soft)}
+.sb-fab{position:fixed;right:20px;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:18px;border:0;background:var(--pri);color:#fff;font-size:30px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer}
+#masksub{z-index:30}
+/* v8.4 时间尺 */
+.tpk{padding:12px 0 14px;display:flex;flex-direction:column;gap:10px;user-select:none}
+.tpk-read{text-align:center;font-size:26px;font-weight:800;letter-spacing:.5px}
+.tpk-read small{display:block;font-size:13px;font-weight:600;color:var(--soft);letter-spacing:0}
+.tpk-read .bad{color:#d33}
+.tpk-wrap{position:relative;height:84px}
+.tpk-r{position:absolute;inset:0;overflow-x:scroll;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x;cursor:grab}
+.tpk-r::-webkit-scrollbar{display:none}
+.tpk-tr{position:relative;height:100%;background-image:repeating-linear-gradient(to right,var(--line) 0 1px,transparent 1px 8px),repeating-linear-gradient(to right,var(--soft) 0 2px,transparent 2px 96px);background-size:100% 12px,100% 22px;background-repeat:repeat-x;background-position:0 22px,0 22px}
+.tpk-h{position:absolute;top:0;font-size:12px;color:var(--soft);transform:translateX(-50%);font-weight:700}
+.tpk-sel{position:absolute;top:34px;height:22px;border-radius:6px;background:var(--pri);opacity:.35}
+.tpk-b{position:absolute;top:60px;height:20px;border-radius:5px;font-size:11px;line-height:20px;padding:0 3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;background:var(--line);color:var(--ink)}
+.tpk-need{position:absolute;left:50%;top:14px;bottom:0;width:3px;margin-left:-1.5px;background:var(--pri);border-radius:2px;pointer-events:none;z-index:2}
+.tpk-need:before{content:"";position:absolute;top:-6px;left:-5px;border:6.5px solid transparent;border-top-color:var(--pri);border-bottom:0}
+.tpk-fade{position:absolute;top:0;bottom:0;width:36px;pointer-events:none;z-index:1}
+.tpk-fade.l{left:0;background:linear-gradient(to right,var(--card),transparent)}.tpk-fade.r{right:0;background:linear-gradient(to left,var(--card),transparent)}
+.tpk-d{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap;padding:0 10px}
+.tpk-d .chip.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tpk-d .st{width:38px;padding:5px 0}
+
+/* v8.5: 拖拽排序 */
+.grip{cursor:grab;opacity:.5;padding:0 6px 0 0;touch-action:none;user-select:none}
+.sort-ghost{opacity:.35}
+
+#aiinfo{white-space:pre-line}

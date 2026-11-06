@@ -8,7 +8,7 @@
     if(!L.length){box.appendChild(el('div','msg','还没有安排～'));return}
     L.forEach(function(x,i){var r=el('label','tp'),cb=el('input');cb.type='checkbox';cb.checked=!!DN[kk(x,ww)];
       cb.onchange=function(){if(cb.checked)DN[kk(x,ww)]=1;else delete DN[kk(x,ww)];put2(K_DN,DN);draw()};
-      var n=el('div','n',(i+1)+'. 周'+DAYS[x.day]+' '+tmin(x.s)+' '+x.t+(x.rp?' 🔁':''));if(cb.checked)n.style.textDecoration='line-through';
+      var n=el('div','n',(i+1)+'. 周'+DAYS[x.day]+' '+tmin(x.s)+' '+x.t+(x.rp?' 🔁':''));if(cb.checked)n.style.opacity='.5';
       r.appendChild(cb);r.appendChild(n);box.appendChild(r)});
   }
   function rRm(){

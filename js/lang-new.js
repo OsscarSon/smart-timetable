@@ -50,4 +50,12 @@ L("复制本周手动安排 → 下周","Copy this week’s manual events → ne
 L("清空本周手动安排…","Clear this week’s manual events…","Kosongkan acara manual minggu ini…");
 L("回到今天","Back to today","Kembali ke hari ini");
 L("更多操作","More actions","Lebih banyak tindakan");
+L("科目","Subject","Subjek");L("无","None","Tiada");L("编辑科目","Edit subject","Edit subjek");L("添加科目","Add subject","Tambah subjek");
+L("还没有科目。点右下角 ＋ 添加，之后就能一点选中～","No subjects yet. Tap ＋ to add one, then pick it with one tap~","Belum ada subjek. Ketik ＋ untuk tambah, kemudian pilih dengan satu ketikan~");
+L("科目名，如：数学","Subject name, e.g. Maths","Nama subjek, cth: Matematik");
+L("常用楼栋（可选）","Usual building (optional)","Bangunan biasa (pilihan)");L("常用教室（可选）","Usual room (optional)","Bilik biasa (pilihan)");L("常用老师（可选）","Usual teacher (optional)","Guru biasa (pilihan)");
+L("保存","Save","Simpan");L("已经有这个科目了","This subject already exists","Subjek ini sudah wujud");
+L("删除这个科目（不影响已有课程）","Delete this subject (existing lessons stay)","Padam subjek ini (kelas sedia ada kekal)");
+L("从科目库选","Pick from subject library","Pilih dari pustaka subjek");
+L("分钟"," min"," min");L(" 分钟"," min"," min");L(" 小时"," h"," j");L(" 分"," min"," min");
 })();

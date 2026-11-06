@@ -27,6 +27,19 @@ function weekItems(){      // 这一周所有要画的块（手动 + 重复 + �
     sub:[(l.bld||'')+(l.room||'')].filter(Boolean).join(' ')})});
   return out}
 
+// 防止「Science」这种长单词被从中间劈开：先缩字号（最小 8px），还放不下就加省略号
+function fitText(){
+  [].forEach.call(document.querySelectorAll('.wk-e .et:not(.cjk)'),function(t){
+    if(!t.clientWidth)return;
+    // 很窄的块里，开头的 emoji 会吃掉一半宽度：先藏起来，让名字完整显示
+    var full=t.getAttribute('data-full')||t.textContent;t.setAttribute('data-full',full);
+    var m=/^([^\u0000-\u007f]{1,4}) (\S.*)$/.exec(full);
+    t.textContent=(t.parentNode.clientWidth<52&&m)?m[2]:full;
+    var f=12;t.style.fontSize='';t.style.whiteSpace='';
+    while(t.scrollWidth>t.clientWidth+1&&f>8){f--;t.style.fontSize=f+'px'}
+    if(t.scrollWidth>t.clientWidth+1)t.style.whiteSpace='nowrap'})}
+if(window.ResizeObserver)new ResizeObserver(function(){fitText()}).observe(document.getElementById('grid')||document.body);
+window.addEventListener('resize',fitText);
 function drawGrid(){
   var vd=visDays(),n=H1-H0,Ht=n*HR,mini=function(wd){return !!SET.wkc&&wd>=5&&vd.length>5};
   grid.innerHTML='';
@@ -64,7 +77,7 @@ function drawGrid(){
           b=el('button','wk-e c-'+o.c+(o.k==='f'?' fx':'')+(o.k==='r'?' rp':'')+(o.dn?' dn':''));
       b.style.top=top+'px';b.style.height=hh+'px';
       b.style.left='calc(2px + (100% - 4px) * '+o.ln+' / '+o.nl+')';b.style.width='calc((100% - 4px) / '+o.nl+' - 1px)';
-      var tx=el('span','et',o.t);b.appendChild(tx);
+      var tx=el('span','et'+(/[\u3000-\u9fff\uac00-\ud7af]/.test(o.t)?' cjk':''),o.t);b.appendChild(tx);
       if(hh>=58){var tm=el('span','tm2',tmin(o.s)+'–'+tmin(o.e));b.appendChild(tm)}
       if(o.sub&&hh>=74)b.appendChild(el('span','tm2',o.sub));
       b.title=o.t+' '+tmin(o.s)+'–'+tmin(o.e)+(o.les&&o.les.teacher?' · '+o.les.teacher:'');
@@ -74,6 +87,7 @@ function drawGrid(){
     body.appendChild(c)});
   if(typeof isBlank==='function'&&isBlank()){var cta=emptyCTA();cta.classList.add('over');body.appendChild(cta)}
   grid.appendChild(body);
+  fitText();setTimeout(fitText,0);
   nowLine();
 }
 function nowLine(){          // 当前时间线（只在看本周时出现）：整周一条淡线 + 今天那一列加粗发光 + 时间轴上的时间标签

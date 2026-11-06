@@ -10,6 +10,7 @@ const PROMPT = `你是 Mochi 时间表里的“日程助手”。用户会问关
 - days：从今天起的若干天；每天有 items（已有安排）和 free（已经算好的空闲时段）。时间都是“当天 0 点起的分钟数”。
 - items 的 k：m = 手动活动（有 ref，可以移动 / 删除）；r = 重复活动、f = 固定课程（只读，不能改）。
 - hw：还没完成的作业（id、标题、科目、截止日期）。
+- health：护肤步骤和今天完成数、饮食目标与今天 / 最近几天的热量和饮水杯数。只用来回答问题和给建议（比如“今天还差多少热量 / 水”），你不能修改它。
 - now 是现在的分钟数；今天已经过去的时间不要安排。
 
 回答规则：
@@ -30,6 +31,7 @@ actions 里的工具（最多 8 个）：
 
 只输出 JSON：{"reply":"……","actions":[…]}`;
 
+const { generate, ready } = require('./_llm');
 const { guard, userKey, int, str, iso } = require('./_lib');
 const LANGN = { en: 'English', ms: 'Bahasa Melayu', zh: '简体中文' };
 const langNote = (l) => '\n\nLanguage: write "reply" and any event titles you create in ' + (LANGN[l] || 'English') + ', unless the user clearly writes in another language.';
@@ -37,8 +39,7 @@ const langNote = (l) => '\n\nLanguage: write "reply" and any event titles you cr
 module.exports = async (req, res) => {
   const who = await guard(req, res, { cost: 1, maxBytes: 60_000 });
   if (!who) return;
-  const key = userKey(req) || process.env.GEMINI_API_KEY;
-  if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
+  const gemKey = userKey(req);
 
   const { messages, snapshot, lang } = req.body || {};
   if (!Array.isArray(messages) || !messages.length || messages.length > 10) return res.status(400).json({ error: 'bad messages' });
@@ -55,23 +56,14 @@ module.exports = async (req, res) => {
   }));
   (Array.isArray(snapshot.hw) ? snapshot.hw : []).forEach(h => { if (h && h.id) hwIds.set(String(h.id), str(h.t, 100)); });
 
-  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+  const opts = { system: PROMPT + langNote(lang) + '\n\n日程快照：\n' + snapText, messages: msgs.map(m => ({ role: m.role, text: m.text })), gemKey, temperature: 0.2 };
+  if (!ready(opts)) return res.status(500).json({ error: 'no AI key configured' });
   try {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: PROMPT + langNote(lang) + '\n\n日程快照：\n' + snapText }] },
-        contents: msgs.map(m => ({ role: m.role, parts: [{ text: m.text }] })),
-        generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
-      }),
-    });
-    if (!r.ok) return res.status(502).json({ error: 'gemini ' + r.status + ' ' + (await r.text()).slice(0, 200) });
-    const j = await r.json();
+    let text;
+    try { text = (await generate(opts)).text; } catch (e) { return res.status(502).json({ error: String(e && e.message).slice(0, 200) }); }
     let out;
-    try { out = JSON.parse((j.candidates?.[0]?.content?.parts?.[0]?.text || '{}').replace(/```json|```/g, '').trim()); }
+    try { out = JSON.parse(text.replace(/```json|```/g, '').trim()); }
     catch (e) { return res.status(502).json({ error: 'AI 回复不是有效 JSON' }); }
-
     const actions = (Array.isArray(out.actions) ? out.actions : []).slice(0, 24).map(a => {
       if (!a) return null;
       const t = a.tool;

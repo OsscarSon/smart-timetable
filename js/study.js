@@ -12,6 +12,8 @@
     ST.subs.forEach(function(n,i){var b=el('button','chip'+(i===sel?' on':''),n+(dleft(n)!==null?' · '+dleft(n)+'天':''));
       var u=el('u',null,'×');u.onclick=function(e){e.stopPropagation();if(confirm('删除科目「'+n+'」及其章节？')){ST.topics=ST.topics.filter(function(t){return t.s!==n});ST.subs.splice(i,1);sel=0;sv();rSt()}};
       b.appendChild(u);b.onclick=function(){sel=i;rSt()};sb.appendChild(b)});
+    var cur=ST.subs[sel];
+    mkSort(sb,{item:'.chip',get:function(){return ST.subs},done:function(){sel=Math.max(0,ST.subs.indexOf(cur));sv();rSt()}});
     var tl=document.getElementById('tl');tl.innerHTML='';
     if(!ST.topics.length)tl.appendChild(el('div','msg','还没有章节～'));
     ST.topics.slice().sort(function(a,b){return a.nx-b.nx}).forEach(function(t){

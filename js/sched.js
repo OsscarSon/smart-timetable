@@ -27,7 +27,7 @@ var Sched=(function(){
         items:it.map(function(x){var o={k:x.k,t:x.t,s:x.s,e:x.e};if(x.ref)o.ref=x.ref;if(x.done)o.done=1;return o}),
         free:freeWindows(it,i===0?Math.ceil(now/15)*15:0)})}
     var hw=HW.filter(function(h){return !h.done}).slice(0,40).map(function(h){return {id:h.id,t:h.t,sb:h.sb||'',due:h.due||''}});
-    return {today:isoOf(todayDn),wd:todayIdx,now:now,h0:H0,h1:H1,days:days,hw:hw}}
+    return {today:isoOf(todayDn),wd:todayIdx,now:now,h0:H0,h1:H1,days:days,hw:hw,health:(window.healthSummary?healthSummary():null)}}
   // ref（'m<周>_<序号>'）→ {w,i,x}；找不到返回 null
   function byRef(ref){
     var m=/^m(-?\d+)_(\d+)$/.exec(String(ref));if(!m)return null;

@@ -20,22 +20,22 @@ const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划
 10. 用户隐藏的日子（hidden）不要排任何活动。
 11. 作业 homework（t 标题、sb 科目、due 截止日期 YYYY-MM-DD，可能为空）：把写作业的时间排进截止日之前的空档，越近越优先，已逾期的尽快安排；每份作业用“📝 科目·作业”之类的标题。
 12. notes 是最多 4 条简短中文说明，解释你改了什么、为什么（语气可爱温柔）。
+13. 健康（health）：午餐约 12:00–13:00、晚餐约 18:00–19:00 尽量留空，不要排课外学习或训练；睡前留 10 分钟给护肤，不用单独排成活动；训练后可以提醒补水；如果最近摄入明显低于 goalKcal，不要排高强度训练。
 只输出 JSON：{"events":[{"day":0,"s":540,"e":660,"t":"📖 数学复习","c":"pink"}],"notes":["..."]}`;
 
+const { generate, ready } = require('./_llm');
 const { guard, userKey, inr, str, COLS } = require('./_lib');
 
 module.exports = async (req, res) => {
   const who = await guard(req, res, { cost: 1, maxBytes: 200_000 });
   if (!who) return;
-  const key = userKey(req) || process.env.GEMINI_API_KEY;
-  if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
+  const gemKey = userKey(req);
 
-  const { text, events, today, hours, study, sports, fixed, hidden, week, homework, lang } = req.body || {};
+  const { text, events, today, hours, study, sports, fixed, hidden, week, homework, health, lang } = req.body || {};
   if (typeof text !== 'string' || !text.trim() || text.length > 500) {
     return res.status(400).json({ error: 'bad text' });
   }
   if (events != null && (!Array.isArray(events) || events.length > 120)) return res.status(400).json({ error: 'bad events' });
-  const model = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
   const prompt =
     `今天是周${'一二三四五六日'[today] || '?'}（day=${today}）。可排时间 ${hours?.[0] ?? 8}:00–${hours?.[1] ?? 22}:00。\n` +
     `当前课表：${JSON.stringify((events || []).slice(0, 80))}\n` +
@@ -45,32 +45,16 @@ module.exports = async (req, res) => {
     `固定时段（上课/考试/重复活动，不可占用）：${JSON.stringify(fixed || []).slice(0, 2500)}\n` +
     `隐藏的日子（不要排）：${JSON.stringify(hidden || [])}\n` +
     `未完成的作业：${JSON.stringify((homework || []).slice(0, 20)).slice(0, 2000)}\n` +
+    `健康（护肤步骤、饮食目标与最近摄入、饮水）：${JSON.stringify(health || {}).slice(0, 1500)}\n` +
     `用户的新安排：${text.trim()}\n请返回重排后的完整一周。`;
 
-  const call = (withThinking) =>
-    fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: RULES + langNote(lang) }] },
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          ...(withThinking ? { thinkingConfig: { thinkingLevel: process.env.GEMINI_THINKING || 'minimal' } } : {}),
-        },
-      }),
-    });
+  const opts = { system: RULES + langNote(lang), messages: [{ role: 'user', text: prompt }], gemKey, thinking: true, temperature: 0.2 };
+  if (!ready(opts)) return res.status(500).json({ error: 'no AI key configured' });
   try {
-    let r = await call(true);
-    if (r.status === 400) r = await call(false); // 模型不认“思考程度”参数时，退回普通调用
-    if (!r.ok) {
-      const body = (await r.text()).slice(0, 300);
-      return res.status(502).json({ error: 'gemini ' + r.status + ' ' + body });
-    }
-    const j = await r.json();
-    const raw = j.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    let text;
+    try { text = (await generate(opts)).text; } catch (e) { return res.status(502).json({ error: String(e && e.message).slice(0, 200) }); }
     let out;
-    try { out = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    try { out = JSON.parse(text.replace(/```json|```/g, '').trim()); }
     catch (e) { return res.status(502).json({ error: 'AI 回复不是有效 JSON' }); }
     // 不信任模型输出：逐项校验、截断，坏的直接丢掉（前端还会再校验一遍）
     const evs = (Array.isArray(out.events) ? out.events : []).slice(0, 80).map(x => {

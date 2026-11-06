@@ -13,9 +13,9 @@ function drawStats(){
   var ink=cv('--ink'),line=cv('--line');
   ['ch1','ch2'].forEach(function(k){if(CHS[k]){CHS[k].destroy();CHS[k]=null}});
   CHS.ch1=new Chart(document.getElementById('ch1'),{type:'doughnut',
-    data:{labels:['已完成','待办','已逾期'],datasets:[{data:[done,todo,over],backgroundColor:[cv('--mint'),cv('--sky'),cv('--pri3')],borderWidth:0}]},
+    data:{labels:['已完成','待办','已逾期'].map(tr),datasets:[{data:[done,todo,over],backgroundColor:[cv('--mint'),cv('--sky'),cv('--pri3')],borderWidth:0}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:ink}}}}});
   CHS.ch2=new Chart(document.getElementById('ch2'),{type:'bar',
-    data:{labels:vd.map(function(wd){return '周'+DAYS[wd]}),datasets:[{data:hrs,backgroundColor:cv('--pri2'),borderRadius:8}]},
+    data:{labels:vd.map(function(wd){return tr('周'+DAYS[wd])}),datasets:[{data:hrs,backgroundColor:cv('--pri2'),borderRadius:8}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:ink},grid:{display:false}},y:{beginAtZero:true,ticks:{color:ink},grid:{color:line}}}}})}

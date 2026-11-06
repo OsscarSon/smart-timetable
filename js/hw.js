@@ -9,7 +9,7 @@ function safeUrl(s){                      // 只允许 http(s)，其他协议的
 function subjCol(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return COLS[h%COLS.length]}
 function subjList(){
   var o=[];function add(s){s=String(s||'').trim();if(s&&o.indexOf(s)<0)o.push(s)}
-  (typeof ST!=='undefined'?ST.subs:[]).forEach(add);FX.forEach(function(x){add(x.t)});HW.forEach(function(h){add(h.sb)});return o}
+  (typeof ST!=='undefined'?ST.subs:[]).forEach(add);FX.forEach(function(x){add(x.t)});HW.forEach(function(h){add(h.sb)});(typeof SUBJ!=='undefined'?SUBJ.names():[]).forEach(add);return o}
 function dueLabel(iso){
   var dn=dnFromIso(iso),df=dn-todayDn,x=dnDate(dn);
   return dfmt(dn,'M/D')+' 周'+DAYS[x.wd]+(df===0?' · 今天':df===1?' · 明天':df===-1?' · 昨天':df>1&&df<=14?' · '+df+' 天后':'')}
@@ -27,7 +27,7 @@ function hwRow(h){
   cb.onchange=function(){h.done=cb.checked?Date.now():0;hwSave();rHw();if(typeof bnr==='function')bnr()};
   var n=el('div','n'),ti=el('div','hwt');
   if(h.sb)ti.appendChild(el('span','tag c-'+subjCol(h.sb),h.sb));
-  var tx=el('span',null,h.t);if(h.done)tx.style.textDecoration='line-through';ti.appendChild(tx);n.appendChild(ti);
+  var tx=el('span',null,h.t);if(h.done)tx.style.opacity='.5';ti.appendChild(tx);n.appendChild(ti);
   if(h.note)n.appendChild(el('small',null,h.note.length>70?h.note.slice(0,70)+'…':h.note));
   if(h.att&&h.att.length)n.appendChild(el('small',null,'📎 '+h.att.length+' 个附件'));
   n.style.cursor='pointer';n.onclick=function(){openHw(h)};

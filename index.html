@@ -102,6 +102,30 @@
     <h3 class="hs">✅ 本周训练清单</h3><div class="tl" id="wl2"></div>
   </section>
 
+  <!-- 美容 -->
+  <section class="card st" id="v-bt">
+    <h2>💄 美容护肤</h2>
+    <div class="msg" id="btp"></div>
+    <div class="chips" id="btm"></div>
+    <div class="tl full" id="btl"></div>
+    <div class="row"><input id="btn" placeholder="加一步，如：精华 / 面膜" maxlength="12"><button id="bta">加入</button></div>
+  </section>
+
+  <!-- 饮食 -->
+  <section class="card st" id="v-di">
+    <h2>🥗 饮食与饮水</h2>
+    <div class="msg" id="dis"></div>
+    <div class="row"><b id="diw"></b><button id="diwm" aria-label="-1">－</button><button id="diwp" aria-label="+1">＋ 一杯水</button></div>
+    <div class="chips" id="dim"></div>
+    <div class="row"><input id="dif" placeholder="吃了什么？（可搜索开源食品库）" maxlength="30"><button id="dis2">搜索</button></div>
+    <div class="chips" id="dir"></div>
+    <div class="row"><input id="dig" type="number" inputmode="numeric" placeholder="克" value="100"><input id="dik" type="number" inputmode="numeric" placeholder="热量 kcal"><button id="dia">记录</button></div>
+    <div class="msg" id="dim2"></div>
+    <div class="tl full" id="dil"></div>
+    <h3 class="hs">🎯 每日目标</h3>
+    <div class="row"><input id="digl" type="number" inputmode="numeric" aria-label="kcal"><span class="msg nw">kcal</span><input id="diwl" type="number" inputmode="numeric" aria-label="cups"><span class="msg nw">杯水</span></div>
+  </section>
+
   <!-- 设置：先是分类列表（#seidx），点进去才是各个二级页面 -->
   <section class="card st" id="v-se">
     <h2 id="seh">⚙️ 设置</h2>
@@ -190,8 +214,12 @@
       <div class="msg" id="libs"></div>
       <h3 class="hs">🧠 AI 来源（只对这台设备生效）</h3>
       <div class="chips" id="aisrc"></div>
+      <div class="msg" id="aikn">💡 建议填你自己的 Gemini key：这样不受作者额度影响，也不需要登录。留空也能用，只是会走作者后端的 key（额度有限，用完当天就不能用了）。</div>
       <input id="aikey" type="password" autocomplete="off" spellcheck="false" maxlength="80" placeholder="（可选）粘贴你自己的 Gemini API key" aria-label="Gemini API key">
       <div class="msg" id="aikm"></div>
+      <div class="chips"><button class="chip" id="ailchk">🔍 检查本机 AI</button><button class="chip" id="ailwl">⬇️ 下载 WebLLM 模型</button><button class="chip" id="ailtest">▶️ 测试</button><button class="chip" id="ailauto"></button></div>
+      <div class="msg" id="aiinfo"></div>
+      <div id="aiolr"><input id="aiolu" placeholder="Ollama 地址（默认 http://localhost:11434）" maxlength="80" spellcheck="false"><input id="aiolm" placeholder="Ollama 模型名，如 qwen2.5:3b（留空用第一个）" maxlength="60" spellcheck="false"></div>
     </div>
 
     <div class="sec" data-sec="data" data-t="数据：分享与备份">
@@ -242,8 +270,8 @@
 <!-- 底部标签栏 -->
 <nav class="tabbar" aria-label="主导航"><div class="in">
   <button class="on" data-v="tt"><span>📅</span>课表</button>
-  <button data-v="hw"><span>📝</span>作业</button>
-  <button data-v="st"><span>📚</span>学习</button>
+  <button data-v="hw"><span>📚</span>学习</button>
+  <button data-v="sp"><span>🌿</span>健康</button>
   <button data-v="sta"><span>📊</span>统计</button>
   <button data-v="more"><span>✨</span>更多</button>
 </div></nav>
@@ -392,6 +420,7 @@
 <script src="js/lang-msg.js"></script>
 <script src="js/lang-static.js"></script>
 <script src="js/lang-new.js"></script>
+<script src="js/lang-health.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/wallpaper.js"></script>
 <script src="js/langrow.js"></script>
@@ -405,6 +434,8 @@
 <script data-lib="lz-string" src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <script data-lib="lucide" src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <script data-lib="ical" src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
+<script data-lib="sortable" src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+<script data-lib="fuse" src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/aisrc.js"></script>
@@ -424,6 +455,8 @@
 <script src="js/store.js"></script>
 <script src="js/hw.js"></script>
 <script src="js/lessons.js"></script>
+<script src="js/subjects.js"></script>
+<script src="js/timepick.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/wizard.js"></script>
 <script src="js/holidays.js"></script>
@@ -440,6 +473,8 @@
 <script src="js/native.js"></script>
 <script src="js/syscal.js"></script>
 <script src="js/search.js"></script>
+<script src="js/sortable.js"></script>
+<script src="js/health.js"></script>
 <script src="js/app.js"></script>
 <script src="js/about.js"></script>
 <script src="js/menu.js"></script>

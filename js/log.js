@@ -72,12 +72,12 @@
     return out}
   // 整周重排：云端 AI → 浏览器内置 AI → 本地规则。say(文字) 用来显示进度和说明。
   async function replan(txt,say,onDone){
-    var body={text:txt,events:data.map(function(x){return {day:x.day,s:x.s,e:x.e,t:x.t,c:x.c}}),today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,fixed:fixedForAI(),
+    var body={text:txt,events:data.map(function(x){return {day:x.day,s:x.s,e:x.e,t:x.t,c:x.c}}),today:(curW===thisW?todayIdx:-1),hours:[H0,H1],study:ST,sports:SP,health:(window.healthSummary?healthSummary():null),fixed:fixedForAI(),
       hidden:DAYS.filter(function(n,i){return hiddenDay(i)}).map(function(n){return '周'+n}),
       week:isoOf(wsDn(curW))+' 起的一周（一周从周'+DAYS[SET.ws]+'开始，列顺序：'+visDays().map(function(i){return DAYS[i]}).join('')+'）',
       homework:(typeof hwPending==='function'?hwPending():[])},j,viaLocal=false;
     try{
-      if(window.AISRC&&AISRC.preferLocal()&&window.LocalAI&&await LocalAI.status()!=='no'){
+      if(window.AISRC&&AISRC.preferLocal('plan')&&window.LocalAI&&await LocalAI.status()!=='no'){
         say('🧠 用本机 AI 重排（第一次可能要先下载模型）…');
         try{j=await LocalAI.plan(body,function(p){say('⬇️ 正在下载内置 AI 模型 '+p+'%')});viaLocal=true}catch(e0){j=null;say('本机 AI 没成功，改用云端…')}}
       if(!j)try{j=await apiPost('/api/plan',body,60000)}

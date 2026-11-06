@@ -8,7 +8,7 @@ function gapText(m){var gp=gap(m);return gp?(gp.d>0?'还差 '+ft(gp.d)+'（'+(gp
 function rSp(){
   var box=document.getElementById('sl');box.innerHTML='';
   SP.forEach(function(sp,i){
-    var c=el('div','sc'),hd=el('div','hd');hd.appendChild(el('b',null,'🏅 '+sp.n));
+    var c=el('div','sc'),hd=el('div','hd'),gp=el('span','grip','⠿');gp.setAttribute('aria-hidden','true');hd.appendChild(gp);hd.appendChild(el('b',null,'🏅 '+sp.n));
     var w=el('select');[1,2,3].forEach(function(k){var o=el('option',null,'每周 '+k+' 次');o.value=k;w.appendChild(o)});w.value=sp.w;w.style.width='92px';w.onchange=function(){sp.w=+w.value;ssv()};hd.appendChild(w);
     var x=el('button',null,'×');x.onclick=function(){SP.splice(i,1);ssv();rSp()};hd.appendChild(x);c.appendChild(hd);
     var h=el('div','mr');['项目/距离','现在成绩','目标成绩'].forEach(function(t){h.appendChild(el('span','mh',t))});c.appendChild(h);
@@ -18,6 +18,7 @@ function rSp(){
       r.appendChild(sm);c.appendChild(r)});
     var ad=el('button','chip','＋ 加一个项目');ad.style.alignSelf='flex-start';ad.onclick=function(){sp.m.push({k:'',c:'',g:''});ssv();rSp()};c.appendChild(ad);
     box.appendChild(c)});
+  mkSort(box,{item:'.sc',handle:'.grip',get:function(){return SP},done:function(){ssv();rSp()}});
 }
 function addSp(n,m){if(!n)return;SP.push({n:n.slice(0,10),w:2,m:m||[{k:'',c:'',g:''}]});ssv();rSp()}
 document.getElementById('pa').onclick=function(){var i=document.getElementById('pn');addSp(i.value.trim());i.value=''};
