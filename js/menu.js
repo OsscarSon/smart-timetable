@@ -16,28 +16,39 @@
     seh.textContent=title;if(bk)bk.textContent=sec?'‹ 设置':'‹ 更多'}
   buildIdx();setSec('');
   var _sv=showView;
-  showView=function(v){_sv(v);if(v==='se'&&!via)setSec('')};
+  showView=function(v){_sv(v);if(v==='se'&&!via)setSec('');if(v==='more')buildMore()};
   var via=false;
   function openSet(sec){closeMenu();via=true;showView('se');via=false;setSec(sec)}
   if(bk)bk.onclick=function(){if(curSec)setSec('');else showView('more');window.scrollTo(0,0)};
 
   // ---- 菜单内容 ----
   function go(v){closeMenu();showView(v)}
-  var G=[
-    [['✨','AI 助手','一句话添加 · 拍照导入 · 整周重排',function(){closeMenu();openAI('quick')}],
-     ['🤖','问问 Mochi','问日程、让 AI 帮你改（先预览，可撤销）',function(){closeMenu();if(window.openAgent)openAgent()}],
-     ['📷','拍照导入课表','拍一张课表，AI 帮你填',function(){closeMenu();openAI('photo')}],
-     ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}]],
-    [['🏃','运动计划','训练安排',function(){go('sp')}],
-     ['🏫','课表与课程','多个课表、节次、课程',function(){openSet('tt')}]],
-    [['🎨','外观与显示','主题色、深色、视图密度',function(){openSet('look')}],
-     ['🔔','通知与提醒','课前 / 作业提醒、手机权限',function(){openSet('notify')}],
-     ['🎌','假期','放假期间自动跳过安排',function(){openSet('hol')}]],
-    [['☁️','账号与云同步','多设备同步、附件',function(){openSet('cloud')}],
-     ['💾','数据：分享与备份','链接、二维码、.ics、备份',function(){openSet('data')}]],
-    [['ℹ️',(window.ABOUT_MENU||['功能介绍与开源'])[0],(window.ABOUT_MENU||['','']) [1],function(){closeMenu();openAbout()}],
-     ['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}]].concat(window.INSTALL_MENU?[window.INSTALL_MENU]:[])
-  ];
+  // 一份入口清单，≡ 菜单和底部“更多”页共用（分组：AI 与工具 / 个性化 / 课表与数据 / 关于）
+  function groups(){
+    var about=[['ℹ️',(window.ABOUT_MENU||['功能介绍与开源'])[0],(window.ABOUT_MENU||['',''])[1],function(){closeMenu();openAbout()}],
+      ['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}]].concat(window.INSTALL_MENU?[window.INSTALL_MENU]:[]);
+    return [
+      ['AI 与工具',[['✨','AI 助手','一句话添加 · 拍照导入 · 整周重排',function(){closeMenu();openAI('quick')}],
+        ['🤖','问问 Mochi','问日程、让 AI 帮你改（先预览，可撤销）',function(){closeMenu();if(window.openAgent)openAgent()}],
+        ['📷','拍照导入课表','拍一张课表，AI 帮你填',function(){closeMenu();openAI('photo')}],
+        ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}],
+        ['🏃','运动计划','训练安排',function(){go('sp')}]]],
+      ['个性化',[['🎨','外观与显示','主题色、深色、视图密度',function(){openSet('look')}],
+        window.wpMenuItem?window.wpMenuItem():null,
+        window.langMenuItem?window.langMenuItem():null,
+        ['🔔','通知与提醒','课前 / 作业提醒、手机权限',function(){openSet('notify')}]].filter(Boolean)],
+      ['课表与数据',[['🏫','课表与课程','多个课表、节次、课程',function(){openSet('tt')}],
+        ['🎌','假期','放假期间自动跳过安排',function(){openSet('hol')}],
+        ['☁️','账号与云同步','多设备同步、附件',function(){openSet('cloud')}],
+        ['💾','数据：分享与备份','链接、二维码、.ics、备份',function(){openSet('data')}]]],
+      ['关于 Mochi',about]]}
+  function fill(box,withTitles){
+    groups().forEach(function(g){
+      if(withTitles)box.appendChild(el('div','grp-t',g[0]));
+      var gb=el('div','dw-g');
+      g[1].forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);
+        d.appendChild(t);d.appendChild(el('small',null,it[2]));b.appendChild(i);b.appendChild(d);b.appendChild(el('em','dw-ch','›'));b.onclick=it[3];gb.appendChild(b)});
+      box.appendChild(gb)})}
   function shareApp(){
     var u=location.origin+location.pathname;
     if(navigator.share)navigator.share({title:'Mochi 时间表',text:'我在用 Mochi 排课表，超可爱～',url:u}).catch(function(){});
@@ -47,12 +58,15 @@
     dw.innerHTML='';
     var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);
-    var lg=el('div','chips dw-lang');mkLangChips(lg);dw.appendChild(lg);
-    G.forEach(function(g){var box=el('div','dw-g');
-      g.forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);
-        d.appendChild(t);d.appendChild(el('small',null,it[2]));b.appendChild(i);b.appendChild(d);b.onclick=it[3];box.appendChild(b)});
-      dw.appendChild(box)});
-    dw.appendChild(el('div','dw-ft','Mochi 时间表 · v8'))}
+    fill(dw,true);
+    dw.appendChild(el('div','dw-ft','Mochi 时间表 · v8.2'))}
+  // 「更多」页：同一份清单，不再是 4 行
+  var mv=document.getElementById('v-more');
+  function buildMore(){
+    if(!mv)return;
+    mv.innerHTML='';mv.appendChild(el('h2',null,'更多'));
+    fill(mv,true)}
+  buildMore();
   function openMenu(){build();if(window.applyIcons)applyIcons(dw);dw.classList.add('show');mk.classList.add('show');dw.setAttribute('aria-hidden','false')}
   function closeMenu(){dw.classList.remove('show');mk.classList.remove('show');dw.setAttribute('aria-hidden','true')}
   window.openMenu=openMenu;window.closeMenu=closeMenu;

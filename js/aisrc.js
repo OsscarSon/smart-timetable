@@ -14,7 +14,8 @@ window.AISRC=(function(){
   function paint(){
     chips.innerHTML='';
     [['auto','自动（云端优先）'],['local','优先用本机 AI']].forEach(function(x){
-      var b=el('button','chip'+(o.pref()===x[0]?' on':''),x[1]);b.onclick=function(){o.setPref(x[0]);paint()};chips.appendChild(b)});
+      var b=document.createElement('button');b.className='chip'+(o.pref()===x[0]?' on':'');b.textContent=x[1];   // 这个脚本比 core.js 先加载，不能用 el()
+      b.onclick=function(){o.setPref(x[0]);paint()};chips.appendChild(b)});
     msg.textContent=o.key()?'✓ 已设置自己的 key：AI 请求会用它，不占站长额度，也不需要登录。key 只存在这台设备，不会同步；它会经过本站的后端转发给 Google，不会被保存。':
       '本机 AI = Chrome 内置的 Gemini Nano 或 WebLLM 小模型（免额度，数据不出设备；首次可能要下载约 1GB，只适合文字类，拍照仍需云端）。也可以填自己的 Gemini API key（在 aistudio.google.com/apikey 免费申请）。'}
   inp.value=g(K);

@@ -115,10 +115,9 @@
 
     <div class="sec" data-sec="look" data-t="外观与显示">
       <h3 class="hs">🎨 外观</h3>
-      <div class="msg">🌐 语言 / Language</div>
-      <div class="chips" id="lng"></div>
       <div class="chips" id="thm"></div>
       <div class="swatches" id="acc"></div>
+      <div class="dw-g sgrp"><div id="wprow"></div><div id="lngrow"></div></div>
 
       <h3 class="hs">📅 日历</h3>
       <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
@@ -230,13 +229,7 @@
   </section>
 
   <!-- 更多：只留入口 -->
-  <section class="card st" id="v-more">
-    <h2>更多</h2>
-    <button class="mrow" id="mr-ai"><span>✨</span><div><b>AI 助手</b><small>一句话添加 · 拍照导入课表 · 整周重排</small></div><i>›</i></button>
-    <button class="mrow" data-go="sp"><span>🏃</span><div><b>运动计划</b><small>训练安排</small></div><i>›</i></button>
-    <button class="mrow" id="mr-srch"><span>🔍</span><div><b>搜索</b><small>课程、活动、作业、提醒</small></div><i>›</i></button>
-    <button class="mrow" data-go="se"><span>⚙️</span><div><b>设置</b><small>外观、课表、通知、假期、同步、备份（也可点左上角 ≡）</small></div><i>›</i></button>
-  </section>
+  <section class="card st" id="v-more"><h2>更多</h2></section>
 </div>
 
 <!-- 左侧菜单（≡） -->
@@ -395,7 +388,10 @@
 <script src="js/lang-ui.js"></script>
 <script src="js/lang-msg.js"></script>
 <script src="js/lang-static.js"></script>
+<script src="js/lang-new.js"></script>
 <script src="js/i18n.js"></script>
+<script src="js/wallpaper.js"></script>
+<script src="js/langrow.js"></script>
 <!-- 开源库（固定版本）。data-lib 供手机 App 打包脚本换成本地文件；加载失败时对应功能自动退回基础版 -->
 <script data-lib="dayjs" src="https://cdn.jsdelivr.net/npm/dayjs@1.11.13/dayjs.min.js"></script>
 <script data-lib="rrule" src="https://cdn.jsdelivr.net/npm/rrule@2.8.1/dist/es5/rrule.min.js"></script>

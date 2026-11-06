@@ -4,7 +4,7 @@
   function open(){q.value='';run();m.classList.add('show');setTimeout(function(){q.focus()},50)}
   function close(){m.classList.remove('show')}
   m.onclick=close;document.getElementById('sx').onclick=close;
-  document.getElementById('srchb').onclick=open;document.getElementById('mr-srch').onclick=function(){open()};
+  document.getElementById('srchb').onclick=open;
   window.openSearch=open;
   function hit(){var a=[].slice.call(arguments).join(' ').toLowerCase(),ks=q.value.trim().toLowerCase().split(/\s+/).filter(Boolean);return ks.length&&ks.every(function(k){return a.indexOf(k)>=0})}
   function jump(w,wd,fn){close();showView('tt');if(w!==curW){pendSel=wd;go2(w)}else{selWd=wd;drawDay()}if(fn)fn()}

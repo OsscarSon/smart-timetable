@@ -18,7 +18,7 @@ function mkAccSw(box,after){
   ci.oninput=function(){SET.acc=ci.value;applyTheme()};
   ci.onchange=function(){SET.acc=ci.value;saveSet();applyTheme();mkAccSw(box,after);if(after)after()};
   lab.appendChild(el('span',null,'自选'));lab.appendChild(ci);box.appendChild(lab)}
-mkLangChips(document.getElementById('lng'));mkThemeChips(document.getElementById('thm'));mkAccSw(document.getElementById('acc'));
+if(window.mkWpRow)mkWpRow(document.getElementById('wprow'));if(window.mkLangRow)mkLangRow(document.getElementById('lngrow'));mkThemeChips(document.getElementById('thm'));mkAccSw(document.getElementById('acc'));
 
 // ---- 日历 ----
 // 一周起始日变了：按真实日期把所有已存的周重新归位，数据不会丢也不会错位

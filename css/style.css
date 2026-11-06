@@ -341,12 +341,7 @@ details.guide ol{margin:8px 0 2px;padding-left:20px;line-height:1.65;color:var(-
 @media (max-height:480px) and (min-width:768px){.tt-side{max-height:none;position:static}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
-/* ---- v7.1：Lucide 图标（库没加载到时保留 emoji）---- */
-.tabbar button span svg{width:22px;height:22px;display:block}
-.dw-r i svg{width:18px;height:18px}
-.mrow span svg{width:24px;height:24px;color:var(--pri)}
 
-.dw-lang{padding:2px 14px 10px}
 
 /* v8: 问问 Mochi / 撤销 / 导入 .ics */
 .dlg.ag{max-width:520px}
@@ -380,3 +375,93 @@ details.guide ol{margin:8px 0 2px;padding-left:20px;line-height:1.65;color:var(-
 /* v8: 安装成 App */
 #instb{color:var(--pri)}
 .inst-s{margin:6px 0 0;padding-left:20px;line-height:1.7}
+
+/* =====================  v8.2：统一图标 / 语言栏 / 壁纸 / 排版美化  ===================== */
+/* Lucide 图标：跟着文字大小和颜色走；放在 h2 / 标题 / 按钮里自动对齐 */
+svg.lucide{width:1.15em;height:1.15em;flex:0 0 auto;vertical-align:-.2em;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+i[data-lucide]{display:inline-block;width:1.15em;height:1.15em}
+.st h2 svg.lucide,.hs svg.lucide,.hss svg.lucide,.dlg h2 svg.lucide,.tt-head h2 svg.lucide{color:var(--pri-ink);width:1.05em;height:1.05em;margin-right:.1em}
+.chip svg.lucide,.big svg.lucide,.row button svg.lucide,.er-btn svg.lucide,.pop svg.lucide{margin-right:.15em}
+.chip,.big,.fabm button,.pop button,.er-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.pop button,.er-btn{justify-content:flex-start}
+.chip.on svg.lucide{color:inherit}
+.ibtn svg.lucide,.btns button svg.lucide{width:20px;height:20px}
+.ibtn{display:grid;place-items:center}
+.fab{display:grid;place-items:center}.fab svg.lucide{width:30px;height:30px;stroke-width:2.4}
+.lc .ck svg.lucide{width:15px;height:15px;stroke-width:3}
+.bub svg.lucide{width:1.1em;height:1.1em}
+
+/* 底部标签栏：磨砂 + 选中变成药丸 */
+.tabbar{background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border-top:1.5px solid var(--line)}
+.tabbar button{gap:3px;padding:7px 0 6px;transition:background .18s,color .18s}
+.tabbar button span{display:grid;place-items:center;filter:none;opacity:.85;height:26px;width:52px;border-radius:999px;transition:background .18s,transform .18s}
+.tabbar button span svg.lucide{width:22px;height:22px}
+.tabbar button.on{background:transparent;color:var(--pri-ink);font-weight:800}
+.tabbar button.on span{background:color-mix(in srgb,var(--pri) 24%,transparent);opacity:1;transform:translateY(-1px)}
+
+/* 菜单 / 更多页的分组卡片：图标放进淡色圆角方块，右侧 › */
+.dw-r i,.mrow span{font-style:normal;display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:12px;background:color-mix(in srgb,var(--pri) 15%,var(--card));color:var(--pri-ink);font-size:19px}
+.dw-r i svg.lucide,.mrow span svg.lucide{width:19px;height:19px;color:var(--pri-ink)}
+.dw-r+.dw-r::before{left:64px}
+.dw-r div{flex:1;min-width:0}
+.dw-r b{font-weight:800}
+.dw-ch{font-style:normal;color:var(--soft);display:grid;place-items:center}
+.dw-ch svg.lucide{width:18px;height:18px}
+.grp-t{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);padding:10px 6px 2px}
+.dw>.grp-t:first-of-type{padding-top:0}
+.dw-g{box-shadow:var(--shadow);border:1.5px solid var(--line)}
+.dw-r small{margin-top:1px}
+
+/* 「更多」页：去掉外层大卡片，直接铺分组卡片 */
+#v-more{background:transparent;border:0;box-shadow:none;padding:2px 0 0;gap:6px}
+#v-more h2{font-size:26px;padding:0 4px}
+#v-more .dw-g{background:var(--card)}
+
+/* 设置页：行与分组 */
+.sgrp{margin-top:2px}
+.sgrp .mrow{background:transparent;border-radius:0;width:100%}
+.sgrp .mrow+.mrow,.sgrp>div+div{border-top:1.5px solid var(--line)}
+.se-idx .mrow{box-shadow:var(--shadow);border:1.5px solid var(--line);background:var(--card)}
+.mrow i{font-style:normal;color:var(--soft);display:grid;place-items:center}
+.mrow i svg.lucide{width:20px;height:20px}
+.mrow small{margin-top:1px}
+
+/* 语言 / 壁纸面板：底部弹出 */
+.mask.sheet{place-items:end center;padding:0}
+.mask.sheet .dlg{max-width:520px;border-radius:26px 26px 0 0;border-bottom:0;padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px));gap:12px;animation:sheetup .22s ease}
+@keyframes sheetup{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+.lgp-top{display:flex;align-items:center;gap:8px}.lgp-top h2{flex:1;font-size:22px}
+.lgp-r .lgp-ck{font-style:normal;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;color:var(--onpri)}
+.lgp-r.on .lgp-ck{background:var(--pri)}
+.lgp-r.on{background:color-mix(in srgb,var(--pri) 9%,var(--card))}
+.lgp-r .lgp-ck svg.lucide{width:16px;height:16px;stroke-width:3}
+.wp-g{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.wp-t{display:flex;flex-direction:column;gap:6px;align-items:center;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;border-radius:16px;padding:8px 6px;cursor:pointer}
+.wp-t.on{border-color:var(--pri);box-shadow:inset 0 0 0 2px var(--pri)}
+.wp-p{display:grid;place-items:center;color:var(--soft);width:100%;aspect-ratio:4/5;border-radius:10px;background-color:var(--card);border:1.5px solid var(--line);background-position:center}
+.wp-t small{font-size:12px;color:var(--soft)}
+.wp-o{flex-direction:row}.wp-o input[type=range]{flex:1.4;accent-color:var(--pri)}
+.wp-rm{align-self:flex-start}
+
+/* 壁纸：铺在最底层，卡片变半透明磨砂 */
+html{background:var(--bg)}
+html[data-wp]::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:var(--wp-img);background-size:var(--wp-size,cover);background-position:center;opacity:var(--wp-o,1)}
+html[data-wp] body{background:transparent}
+html[data-wp] .card,html[data-wp] .dw-g{background:color-mix(in srgb,var(--card) 86%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html[data-wp] #v-more{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-wp] .ibtn,html[data-wp] .burger{background:color-mix(in srgb,var(--card) 80%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+html[data-wp] .wk-h{background:color-mix(in srgb,var(--card) 92%,transparent)}
+
+/* 顶栏 / 卡片的细节 */
+.card{border-width:1.5px}
+.top{padding:4px 2px 2px}
+.top-t h1{font-size:23px}
+.hs{display:flex;align-items:center;gap:6px;margin-top:14px}
+.hss{display:flex;align-items:center;gap:6px}
+.st h2{display:flex;align-items:center;gap:6px}
+.lg span{display:inline-flex;align-items:center;gap:4px}
+.back{display:inline-flex;align-items:center;gap:2px}
+.mask.full .ed-x svg,.lgp-top .ed-x svg.lucide{width:24px;height:24px}
+.dw:not(.show){box-shadow:none}
+.dw-r{padding:11px 14px}
+.wp-p svg.lucide{width:26px;height:26px}
