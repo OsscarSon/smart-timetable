@@ -2,8 +2,10 @@
 // 用法：先 npm i（package.json 里已列好所有库，含字体 lxgw-wenkai-webfont），再 npm run build:www
 import { cpSync, rmSync, mkdirSync, existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { build as esbuild } from 'esbuild';
 
 const LIBS = { // data-lib 名 → [npm 包名, 包内文件的候选路径]
+  driver:   ['driver.js',            ['dist/driver.js.iife.js']],
   dayjs:    ['dayjs',                ['dayjs.min.js']],
   rrule:    ['rrule',                ['dist/es5/rrule.min.js']],
   'ts-fsrs':['ts-fsrs',              ['dist/index.umd.js', 'dist/index.umd.cjs']],
@@ -20,7 +22,7 @@ const LIBS = { // data-lib 名 → [npm 包名, 包内文件的候选路径]
 rmSync('www', { recursive: true, force: true });
 mkdirSync('www/vendor', { recursive: true });
 for (const f of ['index.html', 'sw.js', 'manifest.json']) cpSync(f, join('www', f));
-for (const d of ['css', 'js', 'icons']) cpSync(d, join('www', d), { recursive: true });
+for (const d of ['css', 'js', 'icons', 'assets']) cpSync(d, join('www', d), { recursive: true });
 
 let html = readFileSync('www/index.html', 'utf8');
 for (const [name, [pkg, cands]] of Object.entries(LIBS)) {
@@ -29,6 +31,11 @@ for (const [name, [pkg, cands]] of Object.entries(LIBS)) {
   cpSync(hit, `www/vendor/${name}.js`);
   html = html.replace(new RegExp(`(<script data-lib="${name}" src=")[^"]+(")`), `$1vendor/${name}.js$2`);
 }
+
+const driverCss = join('node_modules', 'driver.js', 'dist', 'driver.css');
+if (!existsSync(driverCss)) { console.error('缺少 Driver.js CSS，请先 npm i'); process.exit(1); }
+cpSync(driverCss, 'www/vendor/driver.css');
+html = html.replace(/(<link data-vendor="driver-css"[^>]*href=")[^"]+("[^>]*>)/, '$1vendor/driver.css$2');
 
 // 字体：霞鹜文楷 LXGW WenKai（SIL OFL 1.1）。把 index.html 里 CDN 的 css 换成本地 vendor/lxgw/，并只复制 css 里实际引用的 woff2 切片（常规 + 粗体）。
 const FONT_PKG = join('node_modules', 'lxgw-wenkai-webfont'), FONT_CSS = ['lxgwwenkai-regular.css', 'lxgwwenkai-bold.css'];
@@ -49,6 +56,10 @@ for (const css of FONT_CSS) {
 writeFileSync('www/vendor/lxgw/LICENSE.txt', 'LXGW WenKai (霞鹜文楷) — SIL Open Font License 1.1\nFont: https://github.com/lxgw/LxgwWenKai\nWebfont packaging: https://github.com/chawyehsu/lxgw-wenkai-webfont (MIT)\nOFL text: https://openfontlicense.org\n');
 html = html.replace(/(<link data-font="lxgw"[^>]*href=")[^"]*\/(lxgwwenkai-[a-z]+\.css)(")/g, '$1vendor/lxgw/$2$3');
 if (/data-font="lxgw"[^>]*cdn\.jsdelivr/.test(html)) { console.error('index.html 里的字体链接没换成本地文件'); process.exit(1); }
+// Chrono-node's v2 distribution is ESM/CJS (no browser IIFE), so bundle explicitly.
+// This is an optional accelerator; our independent date-preview fallback works without it.
+await esbuild({stdin:{contents: "import * as chrono from 'chrono-node'; window.MochiChrono = chrono;", resolveDir: process.cwd(), sourcefile: 'mochi-chrono-entry.js'},bundle:true,minify:true,format:'iife',platform:'browser',outfile:'www/vendor/chrono-node.js'});
+html = html.replace('<script src="js/mochi-next.js"></script>', '<script src="vendor/chrono-node.js"></script>\n<script src="js/mochi-next.js"></script>');
 writeFileSync('www/index.html', html);
 
 // 手机 App 里没有同域后端：把 apiBase 写进 www/js/config.js（只改 www/ 里的副本，不动源码，网页版照旧留空）。

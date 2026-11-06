@@ -21,7 +21,7 @@ function wzStep(){
     var hw=el('input');hw.type='checkbox';hw.checked=WZ.hw;hw.onchange=function(){WZ.hw=hw.checked};wzb.appendChild(wzField('隐藏周末',hw));
     var h=el('input');h.type='checkbox';h.checked=WZ.h24;h.onchange=function(){WZ.h24=h.checked};wzb.appendChild(wzField('24 小时制',h))}
   if(WZ.i===2){
-    wzb.appendChild(el('div','msg','填一下学校每节课的时间，生成后可以在设置里微调。不用学校课表的话直接下一步。'));
+    wzb.appendChild(el('div','msg',(window.MochiNext&&MochiNext.mode()==='work')?'如果你有固定轮班或时段，可以设定时间；没有则直接下一步。这不会强制建立课程。':'填一下学校每节课的时间，生成后可以在设置里微调。不用学校课表的话直接下一步。'));
     var s=el('input');s.type='time';s.value=WZ.per.s;s.onchange=function(){WZ.per.s=s.value};wzb.appendChild(wzField('首节开始',s));
     [['l','每节多少分钟',15,180],['g','课间多少分钟',0,60],['n','一天几节',1,16]].forEach(function(f){
       var n=el('input');n.type='number';n.min=f[2];n.max=f[3];n.value=WZ.per[f[0]];n.oninput=function(){WZ.per[f[0]]=+n.value};wzb.appendChild(wzField(f[1],n))});
@@ -36,7 +36,7 @@ function wzStep(){
 }
 function wzApply(){
   var t0=t2min(WZ.per.s);
-  if(!isNaN(t0)&&WZ.per.l>=15&&WZ.per.n>=1)TT.per=genPer(t0,WZ.per.l,Math.max(0,WZ.per.g||0),Math.min(16,WZ.per.n));
+  if((!window.MochiNext||MochiNext.mode()!=='work')&&!isNaN(t0)&&WZ.per.l>=15&&WZ.per.n>=1)TT.per=genPer(t0,WZ.per.l,Math.max(0,WZ.per.g||0),Math.min(16,WZ.per.n));
   if(WZ.cyc!==TT.cyc){TT.cyc=WZ.cyc;TT.anc=mondayDn(todayDn)}
   rebucketAll(SET.ws,WZ.ws);SET.ws=WZ.ws;SET.hw=WZ.hw;SET.h24=WZ.h24;SET.wiz=true;
   ttSave();saveSet();
