@@ -36,7 +36,7 @@
         <h2 id="wt" title="点一下可以跳到某一天">🗓️ 本周</h2>
         <select id="ttsel" class="ttsel" aria-label="切换课表"></select>
         <input type="date" id="wjump" class="wjump" tabindex="-1" aria-hidden="true">
-        <div class="seg" id="vseg" role="group" aria-label="视图"><button id="vmd" class="on">日</button><button id="vmw">周</button></div>
+        <div class="seg" id="vseg" role="group" aria-label="视图"><button id="vmd" class="on" data-i18n="@vday">日</button><button id="vmw" data-i18n="@vweek">周</button></div>
         <div class="btns">
           <button id="wp" aria-label="上一周">‹</button><button id="wn0" class="now">今天</button><button id="wn" aria-label="下一周">›</button>
           <button id="wmore" aria-label="更多操作" aria-haspopup="true" aria-expanded="false">⋯</button>
@@ -111,10 +111,9 @@
 
     <div class="sec" data-sec="look" data-t="外观与显示">
       <h3 class="hs">🎨 外观</h3>
-      <div class="chips" id="thm"></div>
-      <h3 class="hs">🌐 语言 / Language</h3>
+      <div class="msg">🌐 语言 / Language</div>
       <div class="chips" id="lng"></div>
-      <div class="msg">切换后会刷新页面。选择只保存在本机，不参与云同步。</div>
+      <div class="chips" id="thm"></div>
       <div class="swatches" id="acc"></div>
 
       <h3 class="hs">📅 日历</h3>
@@ -196,7 +195,7 @@
 
     <div class="sec" data-sec="data" data-t="数据：分享与备份">
       <h3 class="hs">📤 分享与导出</h3>
-      <div class="row wrap"><button class="chip" id="shl">🔗 分享课表</button><button class="chip" id="ics">📅 导出日历 (.ics)</button></div>
+      <div class="row wrap"><button class="chip" id="shl">🔗 分享课表</button><button class="chip" id="ics">📅 导出日历 (.ics)</button><button class="chip" id="icbtn">📥 导入日历 (.ics)</button><input type="file" id="icfile" accept=".ics,text/calendar" hidden></div>
       <div class="msg" id="shmsg">分享 = 把当前课表的固定课程压成一个链接 / 二维码，朋友打开就能导入为新课表。.ics 可导入 Google / Apple 日历（假期会自动排除）。</div>
       <div id="shqr" class="shqr"></div>
       <h3 class="hs">💾 备份</h3>
@@ -321,7 +320,7 @@
   <div class="seg wide" id="aitabs" role="tablist"><button data-t="quick" class="on" role="tab">一句话</button><button data-t="photo" role="tab">拍照课表</button><button data-t="plan" role="tab">整周重排</button></div>
   <div class="aip" data-p="quick">
     <textarea id="aiq" rows="3" maxlength="300" placeholder="说一句话就行，例如：下周三下午三点半数学补习，每周重复 / 周五前交英语作文"></textarea>
-    <div class="row wrap"><button class="chip" id="aimic">🎤 语音</button></div>
+    <div class="row wrap"><button class="chip" id="aimic">🎤 语音</button><button class="chip" id="aiask">💬 改为提问</button></div>
   </div>
   <div class="aip" data-p="photo" hidden>
     <div class="msg">拍一张课表或选一张截图，我来识别每一节课。识别结果会先给你核对，确认后才会写入。</div>
@@ -341,6 +340,25 @@
 <div class="mask" id="mask7"><div class="dlg srch" onclick="event.stopPropagation()">
   <div class="row"><input id="sq" type="search" placeholder="搜索课程、教室、活动、作业、提醒" aria-label="搜索"><button class="chip" id="sx">关闭</button></div>
   <div class="tl full" id="srl"></div>
+</div></div>
+
+<!-- 问问 Mochi -->
+<div class="mask" id="mask9"><div class="dlg ag" onclick="event.stopPropagation()">
+  <h2>🤖 问问 Mochi</h2>
+  <div class="agl" id="agl" aria-live="polite"></div>
+  <div class="chips" id="agc"></div>
+  <div class="row"><input id="agq" maxlength="300" placeholder="问我日程，或让我帮你改…" enterkeyhint="send"><button id="ags">发送</button></div>
+  <div class="msg">我只“提方案”，你点「应用」才会生效；应用后可以撤销。需要登录账号。</div>
+  <div class="acts"><button id="agclr">清空对话</button><button id="agx">关闭</button></div>
+</div></div>
+
+<!-- 导入 .ics -->
+<div class="mask" id="mask10"><div class="dlg" onclick="event.stopPropagation()">
+  <h2>📥 导入日历文件</h2>
+  <div class="row"><select id="icr" aria-label="导入范围"><option value="4">导入未来 4 周</option><option value="8" selected>导入未来 8 周</option><option value="16">导入未来 16 周</option></select></div>
+  <div class="msg" id="icm"></div>
+  <div class="tl full" id="icl"></div>
+  <div class="acts"><button id="icx">取消</button><button class="ok" id="icok" hidden>导入</button></div>
 </div></div>
 
 <!-- 作业弹窗 -->
@@ -372,6 +390,7 @@
 <script data-lib="chart.js" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <script data-lib="lz-string" src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <script data-lib="lucide" src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<script data-lib="ical" src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/api.js"></script>
@@ -394,7 +413,11 @@
 <script src="js/wizard.js"></script>
 <script src="js/holidays.js"></script>
 <script src="js/account.js"></script>
+<script src="js/sched.js"></script>
+<script src="js/undo.js"></script>
 <script src="js/ai.js"></script>
+<script src="js/agent.js"></script>
+<script src="js/icsimport.js"></script>
 <script src="js/share.js"></script>
 <script src="js/stats.js"></script>
 <script src="js/notifyset.js"></script>
@@ -403,7 +426,6 @@
 <script src="js/search.js"></script>
 <script src="js/app.js"></script>
 <script src="js/menu.js"></script>
-<script src="js/undo.js"></script>
 <script src="js/icons.js"></script>
 </body>
 </html>

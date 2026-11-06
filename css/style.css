@@ -344,3 +344,26 @@ details.guide ol{margin:8px 0 2px;padding-left:20px;line-height:1.65;color:var(-
 .tabbar button span svg{width:22px;height:22px;display:block}
 .dw-r i svg{width:18px;height:18px}
 .mrow span svg{width:24px;height:24px;color:var(--pri)}
+
+.dw-lang{padding:2px 14px 10px}
+
+/* v8: 问问 Mochi / 撤销 / 导入 .ics */
+.dlg.ag{max-width:520px}
+.agl{display:flex;flex-direction:column;gap:8px;min-height:140px;max-height:46vh;overflow-y:auto;padding:2px}
+.bub{max-width:94%;padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.45;word-break:break-word}
+.bub>div:first-child{white-space:pre-wrap}
+.bub.me{align-self:flex-end;background:var(--pri);color:var(--onpri);border-bottom-right-radius:6px}
+.bub.ai{align-self:flex-start;background:var(--bg);color:var(--ink);border-bottom-left-radius:6px}
+.bub.err{background:var(--pink)}
+.acts-l{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.acts-l .tp{background:var(--card)}
+.bub .msg{margin-top:6px}
+.bub button.ok{width:100%;margin-top:8px;border:0;border-radius:12px;padding:9px;font:inherit;cursor:pointer;background:var(--pri);color:var(--onpri)}
+.bub button.ok:disabled{opacity:.45;cursor:default}
+.dlg.ag .row input{flex:1;min-width:0}
+
+.undo{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:8px 8px 8px 16px;border-radius:99px;background:var(--ink);color:var(--card);font-size:14px;box-shadow:var(--shadow)}
+.undo span{min-width:0}
+.undo button{border:0;border-radius:99px;padding:6px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--pri);color:var(--onpri);white-space:nowrap}
+.undo button.x{background:transparent;color:var(--card);padding:6px 8px;opacity:.7}
+#icm{white-space:pre-line}

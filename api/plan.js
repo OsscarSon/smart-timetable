@@ -1,6 +1,8 @@
 // Vercel Serverless Function：把课表和新安排交给 Gemini，返回重排后的整周课表
 // 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，默认 gemini-3.5-flash-lite）
 
+const LANGN = { en: 'English', ms: 'Bahasa Melayu', zh: '简体中文' };
+const langNote = (l) => '\n\nLanguage: write every human-readable string you create (event titles "t", "notes", subject names you invent) in ' + (LANGN[l] || 'English') + '. Keep any wording the user already gave you as it is.';
 const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划助手。
 任务：根据用户输入的新安排，重排整周课表，并返回【完整】的一周安排。
 坐标：day 0=周一 … 6=周日；s、e 为开始和结束时间，用“当天 0 点起的分钟数”（如 9:00=540，10:30=630），取 5 的倍数，e-s 在 30–240 之间；活动必须在可排时间范围内；同一天不能重叠。
@@ -28,7 +30,7 @@ module.exports = async (req, res) => {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
-  const { text, events, today, hours, study, sports, fixed, hidden, week, homework } = req.body || {};
+  const { text, events, today, hours, study, sports, fixed, hidden, week, homework, lang } = req.body || {};
   if (typeof text !== 'string' || !text.trim() || text.length > 500) {
     return res.status(400).json({ error: 'bad text' });
   }
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: RULES }] },
+        systemInstruction: { parts: [{ text: RULES + langNote(lang) }] },
         contents: [{ role: 'user', parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: 'application/json',

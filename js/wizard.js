@@ -9,6 +9,7 @@ function wzStep(){
   document.getElementById('wzn').textContent=WZ.i===WZN?'开始使用':'下一步';
   document.getElementById('wzk').hidden=WZ.i===WZN;
   if(WZ.i===0){
+    var lg=el('div','chips');mkLangChips(lg);wzb.appendChild(lg);
     wzb.appendChild(el('div','msg','先做最重要的一件事：把课表放进来。（后面几步都可以先跳过）'));
     [['photo','📷','拍照导入课表','拍一张课表，AI 帮你识别（需要登录账号）'],['lesson','✍️','手动添加第一节课','自己填，最稳'],['none','🐱','先逛逛','之后随时能在“更多”里导入']].forEach(function(o){
       var b=el('button','wz-o'+(WZ.goal===o[0]?' on':'')),i=el('i',null,o[1]),d=el('div');
@@ -27,8 +28,7 @@ function wzStep(){
     var cy=el('select','sel');for(var k=1;k<=4;k++){var o=el('option',null,k===1?'每周一样':k+' 周一循环（单双周等）');o.value=k;cy.appendChild(o)}cy.value=WZ.cyc;cy.onchange=function(){WZ.cyc=+cy.value};
     wzb.appendChild(wzField('课表循环',cy))}
   if(WZ.i===3){
-    wzb.appendChild(el('div','msg','挑个喜欢的样子和语言，之后随时能在“设置”里改。'));
-    if(window.mkLangChips){var lg=el('div','chips');mkLangChips(lg);wzb.appendChild(lg)}
+    wzb.appendChild(el('div','msg','挑个喜欢的样子，之后随时能在“设置”里改。'));
     var a=el('div','chips'),b=el('div','swatches');wzb.appendChild(a);wzb.appendChild(b);mkThemeChips(a);mkAccSw(b)}
   if(WZ.i===4){
     wzb.appendChild(el('div','msg',WZ.goal==='photo'?'设置好了！点“开始使用”后会直接打开拍照导入。':WZ.goal==='lesson'?'设置好了！点“开始使用”后会直接打开“添加课程”。':'设置好了！随时可以点右下角 ＋ 开始添加。'));

@@ -109,14 +109,14 @@
       pick.forEach(function(it){FX.push({id:uid(),day:it.day,s:it.s,e:it.e,t:it.t,room:it.room,teacher:it.teacher,type:'课',wk:null,c:subjCol(it.t)})});
       fxSave();rFx();draw()}
     else{
-      var touched={};
+      var snap=Undo.snap(),touched={};
       pick.forEach(function(it){
         if(it.type==='homework'){HW.push({id:uid(),done:0,ts:Date.now(),t:it.t,sb:it.sb,due:it.due,note:'',link:''});return}
         var dn=dnFromIso(it.date),wd=dnDate(dn).wd,w=Math.floor((dn+3-SET.ws)/7);
         if(it.every>0)RP.push({id:uid(),day:wd,s:it.s,e:it.e,t:it.t,c:it.c,a0:dn,ev:it.every,un:it.until?dnFromIso(it.until):null,sk:[],xh:true});
         else{(WK[w]=WK[w]||[]).push({day:wd,s:it.s,e:it.e,t:it.t,c:it.c});touched[w]=1}});
       Object.keys(touched).forEach(function(w){saveWeek(+w)});
-      rpSave();save();hwSave();if(typeof rHw==='function')rHw();draw();if(typeof bnr==='function')bnr()}
+      rpSave();save();hwSave();if(typeof rHw==='function')rHw();draw();if(typeof bnr==='function')bnr();Undo.toast('已加入 '+pick.length+' 项',snap)}
     close()};
 
   // ---- 语音（浏览器自带 Web Speech API；不支持的环境直接隐藏按钮）----
@@ -125,7 +125,7 @@
   function stopMic(){if(rec){try{rec.stop()}catch(e){}}}
   mic.onclick=function(){
     if(rec){stopMic();return}
-    rec=new SR();rec.lang='zh-CN';rec.interimResults=true;rec.continuous=false;
+    rec=new SR();rec.lang={en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US';rec.interimResults=true;rec.continuous=false;
     var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
     rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;q.value=(base+t).slice(0,300)};
     rec.onend=function(){rec=null;mic.textContent='🎤 语音';mic.classList.remove('rec');if(q.value.trim()&&!S.busy)say('说完了？点「解析」。')};

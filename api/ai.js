@@ -2,6 +2,8 @@
 // 环境变量：GEMINI_API_KEY（必填）、GEMINI_MODEL（可选，需支持图片输入）
 // 注意：这里只“解析”，不改任何数据；前端会先给用户预览，确认后才写入。
 
+const LANGN = { en: 'English', ms: 'Bahasa Melayu', zh: '简体中文' };
+const langNote = (l) => '\n\nLanguage: write every human-readable string you create (event titles "t", "notes", subject names you invent) in ' + (LANGN[l] || 'English') + '. Keep any wording the user already gave you as it is.';
 const QUICK = `你是“Mochi”的录入助手。把用户的一句话解析成要加入时间表的条目，只输出 JSON。
 今天的日期和星期会在提示里给出，请据此把“明天、下周三、周五前”等换算成具体日期 YYYY-MM-DD。
 条目有两种：
@@ -30,7 +32,7 @@ module.exports = async (req, res) => {
   const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
-  const { mode, text, today, wd, image, mime } = req.body || {};
+  const { mode, text, today, wd, image, mime, lang } = req.body || {};
   let system, parts;
   if (mode === 'photo') {
     if (typeof image !== 'string' || image.length < 100 || image.length > 4_000_000) return res.status(400).json({ error: '图片太大或为空（请压缩后再传）' });
@@ -50,7 +52,7 @@ module.exports = async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
       body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
+        systemInstruction: { parts: [{ text: system + langNote(lang) }] },
         contents: [{ role: 'user', parts }],
         generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
       }),

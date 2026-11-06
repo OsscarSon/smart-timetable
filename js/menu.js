@@ -25,6 +25,7 @@
   function go(v){closeMenu();showView(v)}
   var G=[
     [['✨','AI 助手','一句话添加 · 拍照导入 · 整周重排',function(){closeMenu();openAI('quick')}],
+     ['🤖','问问 Mochi','问日程、让 AI 帮你改（先预览，可撤销）',function(){closeMenu();if(window.openAgent)openAgent()}],
      ['📷','拍照导入课表','拍一张课表，AI 帮你填',function(){closeMenu();openAI('photo')}],
      ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}]],
     [['🏃','运动计划','训练安排',function(){go('sp')}],
@@ -45,6 +46,7 @@
     dw.innerHTML='';
     var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);
+    var lg=el('div','chips dw-lang');mkLangChips(lg);dw.appendChild(lg);
     G.forEach(function(g){var box=el('div','dw-g');
       g.forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);
         d.appendChild(t);d.appendChild(el('small',null,it[2]));b.appendChild(i);b.appendChild(d);b.onclick=it[3];box.appendChild(b)});

@@ -1,19 +1,21 @@
-# 🐱 Mochi 智能时间表（v8）
+# 🐱 Mochi 智能时间表（v7）
 
 AI 整周重排 · 拍照导入课表 · 一句话 / 语音添加 · 分钟级时间 · 周视图 · 课前 / 作业提醒 · Android 桌面小组件（源码）· 可离线的 PWA。
 
 > v7 的改动对照 `docs/v7-progress.md`（逐项说明做了什么、怎么验证的、哪些没做）。
 
-## v8：基于 v7.1-fixed + v7 多语言 + v6.4 撤销
-- **母版**：v7.1-fixed（分钟制、周视图、搜索、通知设置、商店素材、Android 小组件源码、api/_lib 限流等）。
-- **从 v7 并入**：完整界面多语言（en / zh / ms），`js/i18n.js` + `lang-ui.js` + `lang-msg.js`；设置页增加「语言」切换；切换后刷新页面，选择仅存本机。
-- **从 v6.4 并入**：`js/undo.js` 撤销条（适配按周存储键）；后续可在 AI / 导入写入前调用 `Undo.snap()` + `Undo.toast()`。
-- **择优**：继续保留 v7.1 的分钟制周视图（而非 v6.4 FullCalendar）、小组件实现、离线 SW、完整图标与 store 素材。v6.4 的 Agent / .ics 导入 / fcview 因数据模型差异与重复功能，暂未整包迁入（可后续按需适配）。
-- 版本号 → 8.0.0；菜单底部显示 v8。
+## v8：v7.1 + v7（多语言）+ v6.4（问问 Mochi / 导入 .ics / 撤销）
+- **多语言**（来自 v7 多语言版）：English / 中文 / Bahasa Melayu，`js/i18n.js` + `lang-ui.js` + `lang-msg.js`，切换在向导第一页、≡ 菜单顶部、设置 → 外观；AI 请求自动带 `lang`。v7.1 新增的界面文字暂时没有英文 / 马来文译文，会显示中文，要补的话在字典里加 `L("中文","English","Bahasa Melayu")`。
+- **🤖 问问 Mochi**（`js/agent.js`、`js/sched.js`、`api/agent.js`）：≡ 菜单第一组，或 AI 助手里的「💬 改为提问」。已改成分钟制，走 v7 的登录校验 / 限流（`_lib.js`）。
+- **📥 导入 .ics**（`js/icsimport.js`）：设置 → 数据 → 分享与导出。按分钟导入，超出显示范围的截短。
+- **撤销**（`js/undo.js`）：覆盖按周存储的全部活动；AI 助手、导入 .ics、一句话添加写入后可撤销。
+- 没搬的：v6.4 的 FullCalendar 周视图、旧小组件（v7.1 已有更好的）。
+- 手机 App 打包多装：`npm i -D ical.js`。
 
-## 历史：v7.1 = v7 + v6.5 合并
-- 以 v7 为主体（分钟制数据、周视图、设置页拆分、接口限流、云同步分块、搜索、通知、商店素材等已超过 v6.5），并入 Lucide 图标等。
-- 周视图、小组件、SW、manifest 均采用更完善的一方。
+## v7.1：v7 + v6.5 合并说明
+- 以 v7 为主体（它在分钟制数据、周视图、设置页拆分、接口限流、云同步分块、搜索、通知、商店素材等方面已经包含并超过 v6.5），把 v6.5 里 v7 没有的东西并进来：**Lucide 图标**（`js/icons.js`，库没加载到就保留 emoji）、你手改的两处 `addEventListener('error')` 和 `safeUrl` 注释。
+- 两边重复的功能择优保留一个：周视图用 v7 自己的（按分钟存数据，v6.5 的 FullCalendar 版本只认整点，所以去掉）；桌面小组件用 v7 的（带系统倒计时和安装脚本）；离线缓存用 v7 的 `sw.js`（不依赖外部 CDN）；manifest 与图标用 v7 的（更全）。
+- `docs/改进完成情况.md` 改名为 `docs/v7-progress.md`（GitHub 网页上传对中文文件名有时不友好）。
 
 ## 文件结构
 ```
@@ -35,8 +37,6 @@ js/ai.js          ✨ AI 助手：一句话 / 拍照课表 / 整周重排（三�
 js/log.js         整周重排的逻辑 + 本地规则兜底（认“三点半 / 一个半小时”）
 js/search.js      全局搜索            js/menu.js    ≡ 菜单 + 设置二级页
 js/wizard.js      首次向导            js/theme.js   主题 + 对比度自适应
-js/i18n.js + lang-ui.js + lang-msg.js  多语言（en/zh/ms）
-js/undo.js       撤销条（AI/批量写入后可撤销）
 js/…              其余（hw / lessons / settings / study / sport / stats / share / holidays / recur / localai 等）
 api/_lib.js       后端共用：登录校验、限流、CORS 白名单、请求大小限制
 api/plan.js       整周重排（Gemini）   api/ai.js  一句话 / 拍照识别（Gemini）

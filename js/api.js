@@ -4,7 +4,7 @@ async function apiPost(path,body,ms){
   try{
     var h={'Content-Type':'application/json'},tok=window.cloud&&cloud.token?await cloud.token():'';
     if(tok)h.Authorization='Bearer '+tok;
-    var r=await fetch(((window.MOCHI_CFG&&MOCHI_CFG.apiBase)||'')+path,{method:'POST',headers:h,body:JSON.stringify(body),signal:ctl.signal});
+    var r=await fetch(((window.MOCHI_CFG&&MOCHI_CFG.apiBase)||'')+path,{method:'POST',headers:h,body:JSON.stringify(Object.assign({lang:window.LANG||'en'},body)),signal:ctl.signal});
     var j=await r.json().catch(function(){return {}});
     if(!r.ok){var e=new Error(j.error||('HTTP '+r.status));e.status=r.status;e.code=j.code;e.retry=+r.headers.get('retry-after')||0;throw e}
     return j}
