@@ -6,13 +6,17 @@
     menu:['功能介绍与开源','Features & open source','Ciri & sumber terbuka'],
     menuSub:['这个 App 能做什么、用了哪些开源项目','What this app does and what it is built on','Apa yang app ini boleh buat & projek yang digunakan'],
     h:['🐱 Mochi 智能时间表','🐱 Mochi Smart Timetable','🐱 Mochi Jadual Pintar'],
-    intro:['给学生用的时间表：排课、作业、复习、运动都在一个地方，AI 帮你少打字。数据默认只存在你的设备上，登录账号后才会同步。','A timetable for students: classes, homework, revision and sport in one place, with AI to save typing. Your data stays on your device unless you sign in to sync.','Jadual untuk pelajar: kelas, kerja rumah, ulang kaji dan sukan di satu tempat, dengan AI untuk jimat menaip. Data kekal pada peranti anda kecuali anda log masuk untuk segerak.'],
+    intro:['适用于学习、工作与生活的智能时间表。AI 帮你安排时间；数据默认保存在设备上，登录后才同步。','A smart timetable for study, work and everyday life. AI helps organize your time. Your data stays on your device unless you sign in to sync.','Jadual pintar untuk belajar, kerja dan kehidupan harian. AI membantu mengatur masa anda. Data kekal pada peranti sehingga anda log masuk untuk segerak.'],
     fh:['功能','Features','Ciri'],
     lh:['用到的开源项目','Open-source projects used','Projek sumber terbuka'],
     note:['AI 整理 / 问答：文字类请求按顺序用 Groq / Cerebras / Mistral / Gemini 的免费额度（都不是开源，需要登录）；拍照识别只用 Gemini。浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Text AI requests use the free tiers of Groq, Cerebras, Mistral and Gemini in turn (none are open source; sign-in required); photo import uses Gemini only. Browser built-in translation is a browser feature.','Permintaan AI teks guna tahap percuma Groq, Cerebras, Mistral dan Gemini secara bergilir (bukan sumber terbuka; perlu log masuk); import foto guna Gemini sahaja. Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
     close:['关闭','Close','Tutup']
   };
   var F=[
+    ['🧭',['使用场景与引导','Modes & guided tour','Mod & panduan'],['学习、工作、生活可多选；全部共用同一份时间表，新手引导结束后可选择模式。','Select any combination of Study, Work and Life on one timetable; choose modes after the guided tour.','Pilih Belajar, Kerja dan Kehidupan secara gabungan pada satu jadual selepas panduan.']],
+    ['⚡',['Mochi Energy','Mochi Energy','Mochi Energy'],['记录每天精力，得到不自动修改日程的安排建议。','Log your daily energy and get suggestions without automatic schedule changes.','Rekod tenaga harian dan terima cadangan tanpa mengubah jadual secara automatik.']],
+    ['🎧',['Mochi Wrapped','Mochi Wrapped','Mochi Wrapped'],['根据当前课表已保存的手动安排生成每月回顾，可导出 PNG 分享；计划时长不等于实际时长。','Monthly recap from saved manual events in the current timetable, exportable as PNG; planned time is not actual time.','Ringkasan bulanan daripada acara manual tersimpan dan eksport PNG; masa dirancang bukan masa sebenar.']],
+    ['🕒',['Chrono 日期识别','Chrono date preview','Pratonton tarikh Chrono'],['在 AI 输入框预览识别到的日期，仍通过原本的 AI 流程确认后添加。','Preview detected dates in the AI input; adding events still follows the existing confirmation flow.','Pratonton tarikh yang dikesan dalam input AI; tambah acara masih melalui pengesahan asal.']],
     ['📅',['日视图 / 周视图','Day & week views','Paparan hari & minggu'],['按分钟排课，周视图能看到当前时间线，重叠的安排会并排显示。','Minute-level scheduling, a live “now” line, and overlapping items shown side by side.','Jadual hingga minit, garisan masa kini, dan item bertindih dipaparkan bersebelahan.']],
     ['✨',['AI 助手','AI assistant','Pembantu AI'],['一句话添加活动或作业；拍照导入课表；整周自动重排。AI 只给方案，你确认后才写入。','Add an event or homework in one sentence, import a timetable from a photo, or let AI re-plan the week. AI only proposes — you confirm.','Tambah acara/kerja rumah dengan satu ayat, import jadual dari foto, atau susun semula minggu. AI hanya cadang — anda sahkan.']],
     ['🤖',['问问 Mochi','Ask Mochi','Tanya Mochi'],['问“明天哪段时间有空”“哪些作业快到期”，或让它帮你挪日程。改动先预览，可撤销。','Ask “when am I free tomorrow?” or “what is due soon?”, or have it move things around. Changes are previewed and can be undone.','Tanya “bila saya lapang esok?” atau “apa yang hampir tamat tempoh?”. Perubahan dipratonton dan boleh dibatalkan.']],
@@ -28,6 +32,8 @@
     ['🌐',['三种语言 / 可安装','3 languages & installable','3 bahasa & boleh dipasang'],['English / 中文 / Bahasa Melayu；可像 App 一样安装到手机，离线也能打开。','English / 中文 / Bahasa Melayu; install it like an app and open it offline.','English / 中文 / Bahasa Melayu; pasang seperti app dan buka tanpa internet.']]
   ];
   var O=[
+    ['Driver.js','MIT',['交互式新手引导','Interactive guided tour','Panduan interaktif'],'https://github.com/kamranahmedse/driver.js'],
+    ['chrono-node','MIT',['自然语言日期识别预览','Natural-language date parsing preview','Pratonton tafsiran tarikh bahasa semula jadi'],'https://github.com/wanasit/chrono'],
     ['dayjs','MIT',['日期计算','Date handling','Pengiraan tarikh'],'https://github.com/iamkun/dayjs'],
     ['rrule','BSD-3',['复杂重复规则（每月第几个周几）','Complex recurrence rules','Peraturan ulangan kompleks'],'https://github.com/jkbrzt/rrule'],
     ['ical.js','MPL-2.0',['解析 .ics 日历文件','Parsing .ics calendar files','Menghurai fail kalendar .ics'],'https://github.com/kewisch/ical.js'],

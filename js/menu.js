@@ -21,6 +21,7 @@
   function openSet(sec){closeMenu();via=true;showView('se');via=false;setSec(sec)}
   if(bk)bk.onclick=function(){if(curSec)setSec('');else showView('more');window.scrollTo(0,0)};
 
+  function loc(en,zh,ms){return ({en:en,zh:zh,ms:ms})[window.LANG||'en']||en}
   // ---- 菜单内容 ----
   function go(v){closeMenu();showView(v)}
   // 一份入口清单，≡ 菜单和底部“更多”页共用（分组：AI 与工具 / 个性化 / 课表与数据 / 关于）
@@ -33,11 +34,9 @@
         ['📷','拍照导入课表','拍一张课表，AI 帮你填',function(){closeMenu();openAI('photo')}],
         ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}],
         ['🏃','运动计划','训练安排',function(){go('sp')}],
-        ['⚡','Mochi Energy','根据自己的精力合理安排',function(){closeMenu();window.MochiNext&&MochiNext.openEnergy()}],
-        ['🎧','Mochi Wrapped','查看每月时间使用回顾',function(){closeMenu();window.MochiNext&&MochiNext.openWrapped()}]]],
-      ['生活管理',[['🌿','生活管理','运动、饮食、习惯与日常安排',function(){go('life')}]]],
-      ['个人配置',[['🧭','使用场景与模式','学习 / 工作 / 混合，可随时切换',function(){closeMenu();window.MochiNext&&MochiNext.openModes()}],
-        ['🪄','新手引导','重新查看主要功能',function(){closeMenu();window.MochiNext&&MochiNext.startTour()}],
+        ['⚡','Mochi Energy',loc('Plan around your energy','根据精力合理安排','Rancang ikut tenaga anda'),function(){closeMenu();window.MochiNext&&MochiNext.openEnergy()}],
+        ['🎧','Mochi Wrapped',loc('Your monthly schedule recap','查看每月时间回顾','Ringkasan jadual bulanan'),function(){closeMenu();window.MochiNext&&MochiNext.openWrapped()}]]],
+      ['个人配置',[['🧭',loc('Getting started & modes','新手引导与模式','Panduan & mod'),loc('Take a tour, then choose Study / Work / Life','先看引导，再选择学习 / 工作 / 生活','Lihat panduan, kemudian pilih Belajar / Kerja / Kehidupan'),function(){closeMenu();window.MochiNext&&MochiNext.startTour()}],
         ['🎨','外观与显示','主题色、深色、视图密度',function(){openSet('look')}],
         window.wpMenuItem?window.wpMenuItem():null,
         window.langMenuItem?window.langMenuItem():null,
@@ -64,7 +63,7 @@
     var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);
     fill(dw,true);
-    dw.appendChild(el('div','dw-ft','Mochi 时间表 · v8.2'))}
+    dw.appendChild(el('div','dw-ft','Mochi Schedule · v8.8'))}
   // 「更多」页：同一份清单，不再是 4 行
   var mv=document.getElementById('v-more');
   function buildMore(){
