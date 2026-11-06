@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Mochi 时间表</title>
-<meta name="description" content="Mochi 智能时间表：AI 整周重排、拍照导入课表、一句话添加、复习与运动计划。">
+<meta name="description" content="Mochi Smart Timetable：智能安排学习、工作与生活。">
 <meta name="theme-color" content="#fff4ec" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1d1613" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.json">
@@ -21,6 +21,8 @@
 <link data-font="lxgw" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-regular.css">
 <link data-font="lxgw" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/mochi-life.css">
+<link data-vendor="driver-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.4.0/dist/driver.css">
 </head>
 <body>
 <div class="app">
@@ -248,7 +250,10 @@
     <h3 class="hs">🗓️ 这一周每天的安排时长（小时）</h3>
     <div class="chbox"><canvas id="ch2"></canvas></div>
     <div class="msg" id="stmsg"></div>
+    <div id="mochi-wrapped-mount"></div>
   </section>
+
+  <section class="card st" id="v-life"><h2>🌿 Life Management</h2><div id="mochi-life-mount"></div></section>
 
   <!-- 更多：只留入口 -->
   <section class="card st" id="v-more"><h2>更多</h2></section>
@@ -437,6 +442,7 @@
 <script data-lib="sortable" src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script data-lib="fuse" src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script data-lib="driver" src="https://cdn.jsdelivr.net/npm/driver.js@1.4.0/dist/driver.js.iife.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/aisrc.js"></script>
 <script src="js/api.js"></script>
@@ -458,6 +464,7 @@
 <script src="js/subjects.js"></script>
 <script src="js/timepick.js"></script>
 <script src="js/settings.js"></script>
+<script src="js/mochi-next.js"></script>
 <script src="js/wizard.js"></script>
 <script src="js/holidays.js"></script>
 <script src="js/account.js"></script>
