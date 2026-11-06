@@ -26,6 +26,9 @@
   document.getElementById('fxph').onclick=function(){openAI('photo')};
 
   async function post(body){
+    if(body.mode==='quick'&&window.AISRC&&AISRC.preferLocal()&&window.LocalAI&&await LocalAI.status()!=='no'){
+      say('🧠 用本机 AI 解析（第一次可能要先下载模型）…');
+      try{return await LocalAI.quick(body,function(p){say('⬇️ 正在下载内置 AI 模型 '+p+'%')})}catch(e0){say('本机 AI 没成功，改用云端…')}}
     try{return await apiPost('/api/ai',body,45000)}
     catch(e){            // 云端不可用时，文字解析改用浏览器内置 AI（拍照识别需要云端）
       if(body.mode!=='quick'||!(window.LocalAI&&await LocalAI.status()!=='no')){e.message=apiErr(e);throw e}

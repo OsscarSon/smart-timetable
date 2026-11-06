@@ -22,12 +22,12 @@ const RULES = `你是“Mochi”，一个可爱又靠谱的学习时间表规划
 12. notes 是最多 4 条简短中文说明，解释你改了什么、为什么（语气可爱温柔）。
 只输出 JSON：{"events":[{"day":0,"s":540,"e":660,"t":"📖 数学复习","c":"pink"}],"notes":["..."]}`;
 
-const { guard, inr, str, COLS } = require('./_lib');
+const { guard, userKey, inr, str, COLS } = require('./_lib');
 
 module.exports = async (req, res) => {
   const who = await guard(req, res, { cost: 1, maxBytes: 200_000 });
   if (!who) return;
-  const key = process.env.GEMINI_API_KEY;
+  const key = userKey(req) || process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
   const { text, events, today, hours, study, sports, fixed, hidden, week, homework, lang } = req.body || {};

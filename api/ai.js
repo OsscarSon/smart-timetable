@@ -23,13 +23,13 @@ t 是科目名（不超过 12 个字，保持图片里的原文，不要加 emoj
 看不清的格子不要猜，跳过，并在 notes 说明。单双周之类的特殊标记，在 notes 里说明即可，不要拆成多条。
 输出格式：{"lessons":[{"day":0,"s":480,"e":525,"t":"数学","room":"A301","teacher":"王老师"}],"notes":["最多 4 条简短中文说明"]}`;
 
-const { guard, int, inr, str, iso, COLS } = require('./_lib');
+const { guard, userKey, int, inr, str, iso, COLS } = require('./_lib');
 
 module.exports = async (req, res) => {
   const { mode: m0 } = req.body || {};
   const who = await guard(req, res, { cost: m0 === 'photo' ? 3 : 1, maxBytes: 5_500_000 });
   if (!who) return;
-  const key = process.env.GEMINI_API_KEY;
+  const key = userKey(req) || process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
   const { mode, text, today, wd, image, mime, lang } = req.body || {};

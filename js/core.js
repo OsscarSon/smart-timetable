@@ -79,7 +79,9 @@ if(!DN.__v){var nd={__v:2};Object.keys(DN).forEach(function(k){var m=k.match(/^(
 function kk(x,w){return (w===undefined?curW:w)+'-'+x.day+'-'+x.s+'-'+x.t}
 
 var thisW=weekNum(d),curW=thisW,WK=weeksOf(TT.id);
-if(TT.id==='main'){var oldTT=lget('mochi-tt',null);if(Array.isArray(oldTT)&&!Object.keys(WK).length){WK[thisW]=oldTT.map(normEv);put2(wkKeyOf('main',thisW),WK[thisW])}}
+if(TT.id==='main'){var oldTT=lget('mochi-tt',null);if(oldTT!==null){          // 更早版本的旧键：迁移一次后必须删掉，否则清空本周后刷新会被它“复活”
+  if(Array.isArray(oldTT)&&!Object.keys(WK).length){WK[thisW]=oldTT.map(normEv);put2(wkKeyOf('main',thisW),WK[thisW])}
+  try{localStorage.removeItem('mochi-tt')}catch(e){}}}
 var data=WK[curW]||[];WK[curW]=data;
 var grid=document.getElementById('grid'),cur=null,col='pink';
 function saveWeek(w){var a=WK[w],k=wkKeyOf(TT.id,w);

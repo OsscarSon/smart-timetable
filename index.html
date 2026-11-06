@@ -191,6 +191,10 @@
       <h3 class="hs">☁️ 账号与云同步</h3>
       <div id="cloud"></div>
       <div class="msg" id="libs"></div>
+      <h3 class="hs">🧠 AI 来源（只对这台设备生效）</h3>
+      <div class="chips" id="aisrc"></div>
+      <input id="aikey" type="password" autocomplete="off" spellcheck="false" maxlength="80" placeholder="（可选）粘贴你自己的 Gemini API key" aria-label="Gemini API key">
+      <div class="msg" id="aikm"></div>
     </div>
 
     <div class="sec" data-sec="data" data-t="数据：分享与备份">
@@ -378,6 +382,7 @@
 
 <script src="js/hook.js"></script>
 <script src="js/config.js"></script>
+<script src="js/install.js"></script>
 <script src="js/lang-ui.js"></script>
 <script src="js/lang-msg.js"></script>
 <script src="js/lang-static.js"></script>
@@ -394,6 +399,7 @@
 <script data-lib="ical" src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
+<script src="js/aisrc.js"></script>
 <script src="js/api.js"></script>
 <script src="js/core.js"></script>
 <script src="js/dates.js"></script>
@@ -426,6 +432,7 @@
 <script src="js/native.js"></script>
 <script src="js/search.js"></script>
 <script src="js/app.js"></script>
+<script src="js/about.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/icons.js"></script>
 </body>

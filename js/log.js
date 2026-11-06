@@ -77,7 +77,10 @@
       week:isoOf(wsDn(curW))+' 起的一周（一周从周'+DAYS[SET.ws]+'开始，列顺序：'+visDays().map(function(i){return DAYS[i]}).join('')+'）',
       homework:(typeof hwPending==='function'?hwPending():[])},j,viaLocal=false;
     try{
-      try{j=await apiPost('/api/plan',body,60000)}
+      if(window.AISRC&&AISRC.preferLocal()&&window.LocalAI&&await LocalAI.status()!=='no'){
+        say('🧠 用本机 AI 重排（第一次可能要先下载模型）…');
+        try{j=await LocalAI.plan(body,function(p){say('⬇️ 正在下载内置 AI 模型 '+p+'%')});viaLocal=true}catch(e0){j=null;say('本机 AI 没成功，改用云端…')}}
+      if(!j)try{j=await apiPost('/api/plan',body,60000)}
       catch(e1){        // 后端不可用 / 没登录 / 没 key / 超额：试试浏览器内置 AI（免 key）
         if(!(window.LocalAI&&await LocalAI.status()!=='no'))throw e1;
         say('🧠 云端 AI 不可用（'+apiErr(e1)+'），改用浏览器内置 AI（第一次可能要先下载模型）…');

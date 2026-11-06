@@ -22,7 +22,7 @@ function cors(req, res) {
   }
   res.setHeader('Access-Control-Allow-Origin', allow);
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-User-Key');
   res.setHeader('Access-Control-Max-Age', '600');
   return ok;
 }
@@ -73,6 +73,7 @@ async function count(key, inc, ttl) {
 }
 
 // 入口：处理 CORS / 方法 / 大小 / 登录 / 限流。返回用户标识；已经回复过错误的话返回 null。
+const userKey = req => { const k = String(req.headers['x-user-key'] || '').trim(); return /^[\w-]{20,80}$/.test(k) ? k : ''; };
 async function guard(req, res, { cost = 1, maxBytes = 5_000_000 } = {}) {
   const originOk = cors(req, res);
   if (req.method === 'OPTIONS') { res.status(204).end(); return null; }
@@ -80,6 +81,7 @@ async function guard(req, res, { cost = 1, maxBytes = 5_000_000 } = {}) {
   if (req.method !== 'POST') { res.status(405).json({ error: 'POST only' }); return null; }
   if (Number(req.headers['content-length'] || 0) > maxBytes) { res.status(413).json({ error: '请求太大' }); return null; }
 
+  if (userKey(req)) return 'own';          // 用户自带 Gemini key：花的是他自己的额度，不需要登录、不计站长的限流
   const uid = await userOf(req);
   if (!uid && authRequired()) { res.status(401).json({ error: '请先登录账号，再使用云端 AI', code: 'auth' }); return null; }
   const id = uid ? 'u:' + uid : 'ip:' + clientIp(req);
@@ -99,4 +101,4 @@ const int = (v, lo, hi, d) => { v = Math.round(Number(v)); return Number.isFinit
 const str = (v, n) => String(v == null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, n);
 const iso = v => (/^\d{4}-\d{2}-\d{2}$/.test(String(v)) ? String(v) : '');
 const COLS = ['pink', 'mint', 'sky', 'lemon', 'peach'];
-module.exports = { guard, int, inr, str, iso, COLS };
+module.exports = { guard, userKey, int, inr, str, iso, COLS };

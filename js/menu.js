@@ -35,7 +35,8 @@
      ['🎌','假期','放假期间自动跳过安排',function(){openSet('hol')}]],
     [['☁️','账号与云同步','多设备同步、附件',function(){openSet('cloud')}],
      ['💾','数据：分享与备份','链接、二维码、.ics、备份',function(){openSet('data')}]],
-    [['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}]]
+    [['ℹ️',(window.ABOUT_MENU||['功能介绍与开源'])[0],(window.ABOUT_MENU||['','']) [1],function(){closeMenu();openAbout()}],
+     ['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}]].concat(window.INSTALL_MENU?[window.INSTALL_MENU]:[])
   ];
   function shareApp(){
     var u=location.origin+location.pathname;

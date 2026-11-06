@@ -7,6 +7,7 @@ AI 整周重排 · 拍照导入课表 · 一句话 / 语音添加 · 分钟级�
 ## v8：v7.1 + v7（多语言）+ v6.4（问问 Mochi / 导入 .ics / 撤销）
 - **多语言**（来自 v7 多语言版）：English / 中文 / Bahasa Melayu，`js/i18n.js` + `lang-ui.js` + `lang-msg.js`，切换在向导第一页、≡ 菜单顶部、设置 → 外观；AI 请求自动带 `lang`。v7.1 新增的界面文字暂时没有英文 / 马来文译文，会显示中文，要补的话在字典里加 `L("中文","English","Bahasa Melayu")`。
 - **漏翻的文字**：`node scripts/extract-i18n.mjs` 生成 `js/lang-static.js`（词典里没有译文的写死文字）；运行时用 Chrome 内置 Translator，没有则用 transformers.js + opus-mt-zh-en（首次询问、约 100MB），译文缓存在本机。用户自己输入的内容不会被机翻。
+- **AI 来源**（设置 → 账号与同步）：自动 / 优先本机 AI（Gemini Nano 或 WebLLM）；还可以填自己的 Gemini key（`X-User-Key` 请求头，后端用它调用，不占站长额度、不要求登录，不保存）。站长的 key 仍受登录 + 限流保护；要不要强制登录由 Vercel 环境变量 `SUPABASE_URL` / `SUPABASE_ANON_KEY`（或 `REQUIRE_AUTH=1`）决定，全站日上限 `AI_GLOBAL_PER_DAY`。
 - **🤖 问问 Mochi**（`js/agent.js`、`js/sched.js`、`api/agent.js`）：≡ 菜单第一组，或 AI 助手里的「💬 改为提问」。已改成分钟制，走 v7 的登录校验 / 限流（`_lib.js`）。
 - **📥 导入 .ics**（`js/icsimport.js`）：设置 → 数据 → 分享与导出。按分钟导入，超出显示范围的截短。
 - **撤销**（`js/undo.js`）：覆盖按周存储的全部活动；AI 助手、导入 .ics、一句话添加写入后可撤销。

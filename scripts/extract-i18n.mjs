@@ -7,7 +7,7 @@ for (const f of ['js/lang-ui.js', 'js/lang-msg.js']) vm.runInContext(readFileSyn
 const have = new Set([...(win.I18N || []), ...(win.I18N_X || [])].map(r => r[0]));
 const CJK = /[\u4e00-\u9fff]/, out = new Set();
 const add = s => { s = s.replace(/\\n/g, '\n').replace(/\\(['"`\\])/g, '$1'); s.split('\n').forEach(l => { l = l.trim(); if (CJK.test(l) && l.length <= 80 && !have.has(l) && !/\$\{|<[a-z]/i.test(l)) out.add(l); }); };
-const skip = new Set(['i18n.js', 'lang-ui.js', 'lang-msg.js', 'lang-static.js']);
+const skip = new Set(['i18n.js', 'lang-ui.js', 'lang-msg.js', 'lang-static.js', 'about.js']);
 for (const f of readdirSync('js').filter(f => !skip.has(f))) {
   const src = readFileSync('js/' + f, 'utf8').split('\n').filter(l => !/^\s*\/\//.test(l)).join('\n');
   for (const m of src.matchAll(/(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g)) if (CJK.test(m[2])) add(m[2]);

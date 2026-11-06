@@ -30,14 +30,14 @@ actions 里的工具（最多 8 个）：
 
 只输出 JSON：{"reply":"……","actions":[…]}`;
 
-const { guard, int, str, iso } = require('./_lib');
+const { guard, userKey, int, str, iso } = require('./_lib');
 const LANGN = { en: 'English', ms: 'Bahasa Melayu', zh: '简体中文' };
 const langNote = (l) => '\n\nLanguage: write "reply" and any event titles you create in ' + (LANGN[l] || 'English') + ', unless the user clearly writes in another language.';
 
 module.exports = async (req, res) => {
   const who = await guard(req, res, { cost: 1, maxBytes: 60_000 });
   if (!who) return;
-  const key = process.env.GEMINI_API_KEY;
+  const key = userKey(req) || process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing GEMINI_API_KEY' });
 
   const { messages, snapshot, lang } = req.body || {};

@@ -367,3 +367,19 @@ details.guide ol{margin:8px 0 2px;padding-left:20px;line-height:1.65;color:var(-
 .undo button{border:0;border-radius:99px;padding:6px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--pri);color:var(--onpri);white-space:nowrap}
 .undo button.x{background:transparent;color:var(--card);padding:6px 8px;opacity:.7}
 #icm{white-space:pre-line}
+
+/* v8: 功能介绍 */
+.dlg.ab{max-width:560px;max-height:86vh;overflow-y:auto}
+.ab-r{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.ab-r i{font-style:normal;font-size:20px;line-height:1.3}
+.ab-r b{display:block;font-size:14px}
+.ab-r small{display:block;font-size:12.5px;line-height:1.45;opacity:.85}
+.ab-r a{color:inherit;text-decoration:underline}
+
+/* v8: 安装成 App */
+.inst{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:39;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;border-radius:99px;background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:var(--shadow)}
+.inst img{border-radius:10px;flex:none}
+.inst span{min-width:0;font-weight:700;font-size:14px}
+.inst button{border:0;border-radius:99px;padding:7px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--pri);color:var(--onpri);white-space:nowrap}
+.inst button.x{background:transparent;color:var(--ink);padding:6px 8px;opacity:.6}
+.inst-s{margin:6px 0 0;padding-left:20px;line-height:1.7}
