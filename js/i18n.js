@@ -27,6 +27,49 @@
     keys.sort(function(a,b){return b.length-a.length});
     window.I18N=window.I18N_X=window.I18N_P=null}
   load();
+
+  // ---- 词典里没有的界面文字：用开源 / 内置翻译模型现翻，译文缓存在本机（只翻 js/lang-static.js 里的写死文字，用户自己写的内容不动）----
+  // ① Chrome 内置 Translator API（本机离线模型，免费）② 没有的话 transformers.js + Helsinki-NLP/opus-mt-zh-en（约 100MB，首次会先询问）。
+  // 马来文：只有 ① 支持时才译成马来文；否则暂时显示英文。
+  var MT={},ST=null,Q=[],QS={},FAIL={},MTK='i18n-mt-'+lang,busy=false,tmr=0,eng=null,engDone=false;
+  try{MT=JSON.parse(localStorage.getItem(MTK)||'{}')||{}}catch(e){MT={}}
+  if(window.I18N_STATIC){ST={};window.I18N_STATIC.forEach(function(x){ST[x]=1});window.I18N_STATIC=null}
+  function kick(){clearTimeout(tmr);tmr=setTimeout(runQ,700)}
+  async function getEng(){
+    if(eng||engDone)return eng;
+    try{
+      if(window.Translator){
+        var tgt=lang==='ms'?'ms':'en',av=await Translator.availability({sourceLanguage:'zh',targetLanguage:tgt});
+        if(av&&av!=='unavailable'){
+          var T=await Translator.create({sourceLanguage:'zh',targetLanguage:tgt});
+          return eng=function(x){return T.translate(x)}}}
+    }catch(e){}
+    try{
+      var ok=localStorage.getItem('i18n-mt-ok');
+      if(ok==='no'){engDone=true;return null}
+      if(ok!=='1'){
+        if(!confirm('Translate the remaining screens with a free open-source model (Helsinki-NLP opus-mt, ~100 MB download, cached on this device)?\n用开源翻译模型翻译剩下的界面文字（约 100MB，只下载一次）？')){localStorage.setItem('i18n-mt-ok','no');engDone=true;return null}
+        localStorage.setItem('i18n-mt-ok','1')}
+      var tf=await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.2/+esm');
+      var pipe=await tf.pipeline('translation','Xenova/opus-mt-zh-en');
+      return eng=async function(x){var r=await pipe(x,{max_new_tokens:80});return r&&r[0]&&r[0].translation_text}
+    }catch(e){engDone=true;return null}}
+  async function runQ(){
+    if(busy||!Q.length)return;busy=true;
+    var E=await getEng();
+    if(!E){Q.forEach(function(t){FAIL[t]=1});Q=[];busy=false;return}
+    var n=0;
+    while(Q.length&&n++<400){
+      var t=Q.shift(),m=/^([^\u4e00-\u9fff]*)([\s\S]*?)([^\u4e00-\u9fff]*)$/.exec(t);
+      try{
+        var r=String(await E(m[2])||'').trim();
+        if(!r||CJK.test(r)){FAIL[t]=1;continue}
+        if(!/[。！？.!?]$/.test(m[2]))r=r.replace(/[.。]$/,'');
+        MT[t]=m[1]+r+m[3]}
+      catch(e){FAIL[t]=1}
+      if(n%10===0){try{localStorage.setItem(MTK,JSON.stringify(MT))}catch(e){}walk(document.documentElement)}}
+    try{localStorage.setItem(MTK,JSON.stringify(MT))}catch(e){}
+    walk(document.documentElement);busy=false;if(Q.length)kick()}
   function esc(s){return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}
   var RE=keys.length?new RegExp(keys.map(esc).join('|'),'g'):null;
   var maxK=0;
@@ -42,6 +85,8 @@
   function core(t,deep){
     if(t in M)return M[t];
     if(t in XM)return XM[t];
+    if(t in MT)return MT[t];
+    if(ST&&ST[t]===1&&!FAIL[t]&&!QS[t]){QS[t]=1;Q.push(t);kick()}      // 词典里没有的写死文字 → 交给翻译模型
     var o=t;
     PAT.forEach(function(p){o=o.replace(p[0],p[1])});
     o=subst(o);
