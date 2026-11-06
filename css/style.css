@@ -21,10 +21,10 @@
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito","ZCOOL KuaiLe",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;font-weight:600}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",-apple-system,"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;font-weight:600}
 .app{max-width:var(--appw);margin:0 auto;padding:14px;display:flex;flex-direction:column;gap:12px;min-height:100vh}
 .card{background:var(--card);border-radius:24px;box-shadow:var(--shadow);border:2px solid var(--line)}
-h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
+h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 
 /* Sidebar 区 */
 
@@ -95,7 +95,7 @@ h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 .gen label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--soft)}
 .gen input{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:5px;font:inherit;font-size:14px;width:100%;min-width:0}
 .tp.rm input[type=number]{width:70px}
-.hwg{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-size:14px;color:var(--soft);margin-top:6px}
+.hwg{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-size:14px;color:var(--soft);margin-top:6px}
 .hwg.over{color:var(--danger)}
 .tp.hw .hwt{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .tag{font-size:12px;padding:1px 8px;border-radius:999px;color:var(--ink);font-weight:800}
@@ -233,7 +233,7 @@ h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 
 /* 顶栏 */
 .top{display:flex;align-items:center;gap:10px;padding:2px 2px 0}
-.top-t{flex:1;min-width:0}.top-t h1{font-size:19px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-t{flex:1;min-width:0}.top-t h1{font-size:21px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .top-t small{display:block;font-size:14px;color:var(--soft)}
 .ibtn{flex:0 0 auto;width:40px;height:40px;border:0;border-radius:50%;background:var(--card);color:var(--ink);font-size:18px;cursor:pointer;box-shadow:var(--shadow)}
 .tdp{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:48px;height:44px;border:0;border-radius:14px;background:var(--pri);color:var(--onpri);font:inherit;line-height:1.05;cursor:pointer;box-shadow:var(--shadow)}
@@ -293,8 +293,8 @@ h1,h2{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;margin:0}
 .dlist{display:flex;flex-direction:column;gap:8px;min-height:30vh}
 .mrow.sm{padding:9px 12px}.mrow.sm span{font-size:20px}
 .mrow small.over{color:var(--danger)}
-.hs{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;font-size:17px;margin:10px 0 0}
-.hss{font-family:"ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;font-size:16px;margin:0}
+.hs{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;font-size:17px;margin:10px 0 0}
+.hss{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:400;font-size:16px;margin:0}
 .hsss{font-size:14px;font-weight:800;color:var(--soft);margin:8px 0 0}
 [data-dens=compact] .lc .cd{min-height:44px;padding:6px 12px}
 [data-dens=roomy] .lc .cd{min-height:70px;padding:15px 14px}
@@ -377,9 +377,5 @@ details.guide ol{margin:8px 0 2px;padding-left:20px;line-height:1.65;color:var(-
 .ab-r a{color:inherit;text-decoration:underline}
 
 /* v8: 安装成 App */
-.inst{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:39;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:8px 8px 8px 10px;border-radius:99px;background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:var(--shadow)}
-.inst img{border-radius:10px;flex:none}
-.inst span{min-width:0;font-weight:700;font-size:14px}
-.inst button{border:0;border-radius:99px;padding:7px 14px;font:inherit;font-weight:800;cursor:pointer;background:var(--pri);color:var(--onpri);white-space:nowrap}
-.inst button.x{background:transparent;color:var(--ink);padding:6px 8px;opacity:.6}
+#instb{color:var(--pri)}
 .inst-s{margin:6px 0 0;padding-left:20px;line-height:1.7}

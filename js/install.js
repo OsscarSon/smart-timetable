@@ -1,5 +1,5 @@
 // 📲 安装成 App（PWA）：Android / 电脑 Chrome 一键安装；iPhone 没有一键安装，给出“添加到主屏幕”的步骤。
-// 入口：≡ 菜单里的「安装成 App」+ 课表页底部一条可关闭的小提示（关掉后 14 天不再出现）。已经装好（独立窗口打开）就都不显示。
+// 入口：顶栏右上角的 📲 圆形图标按钮 + ≡ 菜单里的「安装成 App」。已经装好（独立窗口打开）就都不显示。
 (function(){
   var L=window.LANG||'en',I=L==='zh'?0:L==='ms'?2:1;
   var T={
@@ -16,9 +16,9 @@
   var standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
   if(standalone)return;
   var ua=navigator.userAgent||'',IOS=/iphone|ipad|ipod/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
-  var dp=null,bar=null,m=null;
+  var dp=null,m=null;
   function mk(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
-  function hideBar(rem){if(bar){bar.remove();bar=null}if(rem){try{localStorage.setItem('inst-dismiss',String(Date.now()))}catch(e){}}}
+  function hideBtn(){var b=document.getElementById('instb');if(b)b.remove()}
   function help(){
     if(!m){
       m=mk('div','mask');m.onclick=function(){m.classList.remove('show')};
@@ -29,22 +29,17 @@
       m.appendChild(d);document.body.appendChild(m)}
     m.classList.add('show')}
   window.openInstall=async function(){
-    hideBar(true);
     if(dp){var p=dp;dp=null;try{p.prompt();var c=await p.userChoice;if(c&&c.outcome==='accepted')alert(t(T.done))}catch(e){help()}return}
     help()};
   window.INSTALL_MENU=['📲',t(T.menu[0]),t(T.menu[1]),function(){if(window.closeMenu)closeMenu();openInstall()}];
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;later()});
-  window.addEventListener('appinstalled',function(){dp=null;hideBar(false);window.INSTALL_MENU=null});
-  function later(){setTimeout(showBar,3500)}
-  function showBar(){
-    if(bar||standalone)return;
-    try{var d=+localStorage.getItem('inst-dismiss')||0;if(Date.now()-d<14*864e5)return}catch(e){}
-    if(!dp&&!IOS)return;
-    bar=mk('div','inst');bar.setAttribute('role','status');
-    var im=mk('img');im.src='icons/icon-192.png';im.alt='';im.width=36;im.height=36;bar.appendChild(im);
-    bar.appendChild(mk('span',null,t(T.bar)));
-    var b=mk('button',null,t(T.go));b.onclick=function(){openInstall()};bar.appendChild(b);
-    var x=mk('button','x','✕');x.setAttribute('aria-label','close');x.onclick=function(){hideBar(true)};bar.appendChild(x);
-    document.body.appendChild(bar)}
-  if(IOS)later();
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e});
+  window.addEventListener('appinstalled',function(){dp=null;hideBtn();window.INSTALL_MENU=null});
+  var tip={zh:'安装成 App',ms:'Pasang sebagai app'};
+  function addBtn(){
+    var top=document.getElementById('top'),sr=document.getElementById('srchb');
+    if(!top||document.getElementById('instb'))return;
+    var b=mk('button','ibtn',null);b.id='instb';b.setAttribute('aria-label',tip[L]||'Install as an app');b.title=tip[L]||'Install as an app';
+    b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v6m-3-3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    b.onclick=function(){openInstall()};top.insertBefore(b,sr||null)}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addBtn);else addBtn();
 })();
