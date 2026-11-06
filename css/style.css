@@ -258,7 +258,7 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .pop button:hover,.pop button:active{background:var(--bg)}.pop .dng{color:var(--danger)}
 
 /* 周视图：线格 + 分钟定位；页面只有一个滚动条，日期头吸顶 */
-.wk{display:block;--gut:38px;--cols:repeat(7,1fr)}
+.wk{display:block;--gut:42px;--cols:repeat(7,1fr)}
 .wk-h,.wk-b{display:grid;grid-template-columns:var(--gut) var(--cols)}
 .wk-h{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--card);border-bottom:2px solid var(--line)}
 .wk-d{display:flex;flex-direction:column;align-items:center;gap:0;padding:4px 0;margin:2px;border-radius:10px;min-width:0;line-height:1.2}
@@ -280,8 +280,6 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .wk-e.rp{box-shadow:inset 0 0 0 2px var(--pri2),0 1px 3px rgba(0,0,0,.1)}
 .wk-e.dn{opacity:.45;text-decoration:line-through}
 .wk-c.mini .wk-e{padding:0}.wk-c.mini .wk-e .et,.wk-c.mini .wk-e .tm2{display:none}
-.wk-now{position:absolute;left:var(--gut);right:0;height:0;border-top:2px solid #e5484d;z-index:4;pointer-events:none}
-.wk-now i{position:absolute;left:-5px;top:-6px;width:10px;height:10px;border-radius:50%;background:#e5484d}
 .vm-week .tt-main{padding-bottom:56px}
 
 /* 日视图 */
@@ -465,3 +463,23 @@ html[data-wp] .wk-h{background:color-mix(in srgb,var(--card) 92%,transparent)}
 .dw:not(.show){box-shadow:none}
 .dw-r{padding:11px 14px}
 .wp-p svg.lucide{width:26px;height:26px}
+
+/* ---- v8.3：排版修复 ---- */
+/* ＋ 按钮在页面最外层，只在“课表”页显示（app.js 的 showView 会在 body 上写 data-view） */
+body[data-view]:not([data-view="tt"]) .fab,body[data-view]:not([data-view="tt"]) .fabm{display:none!important}
+
+/* 当前时间线：整周一条淡线 + 今天这一列加粗发光 + 时间轴上的时间标签 */
+.wk-now{position:absolute;left:var(--gut);right:0;height:0;border-top:1px solid color-mix(in srgb,var(--pri) 38%,transparent);z-index:3;pointer-events:none}
+.wk-now-d{position:absolute;left:0;right:0;height:2px;margin-top:-1px;border-radius:2px;background:var(--pri);z-index:4;pointer-events:none;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--card) 70%,transparent),0 0 10px color-mix(in srgb,var(--pri) 55%,transparent)}
+.wk-now-d::before{content:"";position:absolute;left:-3px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:var(--pri);box-shadow:0 0 0 3px color-mix(in srgb,var(--pri) 28%,transparent)}
+.wk-nt{position:absolute;right:0;transform:translateY(-50%);z-index:5;padding:0 4px;border-radius:99px;background:var(--pri);color:var(--onpri);font-size:12px;font-weight:800;line-height:1.45;white-space:nowrap;pointer-events:none;font-variant-numeric:tabular-nums}
+
+/* 手绘下划线：纯 CSS。原来用 rough-notation 在页面每次变化后重画（形状随机、滚动弹窗时线不跟着走），现在是固定形状，跟着标题走 */
+#wt,.hs,.dlg h2{position:relative;padding-bottom:7px}
+#wt::after,.hs::after,.dlg h2::after{content:"";position:absolute;left:0;right:0;bottom:0;height:7px;background:var(--pri);opacity:.9;pointer-events:none;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.2C42 2.4 78 6.8 128 4.4S222 2.6 272 5.4 356 3.4 398 4.6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat;
+  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5.2C42 2.4 78 6.8 128 4.4S222 2.6 272 5.4 356 3.4 398 4.6' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/100% 100% no-repeat}
+
+/* 弹窗是纵向 flex 且有最大高度：内容超高时，文字块不许被压扁（否则文字溢出，会被下一行盖住） */
+.dlg>.msg,.dlg>h2,.dlg>h3,.dlg.ab>*{flex-shrink:0}

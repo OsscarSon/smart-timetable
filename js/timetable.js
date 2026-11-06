@@ -76,11 +76,14 @@ function drawGrid(){
   grid.appendChild(body);
   nowLine();
 }
-function nowLine(){          // 当前时间红线（只在看本周时出现）
-  var old=grid.querySelector('.wk-now');if(old)old.remove();
+function nowLine(){          // 当前时间线（只在看本周时出现）：整周一条淡线 + 今天那一列加粗发光 + 时间轴上的时间标签
+  grid.querySelectorAll('.wk-now,.wk-now-d,.wk-nt').forEach(function(e){e.remove()});
   var body=grid.querySelector('.wk-b');if(!body||curW!==thisW)return;
   var m=nowMin();if(m<H0*60||m>=H1*60)return;
-  var ln=el('div','wk-now');ln.style.top=((m-H0*60)/60*HR)+'px';ln.appendChild(el('i'));body.appendChild(ln)}
+  var y=((m-H0*60)/60*HR)+'px';
+  var ln=el('div','wk-now');ln.style.top=y;body.appendChild(ln);
+  var td=body.querySelector('.wk-c.td');if(td){var d=el('div','wk-now-d');d.style.top=y;td.appendChild(d)}
+  var g=body.querySelector('.wk-g');if(g){var t=el('span','wk-nt',tmin(m));t.style.top=y;g.appendChild(t)}}
 function wkScrollNow(){      // 周视图可见时，把页面滚到“现在”附近（只在切到周视图 / 点今天时调用）
   var b=grid.querySelector('.wk-b');if(!b||!b.offsetParent)return;
   var m=curW===thisW?nowMin():9*60,y=b.getBoundingClientRect().top+window.scrollY+(Math.max(m,H0*60)-H0*60)/60*HR-window.innerHeight*.3;

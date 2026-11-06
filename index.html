@@ -66,12 +66,6 @@
       </div>
       <div class="side-hw" id="sidehw"></div>
     </div>
-    <button class="fab" id="fab" aria-label="添加" aria-haspopup="true" aria-expanded="false">＋</button>
-    <div class="fabm" id="fabm" hidden>
-      <button id="fm0"><i>✍️</i>手动添加</button>
-      <button id="fm1"><i>✨</i>一句话 AI</button>
-      <button id="fm2"><i>📷</i>拍照导入课表</button>
-    </div>
   </section>
 
   <!-- 作业 -->
@@ -235,6 +229,15 @@
 <!-- 左侧菜单（≡） -->
 <div class="dw-mask" id="dwm"></div>
 <aside class="dw" id="dwr" aria-label="菜单" aria-hidden="true"></aside>
+
+<!-- ＋ 悬浮按钮：必须放在页面最外层（不能放进 .card）。
+     壁纸模式下 .card 有 backdrop-filter，会让里面 position:fixed 的元素改成“相对卡片定位”，按钮就会被卡片带走。 -->
+<button class="fab" id="fab" aria-label="添加" aria-haspopup="true" aria-expanded="false">＋</button>
+<div class="fabm" id="fabm" hidden>
+  <button id="fm0"><i>✍️</i>手动添加</button>
+  <button id="fm1"><i>✨</i>一句话 AI</button>
+  <button id="fm2"><i>📷</i>拍照导入课表</button>
+</div>
 
 <!-- 底部标签栏 -->
 <nav class="tabbar" aria-label="主导航"><div class="in">
@@ -402,7 +405,6 @@
 <script data-lib="lz-string" src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
 <script data-lib="lucide" src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
 <script data-lib="ical" src="https://cdn.jsdelivr.net/npm/ical.js@1.5.0/build/ical.min.js"></script>
-<script data-lib="rough" src="https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js"></script>
 <script data-lib="qrcode" src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="js/sync.js"></script>
 <script src="js/aisrc.js"></script>
@@ -439,7 +441,6 @@
 <script src="js/syscal.js"></script>
 <script src="js/search.js"></script>
 <script src="js/app.js"></script>
-<script src="js/rough.js"></script>
 <script src="js/about.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/icons.js"></script>

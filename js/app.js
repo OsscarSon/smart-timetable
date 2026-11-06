@@ -6,6 +6,7 @@ function showView(v){
   var tab=SUB[v]?'more':v;
   document.querySelectorAll('.tabbar button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===tab)});
   if(v==='sta'&&typeof drawStats==='function')drawStats();
+  document.body.setAttribute('data-view',v);          // ＋ 按钮在页面最外层，靠它只在“课表”页显示
   if(window.fabClose)fabClose();
   window.scrollTo(0,0)}
 document.querySelectorAll('.tabbar button').forEach(function(b){b.onclick=function(){showView(b.getAttribute('data-v'))}});
