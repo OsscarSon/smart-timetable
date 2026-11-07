@@ -122,6 +122,9 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 
 .fab{position:fixed;z-index:14;right:max(16px,calc((100vw - var(--appw))/2 + 16px));bottom:calc(76px + env(safe-area-inset-bottom,0px));width:54px;height:54px;border-radius:50%;border:0;background:linear-gradient(135deg,var(--pri),var(--pri3));color:var(--onpri);font-size:30px;line-height:1;cursor:pointer;box-shadow:var(--shadow)}
 .fab:active{transform:scale(.94)}
+@keyframes fabRing{0%{box-shadow:var(--shadow),0 0 0 0 rgba(255,143,77,.5)}70%,100%{box-shadow:var(--shadow),0 0 0 16px rgba(255,143,77,0)}}
+.fab.hint:not(.open){animation:fabRing 2.4s ease-out 4}   /* 只闪 4 次就停，不会一直晃 */
+@media (prefers-reduced-motion:reduce){.fab.hint{animation:none}}
 
 .seg button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;padding:4px 12px;border-radius:10px;cursor:pointer}
 .seg button.on{background:var(--pri);color:var(--onpri)}
@@ -309,9 +312,9 @@ h1,h2{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-weight:
 .fab{transition:transform .15s}.fab.open{transform:rotate(45deg)}
 
 /* 空状态 */
-.cta{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:22px 14px;background:var(--bg);border-radius:18px}
-.cta b{font-size:17px}.cta small{color:var(--soft);font-size:14px}.cta-r{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:4px}
-.cta.over{position:absolute;left:calc(var(--gut) + 8px);right:8px;top:24px;z-index:5;background:var(--card);border:2px solid var(--line);box-shadow:var(--shadow)}
+.cta{display:flex;justify-content:center;padding:48px 0 32px;color:var(--pri);pointer-events:none}   /* 只是背景插画：不挡点击 */
+.cta svg{width:min(62vw,230px);height:auto;opacity:.4;fill:none;stroke:currentColor;stroke-width:.65;stroke-linecap:round;stroke-linejoin:round}
+.cta.over{position:absolute;left:var(--gut);right:0;top:14%;z-index:1;padding:0}
 
 /* 设置：分类列表 / 二级页 */
 .se-idx{display:flex;flex-direction:column;gap:8px}

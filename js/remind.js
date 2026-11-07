@@ -29,7 +29,10 @@
     var now=pad2(new Date().getHours())+':'+pad2(new Date().getMinutes());
     var od=RM.filter(function(m){return !m.d&&+m.day===todayIdx&&m.tm&&m.tm<=now})[0];
     var ne=nearestExam(),ex=ne?'　📅 '+ne.s+'考试剩 '+ne.d+' 天':'';var hn=(typeof hwDue==='function')?hwDue():null;if(hn&&(hn.over||hn.today))ex+='　📝 作业：'+(hn.over?'逾期 '+hn.over+' 项 ':'')+(hn.today?'今天截止 '+hn.today+' 项':'');
-    var msg=(od?'⏰ 该做啦：'+od.t:(n?'📌 今天还有 '+n+' 件事要完成，加油！':'🎉 今天的事都完成啦！'))+ex;
+    // 今天根本没有任何安排（没有活动、课程、提醒）时，不说“都完成啦”：那是在夸一件没发生的事，而且下面的「今天没有安排」已经说了。
+    var had=thisEvents().filter(function(x){return x.day===todayIdx}).length+RM.filter(function(m){return +m.day===todayIdx}).length+(typeof fxBlocks==='function'?fxBlocks(thisW).filter(function(x){return x.day===todayIdx}).length:0);
+    var head=od?'⏰ 该做啦：'+od.t:(n?'📌 今天还有 '+n+' 件事要完成，加油！':(had?'🎉 今天的事都完成啦！':'')),
+        msg=head?head+ex:ex.replace(/^\s+/,'');
     var b=document.getElementById('bn');b.textContent=msg;b.title=msg}
   rf=function(){
     wl(document.getElementById('wl1'),function(x){return x.a===1});wl(document.getElementById('wl2'),function(x){return x.a===2});bnr()};

@@ -107,6 +107,7 @@ function draw(){
   refreshBlocks();wtitle();drawGrid();
   if(typeof rf==='function')rf();
   if(typeof drawDay==='function')drawDay();
+  if(typeof fabHint==='function')fabHint();
 }
 
 // ---- 新增 / 修改活动（全屏编辑页）----

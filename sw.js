@@ -1,6 +1,6 @@
 // Service Worker：让网页版能离线打开，并负责通知点击。
 // 策略：本站文件 = 先给缓存、后台更新（下次打开就是新版）；CDN 脚本 / 字体 = 缓存优先；/api/ 一律走网络，绝不缓存。
-const VER = 'mochi-v8-9-6';
+const VER = 'mochi-v8-9-11';
 const SHELL = ['./', 'index.html', 'manifest.json', 'css/style.css', 'css/mochi-life.css', 'css/buddy.css', 'css/goals.css', 'css/wrapped2.css', 'assets/study-mode.webp', 'assets/work-mode.webp', 'assets/life-mode.webp',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   ...['hook', 'config', 'install', 'lang-ui', 'lang-msg', 'lang-static', 'i18n', 'sync', 'aisrc', 'api', 'core', 'dates', 'theme', 'recur', 'srs', 'timetable', 'dayview', 'localai', 'icons', 'log', 'study', 'sport', 'sortable', 'health', 'lang-health', 'lang-onb', 'remind', 'store', 'hw',
