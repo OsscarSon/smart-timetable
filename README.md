@@ -1,4 +1,6 @@
-# 🐱 Mochi 智能时间表（v7）
+# 🐱 Mochi 智能时间表（v9.0）
+
+> **v9.0**：菜单版本号修正（以前写死成 v8.8.1，现在统一读 `js/version.js`）· 新增「给 Mochi 评分」（星星 + 大家的评分统计，需要在 Supabase 运行一次 `supabase/ratings.sql`）· 新增「常见问题与帮助」。详见 `docs/v9.0-about-rate-faq.md`。
 
 AI 整周重排 · 拍照导入课表 · 一句话 / 语音添加 · 分钟级时间 · 周视图 · 课前 / 作业提醒 · Android 桌面小组件（源码）· 可离线的 PWA。
 

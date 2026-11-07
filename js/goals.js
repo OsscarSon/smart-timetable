@@ -1,4 +1,4 @@
-// Mochi Goals · Phase 1（草稿 + 步骤 + 工作量，只存本机）。见 docs/v8.10-goals-phase1.md
+// Mochi Goals · Phase 1（草稿 + 步骤 + 工作量，只存本机）。见 docs/v8.9.5-goals-phase1.md
 // 边界：只读写 goals-* 键；唯一读取的旧数据是 mochi-st（科目 / 考试日，只读，用于“添加我的科目”）。
 // 不写日历、不碰 Undo / 云同步 / Study 排程 / Agent。文案全部在 js/lang-goals.js（en / zh / ms）。
 (function (root) {

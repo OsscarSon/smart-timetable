@@ -29,8 +29,12 @@
   function go(v){closeMenu();showView(v)}
   // 一份入口清单，≡ 菜单和底部“更多”页共用（分组：AI 与工具 / 个性化 / 课表与数据 / 关于）
   function groups(){
-    var about=[['ℹ️',(window.ABOUT_MENU||['功能介绍与开源'])[0],(window.ABOUT_MENU||['',''])[1],function(){closeMenu();openAbout()}],
-      ['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}]].concat(window.INSTALL_MENU?[window.INSTALL_MENU]:[]);
+    var rm=window.RATE_MENU||['给 Mochi 评分','喜欢 Mochi 吗？告诉我们！'],fm=window.FAQ_MENU||['常见问题与帮助','常见问题和使用技巧'];
+    // 顺序：评分 → 分享 → 常见问题 → 功能介绍与开源 →（可安装）
+    var about=[['⭐',rm[0],rm[1],function(){closeMenu();if(window.openRate)openRate()}],
+      ['💌','分享给朋友','把 Mochi 推荐给同学',function(){closeMenu();shareApp()}],
+      ['❓',fm[0],fm[1],function(){closeMenu();if(window.openFaq)openFaq()}],
+      ['ℹ️',(window.ABOUT_MENU||['功能介绍与开源'])[0],(window.ABOUT_MENU||['',''])[1],function(){closeMenu();openAbout()}]].concat(window.INSTALL_MENU?[window.INSTALL_MENU]:[]);
     return [
       ['AI 与工具',[['✨','AI 助手','一句话添加 · 拍照导入 · 整周重排',function(){closeMenu();openAI('quick')}],
         ['🤖','问问 Mochi','问日程、让 AI 帮你改（先预览，可撤销）',function(){closeMenu();if(window.openAgent)openAgent()}],
@@ -61,18 +65,20 @@
     if(navigator.share)navigator.share({title:'Mochi 时间表',text:'我在用 Mochi 排课表，超可爱～',url:u}).catch(function(){});
     else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){alert('链接已复制：'+u)},function(){prompt('复制这个链接：',u)});
     else prompt('复制这个链接：',u)}
+  // 版本号只从 js/version.js 读（以前写死成 v8.8.1，更新后菜单还是旧号）
+  function verLine(){return el('div','dw-ft','Mochi Schedule · v'+(window.MOCHI_VERSION||'?'))}
   function build(){
     dw.innerHTML='';
     var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);
     fill(dw,true);
-    dw.appendChild(el('div','dw-ft','Mochi Schedule · v8.8.1'))}
+    dw.appendChild(verLine())}
   // 「更多」页：同一份清单，不再是 4 行
   var mv=document.getElementById('v-more');
   function buildMore(){
     if(!mv)return;
     mv.innerHTML='';mv.appendChild(el('h2',null,'更多'));
-    fill(mv,true)}
+    fill(mv,true);mv.appendChild(verLine())}
   buildMore();
   function openMenu(){build();if(window.applyIcons)applyIcons(dw);dw.classList.add('show');mk.classList.add('show');dw.setAttribute('aria-hidden','false')}
   function closeMenu(){dw.classList.remove('show');mk.classList.remove('show');dw.setAttribute('aria-hidden','true')}
