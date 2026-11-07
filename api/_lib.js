@@ -30,7 +30,8 @@ function cors(req, res) {
 const tokCache = new Map();
 async function userOf(req) {
   const m = String(req.headers.authorization || '').match(/^Bearer\s+(\S+)$/i);
-  const url = process.env.SUPABASE_URL, anon = process.env.SUPABASE_ANON_KEY;
+  let url = String(process.env.SUPABASE_URL || '').trim(); try { url = new URL(url).origin; } catch (e) {}
+  const anon = String(process.env.SUPABASE_ANON_KEY || '').trim();
   if (!m || !url || !anon) return null;
   const tok = m[1], c = tokCache.get(tok);
   if (c && c.exp > Date.now()) return c.id;
