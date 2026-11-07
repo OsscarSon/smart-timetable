@@ -137,7 +137,11 @@
 
   if(!C.supabaseUrl||!C.supabaseKey){setSt('off','未配置（填 js/config.js）');return}
   if(!window.supabase||!window.supabase.createClient){setSt('off','没加载到 supabase 库（检查网络）');return}
-  SB=window.supabase.createClient(C.supabaseUrl,C.supabaseKey);
+  // 容错：网址只取 “https://xxxx.supabase.co” 这一段（有人会把 Data API 页里带 /rest/v1/ 的地址整条贴进来，
+  // 那样 Google 登录会跳到 supabase.co/rest/v1/... 并报 “No API key found in request”）；key 去掉前后空格 / 引号
+  var SBU=String(C.supabaseUrl).trim(),SBK=String(C.supabaseKey).trim().replace(/^['"]|['"]$/g,'');
+  try{SBU=new URL(SBU).origin}catch(e){}
+  SB=window.supabase.createClient(SBU,SBK);
   SB.auth.getSession().then(function(r){
     USER=(r.data&&r.data.session&&r.data.session.user)||null;
     if(USER)syncNow();else setSt('out')});

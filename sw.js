@@ -3,7 +3,7 @@
 const VER = 'mochi-v8-9-6';
 const SHELL = ['./', 'index.html', 'manifest.json', 'css/style.css', 'css/mochi-life.css', 'css/buddy.css', 'css/goals.css', 'css/wrapped2.css', 'assets/study-mode.webp', 'assets/work-mode.webp', 'assets/life-mode.webp',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
-  ...['hook', 'config', 'install', 'lang-ui', 'lang-msg', 'lang-static', 'i18n', 'sync', 'aisrc', 'api', 'core', 'dates', 'theme', 'recur', 'srs', 'timetable', 'dayview', 'localai', 'icons', 'log', 'study', 'sport', 'sortable', 'health', 'lang-health', 'remind', 'store', 'hw',
+  ...['hook', 'config', 'install', 'lang-ui', 'lang-msg', 'lang-static', 'i18n', 'sync', 'aisrc', 'api', 'core', 'dates', 'theme', 'recur', 'srs', 'timetable', 'dayview', 'localai', 'icons', 'log', 'study', 'sport', 'sortable', 'health', 'lang-health', 'lang-onb', 'remind', 'store', 'hw',
       'lessons', 'subjects', 'timepick', 'settings', 'wizard', 'holidays', 'account', 'ai', 'share', 'stats', 'notifyset', 'notify', 'native', 'syscal', 'sched', 'undo', 'agent', 'icsimport', 'search', 'about', 'app', 'menu', 'lang-new', 'wallpaper', 'langrow', 'mochi-next', 'buddy-art', 'buddy', 'lang-goals', 'goals', 'wrapped-stats', 'wrapped2'].map(n => 'js/' + n + '.js')];
 
 self.addEventListener('install', e => {

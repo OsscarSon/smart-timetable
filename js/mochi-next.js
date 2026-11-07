@@ -39,6 +39,7 @@
     });into.append(wrap);
   }
   function mountWizardChoices(box){var wrap=node('div','mn-wiz-modes');wrap.append(node('h3',null,tx('modeTitle')),node('p','mn-hint',tx('modeIntro')));makeModeCards(wrap);box.append(wrap)}
+  function afterTour(){var d=false;try{d=localStorage.getItem('onb-modes-done')==='1';localStorage.removeItem('onb-modes-done')}catch(e){}if(!d)openModes()}
   function openModes(){var m=modal('🧭 '+tx('modeTitle'));m.panel.append(node('p','mn-hint',tx('modeIntro')));makeModeCards(m.panel);m.panel.append(button(tx('saved'),function(){m.mask.remove()},'mn-primary'))}
   function applyMode(){
     var m=modes();document.body.dataset.mochiMode=m.join('-');
@@ -111,7 +112,7 @@
   function startTour(){
     if(window.driver&&window.driver.js&&typeof window.driver.js.driver==='function'){
       if(typeof showView==='function')showView('tt');
-      var obj=window.driver.js.driver({showProgress:true,allowClose:true,nextBtnText:tx('tourNext'),prevBtnText:tx('tourPrevious'),doneBtnText:tx('tourDone'),onDestroyed:function(){openModes()},steps:[
+      var obj=window.driver.js.driver({showProgress:true,allowClose:true,nextBtnText:tx('tourNext'),prevBtnText:tx('tourPrevious'),doneBtnText:tx('tourDone'),onDestroyed:function(){afterTour()},steps:[
         {element:'#top',popover:{title:tx('tourTitle'),description:tx('tourWelcome')}},
         {element:'#v-tt .tt-head',popover:{title:tx('tourSchedule'),description:tx('tourScheduleText')}},
         {element:'#fab',popover:{title:tx('tourAdd'),description:tx('tourAddText')}},
@@ -119,7 +120,7 @@
         {element:'#burger',popover:{title:tx('tourMenu'),description:tx('tourMenuText')}}]});obj.drive();
     }else{
       var m=modal('🧭 '+tx('tourFallback'));m.panel.append(node('p',null,tx('tourFallbackText')));
-      m.panel.append(node('p','mn-hint',tx('tourOffline')));m.panel.append(button(tx('tourOkay'),function(){m.mask.remove();openModes()},'mn-primary'));
+      m.panel.append(node('p','mn-hint',tx('tourOffline')));m.panel.append(button(tx('tourOkay'),function(){m.mask.remove();afterTour()},'mn-primary'));
     }
   }
   // Chrono parser: async ES module if online. No AI call or automatic calendar write.
