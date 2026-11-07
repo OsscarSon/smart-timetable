@@ -21,6 +21,15 @@ if (existsSync('js/goals.js')) {
   const en = ks('en'); for (const l of ['zh', 'ms']) if (ks(l) !== en) fail('lang-goals.js：' + l + ' 与 en 的键不一致');
   for (const m of g.matchAll(/\bt\('([A-Za-z_0-9]+)'/g)) if (!m[1].endsWith('_') && !en.split(',').includes(m[1])) fail('goals.js 用了没有翻译的键：' + m[1]);
 }
+// 版本号：js/version.js、package.json、sw.js 的缓存名必须一致；菜单等地方不许再写死版本号
+{
+  const pv = JSON.parse(readFileSync('package.json', 'utf8')).version;
+  const vj = (/MOCHI_VERSION\s*=\s*['"]([^'"]+)['"]/.exec(readFileSync('js/version.js', 'utf8')) || [])[1];
+  const sv = (/const VER = 'mochi-v([0-9-]+)'/.exec(sw) || [])[1];
+  if (vj !== pv) fail('js/version.js 的版本（' + vj + '）和 package.json（' + pv + '）不一致');
+  if (sv !== pv.replace(/\./g, '-')) fail('sw.js 的缓存名（mochi-v' + sv + '）和 package.json（' + pv + '）不一致');
+  for (const f of readdirSync('js')) if (f !== 'version.js' && f.endsWith('.js') && /Mochi Schedule · v\d|MOCHI_VERSION\s*=/.test(readFileSync('js/' + f, 'utf8'))) fail(f + ' 里写死了版本号，请读 window.MOCHI_VERSION');
+}
 if (/style="/.test(html)) fail('index.html 里还有内联 style');
 console.log(bad ? `\n${bad} 个问题` : `✓ 通过（检查了 ${files.length} 个脚本、${refs.length} 个页面引用）`);
 process.exit(bad ? 1 : 0);

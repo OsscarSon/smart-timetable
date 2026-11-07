@@ -38,3 +38,4 @@ create policy "hw-files update" on storage.objects for update to authenticated
   using (bucket_id = 'hw-files' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy "hw-files delete" on storage.objects for delete to authenticated
   using (bucket_id = 'hw-files' and (storage.foldername(name))[1] = auth.uid()::text);
+-- 评分统计（v9.0）的函数和表在 supabase/ratings.sql，单独运行即可。
