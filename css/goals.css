@@ -1,0 +1,47 @@
+/* Mochi Goals · Phase 1。只用 style.css 里已有的变量；删除这个文件和 index.html 里的引用即可回滚。 */
+.gl-mask{z-index:25}
+.gl-wrap{width:100%;height:100%;overflow-y:auto;max-width:560px;margin:0 auto;padding:0 12px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px;box-sizing:border-box;color:var(--ink)}
+.gl-top{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top,0px)) 0 8px;background:var(--bg)}
+.gl-top h2{flex:1;font-size:22px;margin:0}
+.gl-x{flex:none}
+.gl-save,.gl-primary{border:0;border-radius:999px;background:var(--pri);color:var(--onpri);font:inherit;font-weight:800;padding:12px 22px;min-height:44px;cursor:pointer}
+.gl-primary{width:100%}
+.gl-hd{padding:2px 2px 0}.gl-h1{font-size:20px;font-weight:800}.gl-sub{color:var(--soft);font-size:15px}.gl-pad{padding:0 2px}
+.gl-note{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 12px;font-size:14px;color:var(--soft)}
+.gl-local{background:var(--lemon);color:var(--ink);border-color:var(--lemon)}
+.gl-ok{background:var(--mint);color:var(--ink);border-color:var(--mint)}
+.gl-warn{color:var(--danger)}
+.gl-note.gl-warn{border-color:var(--danger)}
+.gl-chips{display:flex;flex-wrap:wrap;gap:6px}
+.gl-card{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;background:var(--card);border:2px solid var(--line);border-radius:20px;padding:12px 14px;font:inherit;color:var(--ink);cursor:pointer;min-height:44px}
+.gl-r1{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.gl-ct{font-size:16px;overflow-wrap:anywhere}
+.gl-meta{font-size:13px;color:var(--soft)}
+.gl-badge{flex:none;font-size:12px;border-radius:999px;padding:2px 9px;color:var(--ink);background:var(--sky)}
+.gl-badge.gl-study{background:var(--sky)}.gl-badge.gl-work{background:var(--peach)}.gl-badge.gl-life{background:var(--mint)}
+.gl-prog{width:100%;height:8px;accent-color:var(--pri)}
+.gl-empty{text-align:center;color:var(--soft);padding:28px 12px}
+.gl-foot{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;padding-top:6px}
+.gl-link{border:0;background:transparent;color:var(--pri-ink);font:inherit;text-decoration:underline;cursor:pointer;min-height:44px;padding:0 4px}
+.gl-chk{display:flex;align-items:center;gap:8px;font-size:14px;min-height:36px}
+.gl-chk input{width:20px;height:20px;flex:none}
+.gl-sec{background:var(--card);border-radius:20px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.gl-sec h3{margin:0;font-size:16px}
+.gl-f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.gl-fl{font-size:13px;color:var(--soft)}
+.gl-f input,.gl-f select,.gl-ta{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px;font:inherit;font-size:15px;width:100%;box-sizing:border-box;min-height:44px}
+.gl-ta{min-height:0;resize:vertical;font-size:13px}
+.gl-g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gl-g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.gl-steps{display:flex;flex-direction:column;gap:10px}
+.gl-step{border:2px solid var(--line);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.gl-step>input{border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px;font:inherit;font-size:15px;width:100%;box-sizing:border-box;min-height:44px}
+.gl-srow{display:flex;flex-wrap:wrap;gap:4px 16px}
+.gl-ops{display:flex;gap:6px;justify-content:flex-end}
+.gl-mini{width:44px;height:44px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.gl-addrow{display:flex;flex-wrap:wrap;gap:8px}
+.gl-secondary{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px 14px;font:inherit;cursor:pointer;min-height:44px}
+.gl-danger{border:0;border-radius:14px;background:var(--pink);color:var(--ink);font:inherit;padding:12px;min-height:44px;cursor:pointer}
+.gl-total{font-size:13px;color:var(--soft)}
+.gl-mask button:focus-visible,.gl-mask input:focus-visible,.gl-mask select:focus-visible,.gl-mask textarea:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+@media (max-width:360px){.gl-g3{grid-template-columns:1fr}}

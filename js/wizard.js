@@ -47,6 +47,28 @@ function showWiz(){
   wzStep();wzm.classList.add('show')}
 document.getElementById('wzn').onclick=function(){if(WZ.i===WZN){wzDone();return}WZ.i++;wzStep()};
 document.getElementById('wzp').onclick=function(){if(WZ.i>0){WZ.i--;wzStep()}};
-document.getElementById('wzk').onclick=function(){SET.wiz=true;saveSet();wzm.classList.remove('show');if(window.MochiNext)MochiNext.openModes()};
+document.getElementById('wzk').onclick=function(){SET.wiz=true;saveSet();wzm.classList.remove('show');if(window.MochiNext)MochiNext.startTour()};
 document.getElementById('wzr').onclick=showWiz;
-if(FRESH&&!SET.wiz)showWiz();
+// 第一层：登录（可跳过）。只有配置了云同步、Google 登录可用、不是手机 App、还没登录、没看过这一屏时才出现；点过一次（登录或跳过）就不再出现。
+function loginGate(next){
+  var seen=false;try{seen=localStorage.getItem('onb-login')==='1'}catch(e){}
+  var native=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+  if(seen||native||!window.cloud||!cloud.ready()||!cloud.signInGoogle||cloud.user()){next();return}
+  var I=window.LANG==='zh'?0:window.LANG==='ms'?2:1,T=function(a){return a[I]};
+  var m=el('div','mask show'),d=el('div','dlg');d.onclick=function(e){e.stopPropagation()};
+  d.appendChild(el('h2',null,T(['👋 欢迎来到 Mochi','👋 Welcome to Mochi','👋 Selamat datang ke Mochi'])));
+  var msg=el('div','msg',T(['登录后，课表、作业会在你的所有设备间同步，AI 助手也需要登录才能使用。不登录也能用，之后可以在设置里再登录。','Sign in to sync your timetable and homework across devices — the AI assistant also needs an account. You can skip this and sign in later in Settings.','Log masuk untuk segerakkan jadual dan kerja rumah merentas peranti — pembantu AI juga perlukan akaun. Anda boleh langkau dan log masuk kemudian di Tetapan.']));
+  d.appendChild(msg);
+  var done=function(){try{localStorage.setItem('onb-login','1')}catch(e){}m.remove();next()};
+  var g=el('button','gbtn',T(['使用 Google 登录','Continue with Google','Teruskan dengan Google']));g.type='button';
+  g.onclick=function(){
+    try{localStorage.setItem('onb-login','1')}catch(e){}        // 先记下：Google 登录会整页跳转，回来后不要再显示这一屏
+    g.disabled=true;msg.textContent=T(['正在跳转到 Google…','Redirecting to Google…','Mengalih ke Google…']);
+    cloud.signInGoogle().catch(function(x){
+      var s=String((x&&x.message)||x);g.disabled=false;
+      msg.textContent=/provider is not enabled|Unsupported provider/i.test(s)?T(['Google 登录还没开启，先跳过吧。','Google sign-in isn’t enabled yet — skip for now.','Log masuk Google belum diaktifkan — langkau dahulu.']):s.slice(0,100)})};
+  d.appendChild(g);
+  var sk=el('button','chip',T(['先不登录，直接使用','Skip — use without an account','Langkau — guna tanpa akaun']));sk.type='button';sk.onclick=done;
+  var row=el('div','acts');row.appendChild(sk);d.appendChild(row);
+  m.appendChild(d);document.body.appendChild(m)}
+if(FRESH&&!SET.wiz)loginGate(showWiz);

@@ -1,0 +1,50 @@
+/* Mochi Wrapped 2.0：卡片 + 导出预览。复用 .mn-overlay/.mn-modal 外壳。 */
+.w2-modal{width:min(94vw,520px)}
+.w2-body [hidden]{display:none!important}
+.w2-ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.w2-seg{display:inline-flex;border:1.5px solid var(--line,#ded9de);border-radius:99px;overflow:hidden}
+.w2-seg button{border:0;background:transparent;color:inherit;font:inherit;font-weight:700;padding:7px 16px;cursor:pointer}
+.w2-seg button.on{background:var(--pri,#ff8a4c);color:var(--onpri,#fff)}
+.w2-ctl input,.w2-ctl select{font:inherit;padding:7px 10px;border-radius:12px;border:1.5px solid var(--line,#ded9de);background:var(--card,#fff);color:inherit}
+.w2-body{display:flex;flex-direction:column;gap:12px}
+.w2-card{color:#fff;border-radius:24px;padding:22px 20px;display:flex;flex-direction:column;gap:10px;min-height:300px;box-shadow:0 8px 30px rgba(0,0,0,.18);background:linear-gradient(155deg,#2a1f5c,#c0397c)}
+.w2-c2{background:linear-gradient(155deg,#14305e,#2b86a8)}.w2-c3{background:linear-gradient(155deg,#3d1f4f,#d2534f)}.w2-c4{background:linear-gradient(155deg,#12433a,#3a9a6c)}.w2-c5{background:linear-gradient(155deg,#4a2a1a,#d9822b)}.w2-empty{background:linear-gradient(155deg,#2a2a3a,#55556a)}
+.w2-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;opacity:.9}
+.w2-card h3{margin:0;font-size:24px;line-height:1.2}
+.w2-hero{display:flex;flex-direction:column;gap:2px;margin:4px 0 6px}
+.w2-hero b{font-size:clamp(34px,10vw,52px);line-height:1.05;overflow-wrap:anywhere}
+.w2-hero span{font-size:14px;opacity:.9}
+.w2-row{display:flex;flex-direction:column;gap:4px;padding-top:6px}
+.w2-group{opacity:.95}
+.w2-rt{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.w2-l{font-weight:600;overflow-wrap:anywhere}.w2-v{font-weight:800;white-space:nowrap}
+.w2-sub{opacity:.85;font-size:13px}
+.w2-bar{display:block;height:8px;border-radius:99px;background:rgba(255,255,255,.22);overflow:hidden}
+.w2-bar u{display:block;height:100%;width:calc(var(--p,0)*100%);background:#fff;border-radius:99px;text-decoration:none}
+.w2-note{margin:6px 0 0;font-size:13px;line-height:1.45;opacity:.92}
+.w2-calc{margin-top:auto;font-size:12.5px;opacity:.95}
+.w2-calc summary{cursor:pointer;font-weight:700;padding:6px 0;list-style-position:inside}
+.w2-calc summary:focus-visible{outline:3px solid #fff;outline-offset:2px;border-radius:6px}
+.w2-calc p{margin:4px 0 0;line-height:1.5}
+.w2-nav{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.w2-arrow{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line,#ded9de);background:var(--card,#fff);color:inherit;font-size:24px;cursor:pointer;line-height:1}
+.w2-arrow:disabled{opacity:.35;cursor:default}
+.w2-dots{display:flex;gap:2px;align-items:center}
+.w2-dot{width:24px;height:24px;border:0;background:transparent;cursor:pointer;position:relative;padding:0}
+.w2-dot::after{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--soft,#9a8f96);opacity:.5}
+.w2-dot.on::after{background:var(--pri,#ff8a4c);opacity:1;inset:6px}
+.w2-link{border:0;background:transparent;color:var(--soft,#6f6269);font:inherit;font-size:13px;text-decoration:underline;cursor:pointer;align-self:center;padding:8px}
+.w2-live{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.w2-xp{display:flex;flex-direction:column;gap:12px}
+.w2-ex-t{margin:0;font-size:18px}
+.w2-prev{display:block;max-height:40dvh;max-width:100%;width:auto;margin:0 auto;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.25);background:#eee;aspect-ratio:9/16}
+.w2-err{color:#c0392b;margin:0;font-weight:600}.w2-err:empty{display:none}
+.w2-ex-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.w2-ex-row button:disabled{opacity:.5}
+@media (prefers-reduced-motion:reduce){.w2-card,.w2-bar u{transition:none!important;animation:none!important}}
+@media (max-width:390px){.w2-card{padding:18px 15px}}
+
+/* 主按钮：原 .mn-primary 在浅色主题下白字对比度偏低，在 Wrapped 弹窗里用更深的底色（≥4.5:1） */
+.w2-modal .mn-primary{background:#b84f14;color:#fff;border-color:transparent}
+.w2-modal .mn-primary:disabled{opacity:.45}
+.w2-modal .mn-primary:focus-visible,.w2-modal .mn-btn:focus-visible,.w2-arrow:focus-visible,.w2-dot:focus-visible{outline:3px solid #b84f14;outline-offset:2px}

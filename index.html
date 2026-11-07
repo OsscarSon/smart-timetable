@@ -22,6 +22,9 @@
 <link data-font="lxgw" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/lxgwwenkai-bold.css">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/mochi-life.css">
+<link rel="stylesheet" href="css/buddy.css">
+<link rel="stylesheet" href="css/wrapped2.css">
+<link rel="stylesheet" href="css/goals.css">
 <link data-vendor="driver-css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.4.0/dist/driver.css">
 </head>
 <body>
@@ -213,11 +216,11 @@
     <div class="sec" data-sec="cloud" data-t="账号与同步">
       <h3 class="hs">☁️ 账号与云同步</h3>
       <div id="cloud"></div>
-      <div class="msg" id="libs"></div>
+      <details class="oss"><summary>开源库加载状态</summary><div class="libs" id="libs"></div></details>
       <h3 class="hs">🧠 AI 来源（只对这台设备生效）</h3>
       <div class="chips" id="aisrc"></div>
-      <div class="msg" id="aikn">💡 建议填你自己的 Gemini key：这样不受作者额度影响，也不需要登录。留空也能用，只是会走作者后端的 key（额度有限，用完当天就不能用了）。</div>
-      <input id="aikey" type="password" autocomplete="off" spellcheck="false" maxlength="80" placeholder="（可选）粘贴你自己的 Gemini API key" aria-label="Gemini API key">
+      <div class="msg note" id="aikn">💡 建议填你自己的 Gemini key：这样不受作者额度影响，也不需要登录。留空也能用，只是会走作者后端的 key（额度有限，用完当天就不能用了）。</div>
+      <input id="aikey" class="ft" type="password" autocomplete="off" spellcheck="false" maxlength="80" placeholder="（可选）粘贴你自己的 Gemini API key" aria-label="Gemini API key">
       <div class="msg" id="aikm"></div>
       <div class="chips"><button class="chip" id="ailchk">🔍 检查本机 AI</button><button class="chip" id="ailwl">⬇️ 下载 WebLLM 模型</button><button class="chip" id="ailtest">▶️ 测试</button><button class="chip" id="ailauto"></button></div>
       <div class="msg" id="aiinfo"></div>
@@ -361,7 +364,7 @@
   <div class="seg wide" id="aitabs" role="tablist"><button data-t="quick" class="on" role="tab">一句话</button><button data-t="photo" role="tab">拍照课表</button><button data-t="plan" role="tab">整周重排</button></div>
   <div class="aip" data-p="quick">
     <textarea id="aiq" rows="3" maxlength="300" placeholder="说一句话就行，例如：下周三下午三点半数学补习，每周重复 / 周五前交英语作文"></textarea>
-    <div class="row wrap"><button class="chip" id="aimic">🎤 语音</button><button class="chip" id="aiask">💬 改为提问</button></div>
+    <div class="row wrap"><button class="chip" id="aimlang" type="button"></button><button class="chip" id="aimic">🎤 语音</button><button class="chip" id="aiask">💬 改为提问</button></div>
   </div>
   <div class="aip" data-p="photo" hidden>
     <div class="msg">拍一张课表或选一张截图，我来识别每一节课。识别结果会先给你核对，确认后才会写入。</div>
@@ -425,6 +428,7 @@
 <script src="js/lang-static.js"></script>
 <script src="js/lang-new.js"></script>
 <script src="js/lang-health.js"></script>
+<script src="js/lang-goals.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/wallpaper.js"></script>
 <script src="js/langrow.js"></script>
@@ -464,6 +468,8 @@
 <script src="js/timepick.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/mochi-next.js"></script>
+<script src="js/wrapped-stats.js"></script>
+<script src="js/wrapped2.js"></script>
 <script src="js/wizard.js"></script>
 <script src="js/holidays.js"></script>
 <script src="js/account.js"></script>
@@ -484,6 +490,9 @@
 <script src="js/app.js"></script>
 <script src="js/about.js"></script>
 <script src="js/menu.js"></script>
+<script src="js/goals.js"></script>
 <script src="js/icons.js"></script>
+<script src="js/buddy-art.js"></script>
+<script src="js/buddy.js"></script>
 </body>
 </html>

@@ -150,3 +150,11 @@ npx cap open android     # 用 Android Studio 运行 / 打 AAB（Build → Gener
 ## 注意
 - Key 只放 Vercel 环境变量，不要写进前端文件（Supabase 的 anon key 除外，它本来就是公开的）。
 - 后端没部署、没登录、超额或 AI 出错时，页面自动退回浏览器内置 AI，再退回本地规则。
+
+
+## Google 登录（可选，网页版）
+设置 → 账号与同步 里有「使用 Google 继续」按钮。要让它能用，站长需要在后台开启一次（不开的话，点按钮会提示“Google 登录还没在后台开启”，邮箱登录不受影响）：
+1. **Google Cloud Console** → API 和服务 → 凭据 → 创建凭据 → OAuth 客户端 ID → 应用类型选「Web 应用」。「已获授权的重定向 URI」填：`https://<你的 Supabase 项目>.supabase.co/auth/v1/callback`。
+2. **Supabase** → Authentication → Providers → Google：打开，把上一步的 Client ID 和 Client Secret 粘贴进去。
+3. **Supabase** → Authentication → URL Configuration：Site URL 和 Redirect URLs 都加上你的网站地址（如 `https://smart-timetable-kappa.vercel.app`）。
+4. **手机 App（Capacitor）里不显示 Google 按钮**：Google 不允许在内嵌 WebView 里登录，要另外做“系统浏览器 + 深度链接”回到 App，目前没做；手机 App 里用邮箱登录。

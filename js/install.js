@@ -31,7 +31,7 @@
   window.openInstall=async function(){
     if(dp){var p=dp;dp=null;try{p.prompt();var c=await p.userChoice;if(c&&c.outcome==='accepted')alert(t(T.done))}catch(e){help()}return}
     help()};
-  window.INSTALL_MENU=['📲',t(T.menu[0]),t(T.menu[1]),function(){if(window.closeMenu)closeMenu();openInstall()}];
+  window.INSTALL_MENU=['⬇️',t(T.menu[0]),t(T.menu[1]),function(){if(window.closeMenu)closeMenu();openInstall()}];
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e});
   window.addEventListener('appinstalled',function(){dp=null;hideBtn();window.INSTALL_MENU=null});
   var tip={zh:'安装成 App',ms:'Pasang sebagai app'};
@@ -39,7 +39,7 @@
     var top=document.getElementById('top'),sr=document.getElementById('srchb');
     if(!top||document.getElementById('instb'))return;
     var b=mk('button','ibtn',null);b.id='instb';b.setAttribute('aria-label',tip[L]||'Install as an app');b.title=tip[L]||'Install as an app';
-    b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8v6m-3-3h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    b.innerHTML='<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3"/><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/></svg>';   // Lucide download
     b.onclick=function(){openInstall()};top.insertBefore(b,sr||null)}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addBtn);else addBtn();
 })();

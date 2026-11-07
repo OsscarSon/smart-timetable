@@ -1,6 +1,21 @@
 // 翻译字典 1/2：页面（index.html）和菜单、设置、向导里的文字。格式：L(中文原文, 英文, 马来文)
 (function(){var A=(window.I18N=window.I18N||[]);function L(z,e,m){A.push([z,e,m])}
 L("Mochi 时间表","Mochi Timetable","Jadual Mochi");
+L("使用 Google 继续","Continue with Google","Teruskan dengan Google");
+L("或用邮箱","or use email","atau guna e-mel");
+L("开源库加载状态","Open-source library status","Status pustaka sumber terbuka");
+L("正在跳转到 Google…","Redirecting to Google…","Mengubah hala ke Google…");
+L("Google 登录还没在后台开启（站长要先在 Supabase 里打开 Google 登录）","Google sign-in isn't enabled yet (the site owner must turn it on in Supabase)","Log masuk Google belum diaktifkan (pemilik tapak perlu aktifkannya dalam Supabase)");
+L("✗ = 没加载到，对应功能自动退回基础版","✗ = didn't load; that feature falls back to the basic version","✗ = tidak dimuatkan; ciri itu kembali ke versi asas");
+L("智能（推荐）","Smart (recommended)","Pintar (disyorkan)");
+L("云端优先","Cloud first","Awan dahulu");
+L("全部优先本机","On-device first","Pada peranti dahulu");
+L("🧠 AI 来源（只对这台设备生效）","🧠 AI source (this device only)","🧠 Sumber AI (peranti ini sahaja)");
+L("（可选）粘贴你自己的 Gemini API key","(Optional) Paste your own Gemini API key","(Pilihan) Tampal kunci API Gemini anda sendiri");
+L("💡 建议填你自己的 Gemini key：这样不受作者额度影响，也不需要登录。留空也能用，只是会走作者后端的 key（额度有限，用完当天就不能用了）。","💡 We recommend adding your own Gemini key: it isn't affected by the author's quota and needs no sign-in. Leaving it empty still works, but requests use the author's backend key (limited quota — once it's used up, AI stops working for the day).","💡 Disyorkan: masukkan kunci Gemini anda sendiri — tidak terjejas oleh kuota penulis dan tidak perlu log masuk. Dibiarkan kosong pun boleh, tetapi permintaan guna kunci bahagian belakang penulis (kuota terhad — jika habis, AI tidak berfungsi untuk hari itu).");
+L("智能：一句话添加用本机 AI，整周重排用云端。本机 AI = Chrome 内置 Gemini Nano、WebLLM 小模型，电脑上还可以用 Ollama（免额度，数据不出设备；WebLLM 首次要下载约 1GB）。拍照识别只能走云端。也可以填自己的 Gemini API key（aistudio.google.com/apikey 免费申请）。","Smart: one-line add uses on-device AI, full-week rescheduling uses the cloud. On-device AI = Chrome's built-in Gemini Nano or the small WebLLM model, plus Ollama on a computer (no quota, data stays on the device; WebLLM downloads about 1 GB the first time). Photo import can only use the cloud. You can also add your own Gemini API key (free at aistudio.google.com/apikey).","Pintar: tambah satu ayat guna AI pada peranti, susun semula seminggu guna awan. AI pada peranti = Gemini Nano terbina dalam Chrome atau model kecil WebLLM, dan Ollama pada komputer (tiada kuota, data kekal pada peranti; WebLLM memuat turun kira-kira 1 GB kali pertama). Import foto hanya boleh guna awan. Anda juga boleh masukkan kunci API Gemini sendiri (percuma di aistudio.google.com/apikey).");
+L("✓ 已设置自己的 key：AI 请求会用它，不占站长额度，也不需要登录。key 只存在这台设备，不会同步；它会经过本站的后端转发给 Google，不会被保存。","✓ Your own key is set: AI requests use it, so they don't use the author's quota and don't need sign-in. The key stays on this device only and is never synced; it's relayed to Google through this site's backend and not stored.","✓ Kunci anda sendiri telah ditetapkan: permintaan AI menggunakannya, jadi tidak guna kuota penulis dan tidak perlu log masuk. Kunci hanya disimpan pada peranti ini dan tidak disegerakkan; ia dihantar ke Google melalui bahagian belakang tapak ini dan tidak disimpan.");
+L("自动下载本机模型（Wi-Fi 下，后台进行）","Auto-download on-device model (on Wi-Fi, in the background)","Muat turun model pada peranti secara automatik (guna Wi-Fi, di latar belakang)");
 L("📲 手机日历（只有手机 App）","📲 Phone calendar (phone app only)","📲 Kalendar telefon (app telefon sahaja)");
 L("📤 写入手机日历（未来 4 周）","📤 Write to phone calendar (next 4 weeks)","📤 Tulis ke kalendar telefon (4 minggu akan datang)");
 L("📥 从手机日历导入","📥 Import from phone calendar","📥 Import dari kalendar telefon");

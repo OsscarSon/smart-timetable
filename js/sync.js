@@ -119,6 +119,7 @@
     syncNow:syncNow,
     token:async function(){if(!SB)return '';try{var r=await SB.auth.getSession();return (r.data&&r.data.session&&r.data.session.access_token)||''}catch(e){return ''}},
     signIn:async function(email,pw){var r=await SB.auth.signInWithPassword({email:email,password:pw});if(r.error)throw r.error;return r.data},
+    signInGoogle:async function(){var r=await SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});if(r.error)throw r.error;return r.data},
     signUp:async function(email,pw){var r=await SB.auth.signUp({email:email,password:pw});if(r.error)throw r.error;return r.data},
     signOut:async function(clear){
       await SB.auth.signOut();USER=null;H.raw.del(UK);META={};H.raw.del(MK);

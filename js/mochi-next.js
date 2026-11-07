@@ -107,7 +107,7 @@
     c.toBlob(function(blob){if(!blob)return;var url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mochi-wrapped-'+s.ym+'.png';document.body.append(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},30000)},'image/png');
   }
   function openWrapped(){var m=modal('🎧 Mochi Wrapped'),row=node('div','mn-month-row'),input=node('input');input.type='month';input.value=monthNow();input.max=monthNow();row.append(node('label',null,tx('month')),input);m.panel.append(row);var holder=node('div');m.panel.append(holder);function r(){wrappedPanel(holder,input.value||monthNow(),true)}input.addEventListener('change',r);r();}
-  function mountWrapped(){var t=document.getElementById('mochi-wrapped-mount');if(!t)return;t.replaceChildren();var card=node('div','mn-stats-invite');card.append(node('div',null,'🎧 Mochi Wrapped'),node('p',null,tx('wrappedIntro')));card.append(button(tx('openWrapped'),openWrapped,'mn-btn'));t.append(card);}
+  function mountWrapped(){var t=document.getElementById('mochi-wrapped-mount');if(!t)return;t.replaceChildren();var card=node('div','mn-stats-invite');card.append(node('div',null,'🎧 Mochi Wrapped'),node('p',null,tx('wrappedIntro')));card.append(button(tx('openWrapped'),function(){window.MochiNext.openWrapped()},'mn-btn'));t.append(card);}
   function startTour(){
     if(window.driver&&window.driver.js&&typeof window.driver.js.driver==='function'){
       if(typeof showView==='function')showView('tt');
@@ -146,5 +146,9 @@
   }
   window.MochiNext={mode:mode,modes:modes,selectMode:selectMode,mountWizardChoices:mountWizardChoices,openModes:openModes,openEnergy:openEnergy,openWrapped:openWrapped,startTour:startTour};
   document.addEventListener('DOMContentLoaded',function(){applyMode();mountWrapped();connectChrono();});
+  // 向导走完会重载页面并留下标记：这里接上第二层——先跑 driver.js 引导，引导结束后弹出「学习 / 工作 / 生活」模式选择。
+  window.addEventListener('load',function(){
+    var f=null;try{f=localStorage.getItem('mochi-mode-after-wizard');localStorage.removeItem('mochi-mode-after-wizard')}catch(e){}
+    if(f==='1')setTimeout(startTour,800)});
   // The existing first-run wizard retains full control; tutorial can be launched from More.
 })();

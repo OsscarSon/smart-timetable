@@ -1,7 +1,7 @@
 // 🌿 健康：美容护肤打卡 + 饮食 / 饮水记录（运动在 sport.js）。数据 key：mochi-bt、mochi-di（mochi- 开头，所以自动云同步、进备份）。
 // 食物营养用开源数据库 Open Food Facts（ODbL，免 key，浏览器直接查）；查不到也可以手动输入热量。
 // AI 读取：healthSummary() 会放进「整周重排」的请求（log.js）和「问问 Mochi」的快照（sched.js）。
-var BT={am:['洁面','保湿','防晒'],pm:['卸妆','洁面','保湿'],log:{}},DI={kcal:2000,water:8,days:{}};
+var BT=({en:{am:['Cleanser','Moisturizer','Sunscreen'],pm:['Remove makeup','Cleanser','Moisturizer'],log:{}},ms:{am:['Pencuci muka','Pelembap','Pelindung matahari'],pm:['Tanggal solekan','Pencuci muka','Pelembap'],log:{}}}[window.LANG])||{am:['洁面','保湿','防晒'],pm:['卸妆','洁面','保湿'],log:{}},DI={kcal:2000,water:8,days:{}};
 try{var b0=JSON.parse(localStorage.getItem('mochi-bt')||'null');if(b0&&b0.am)BT=b0}catch(e){}
 try{var d0=JSON.parse(localStorage.getItem('mochi-di')||'null');if(d0&&d0.days)DI=d0}catch(e){}
 function btSave(){var ks=Object.keys(BT.log).sort();ks.slice(0,Math.max(0,ks.length-90)).forEach(function(k){delete BT.log[k]});put2('mochi-bt',BT)}

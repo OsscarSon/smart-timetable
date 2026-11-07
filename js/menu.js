@@ -22,6 +22,9 @@
   if(bk)bk.onclick=function(){if(curSec)setSec('');else showView('more');window.scrollTo(0,0)};
 
   function loc(en,zh,ms){return ({en:en,zh:zh,ms:ms})[window.LANG||'en']||en}
+  // Goals 入口（Phase 1）：goals.js 没加载或被关掉（Goals.setEnabled(false)）时不显示
+  function goalsMenu(){if(!(window.Goals&&Goals.enabled&&Goals.enabled()))return [];var L=(window.GOALS_I18N||{})[window.LANG||'en']||(window.GOALS_I18N||{}).en||{};
+    return [['🎯',L.title||'Goals',L.menuDesc||'',function(){closeMenu();if(window.openGoals)openGoals()}]]}
   // ---- 菜单内容 ----
   function go(v){closeMenu();showView(v)}
   // 一份入口清单，≡ 菜单和底部“更多”页共用（分组：AI 与工具 / 个性化 / 课表与数据 / 关于）
@@ -35,7 +38,7 @@
         ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}],
         ['🏃','运动计划','训练安排',function(){go('sp')}],
         ['⚡','Mochi Energy',loc('Plan around your energy','根据精力合理安排','Rancang ikut tenaga anda'),function(){closeMenu();window.MochiNext&&MochiNext.openEnergy()}],
-        ['🎧','Mochi Wrapped',loc('Your monthly schedule recap','查看每月时间回顾','Ringkasan jadual bulanan'),function(){closeMenu();window.MochiNext&&MochiNext.openWrapped()}]]],
+        ['🎧','Mochi Wrapped',loc('Your monthly schedule recap','查看每月时间回顾','Ringkasan jadual bulanan'),function(){closeMenu();window.MochiNext&&MochiNext.openWrapped()}]].concat(goalsMenu())],
       ['个人配置',[['🧭',loc('Getting started & modes','新手引导与模式','Panduan & mod'),loc('Take a tour, then choose Study / Work / Life','先看引导，再选择学习 / 工作 / 生活','Lihat panduan, kemudian pilih Belajar / Kerja / Kehidupan'),function(){closeMenu();window.MochiNext&&MochiNext.startTour()}],
         ['🎨','外观与显示','主题色、深色、视图密度',function(){openSet('look')}],
         window.wpMenuItem?window.wpMenuItem():null,

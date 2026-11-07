@@ -82,7 +82,28 @@
       var b=o.charAt(m.index-1),a=o.charAt(m.index+m[0].length);
       if(/[A-Za-z0-9]/.test(b)||/[A-Za-z0-9]/.test(a))return false}
     return true}
+  // 用户自己输入的内容（活动标题、作业、课程、提醒、饮食…）按原样显示：打中文就显示中文，打马来文就显示马来文。
+  // 这里收集“用户数据里出现过的中文文字”，和界面文字恰好相同时也不翻译（比如一个活动就叫“数学”）。
+  var UC=null,UT=0;
+  function userSet(){
+    var n=Date.now();if(UC&&n-UT<400)return UC;UT=n;var s=Object.create(null);
+    function add(v){if(typeof v==='string'&&v.length<=80&&CJK.test(v))s[v.trim()]=1}
+    function each(a,f){if(Array.isArray(a))a.forEach(function(x){if(x)f(x)})}
+    try{
+      if(typeof WK!=='undefined')Object.keys(WK).forEach(function(w){each(WK[w],function(x){add(x.t)})});
+      if(typeof FX!=='undefined')each(FX,function(x){add(x.t);add(x.room);add(x.bld);add(x.teacher)});
+      if(typeof RP!=='undefined')each(RP,function(x){add(x.t)});
+      if(typeof RM!=='undefined')each(RM,function(x){add(x.t)});
+      if(typeof HW!=='undefined')each(HW,function(x){add(x.t);add(x.sb);add(x.note)});
+      if(typeof SP!=='undefined')each(SP,function(x){add(x.n)});
+      if(typeof BT!=='undefined'){each(BT.am,add);each(BT.pm,add)}
+      if(typeof DI!=='undefined'&&DI.days)Object.keys(DI.days).forEach(function(d){each(DI.days[d].m,function(m){add(m.n)})});
+      var st=JSON.parse(localStorage.getItem('mochi-st')||'null');
+      if(st){each(st.subs,add);each(st.topics,function(x){add(x.t);add(x.n);add(x.s)})}
+    }catch(e){}
+    UC=s;return s}
   function core(t,deep){
+    if(userSet()[t]===1)return null;
     if(t in M)return M[t];
     if(t in XM)return XM[t];
     if(t in MT)return MT[t];

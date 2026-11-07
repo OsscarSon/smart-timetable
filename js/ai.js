@@ -124,7 +124,9 @@
 
   // ---- 语音：手机 App 用开源插件 @capacitor-community/speech-recognition（弹出系统语音识别窗口）；
   //      网页用浏览器自带 Web Speech API；两个都没有就隐藏按钮 ----
-  var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null,LNG={en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US';
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition,rec=null,SRL=['zh-CN','en-US','ms-MY'];
+  // 语音识别语言可以和界面语言不同：界面用英文、嘴上说中文的人很多。点 🎤 旁边的小按钮切换，记在这台设备上
+  function srLang(){var v='';try{v=localStorage.getItem('ai-sr-lang')||''}catch(e){}return SRL.indexOf(v)>=0?v:({en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US')}
   function nativeSR(){var C=window.Capacitor;if(!(C&&C.isNativePlatform&&C.isNativePlatform()))return null;
     return (C.Plugins&&C.Plugins.SpeechRecognition)||(C.registerPlugin?C.registerPlugin('SpeechRecognition'):null)}
   var NSR=nativeSR(),nbusy=false;
@@ -138,7 +140,7 @@
       if(!p||p.speechRecognition!=='granted'){say('没有麦克风权限，请在手机设置里允许');return}
       nbusy=true;mic.textContent='⏹ 停止';mic.classList.add('rec');say('在听…');
       var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
-      var r=await NSR.start({language:LNG,maxResults:1,partialResults:false,popup:true}),t=r&&r.matches&&r.matches[0]||'';
+      var r=await NSR.start({language:srLang(),maxResults:1,partialResults:false,popup:true}),t=r&&r.matches&&r.matches[0]||'';
       if(t)q.value=(base+t).slice(0,300);
     }catch(e){say('语音识别失败：'+(e&&e.message||e))}
     nbusy=false;mic.textContent='🎤 语音';mic.classList.remove('rec');
@@ -146,7 +148,7 @@
   mic.onclick=function(){
     if(NSR){nativeListen();return}
     if(rec){stopMic();return}
-    rec=new SR();rec.lang=LNG;rec.interimResults=true;rec.continuous=false;
+    rec=new SR();rec.lang=srLang();rec.interimResults=true;rec.continuous=false;
     var base=q.value?q.value.replace(/\s*$/,'')+' ':'';
     rec.onresult=function(e){var t='';for(var i=0;i<e.results.length;i++)t+=e.results[i][0].transcript;q.value=(base+t).slice(0,300)};
     rec.onend=function(){rec=null;mic.textContent='🎤 语音';mic.classList.remove('rec');if(q.value.trim()&&!S.busy)say('说完了？点「解析」。')};
@@ -154,3 +156,12 @@
     try{rec.start();mic.textContent='⏹ 停止';mic.classList.add('rec');say('在听…')}catch(e){rec=null}};
   window.openAI=openAI;
 })();
+
+// 🎤 语言小按钮：中文 → English → Melayu 循环
+(function(){
+  var b=document.getElementById('aimlang');if(!b)return;
+  var N={'zh-CN':'🎤 中文','en-US':'🎤 English','ms-MY':'🎤 Melayu'},L=['zh-CN','en-US','ms-MY'];
+  function cur(){var v='';try{v=localStorage.getItem('ai-sr-lang')||''}catch(e){}return L.indexOf(v)>=0?v:({en:'en-US',ms:'ms-MY',zh:'zh-CN'}[window.LANG]||'en-US')}
+  function paint(){b.textContent=N[cur()];b.setAttribute('aria-label','Speech language')}
+  b.onclick=function(){var n=L[(L.indexOf(cur())+1)%3];try{localStorage.setItem('ai-sr-lang',n)}catch(e){}paint()};
+  paint()})();

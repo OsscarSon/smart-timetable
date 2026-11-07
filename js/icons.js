@@ -19,6 +19,9 @@
     ['📭',['inbox']],['📄',['file-text']],['🖼',['image']],['💡',['lightbulb']],['♻',['recycle']],['ℹ',['info']],
     ['🔊',['volume-2']],['💬',['message-circle']],['👆',['pointer','mouse-pointer-click']],['👋',['hand','smile']],
     ['🐱',['cat']],['😺',['cat']],['😎',['smile']],['🤔',['circle-help','help-circle']],['😵',['frown','annoyed']],
+    ['🌿',['heart-pulse','leaf']],['🌱',['sprout','leaf']],['💧',['droplet']],['🥗',['salad','apple']],['💄',['sparkle','sparkles']],
+    ['🧭',['compass']],['⚡',['zap']],['🎧',['headphones']],['🕒',['clock']],['🎯',['target']],['💼',['briefcase']],
+    ['⬇',['download']],['▶',['play']],['⏹',['square']],['⬜',['square']],['↩',['undo-2','undo']],['✎',['pencil']],
     ['＋',['plus']],['⋯',['ellipsis']],['›',['chevron-right']],['‹',['chevron-left']]
   ];
   var MAP=Object.create(null),keys=[];

@@ -521,3 +521,58 @@ body[data-view]:not([data-view="tt"]) .fab,body[data-view]:not([data-view="tt"])
 .sort-ghost{opacity:.35}
 
 #aiinfo{white-space:pre-line}
+
+
+/* ===== v9 界面整理：账号区 / AI 来源 / 引导弹窗（Driver.js）===== */
+/* 账号与同步 */
+.acc{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.acc input{width:100%;box-sizing:border-box;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:11px 14px;font:inherit;font-size:15px}
+.acc input:focus,#aikey:focus{outline:none;border-color:var(--pri)}
+.acc .abtns{display:flex;gap:8px}
+.acc .abtns button{flex:1;min-height:44px;border-radius:14px;font:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.acc .abtns .p{border:2px solid var(--pri);background:var(--pri);color:var(--onpri)}
+.acc .abtns .s{border:2px solid var(--line);background:transparent;color:var(--ink)}
+.acc button:disabled{opacity:.55;cursor:default}
+.acc .or{display:flex;align-items:center;gap:10px;color:var(--soft);font-size:13px}
+.acc .or::before,.acc .or::after{content:"";flex:1;height:2px;background:var(--line);border-radius:2px}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:46px;padding:0 16px;border-radius:999px;border:1px solid var(--gline,#dadce0);background:var(--gbg,#fff);color:var(--gink,#1f1f1f);font:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.gbtn svg{width:20px;height:20px;flex:none}
+.gbtn:active{transform:scale(.98)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--gbg:#131314;--gink:#e3e3e3;--gline:#8e918f}}
+[data-theme="dark"]{--gbg:#131314;--gink:#e3e3e3;--gline:#8e918f}
+#cloud>.msg{margin-top:8px;line-height:1.5}
+details.oss{margin-top:14px;border:2px dashed var(--line);border-radius:14px;padding:8px 12px}
+details.oss summary{cursor:pointer;color:var(--soft);font-size:14px}
+.libs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.libs span{font-size:12px;padding:2px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--soft)}
+.libs span.no{color:var(--danger)}
+.libs .msg{flex:1 0 100%;font-size:12px}
+.sec .hs:not(:first-child){margin-top:26px}
+/* AI 来源 */
+#aisrc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#aikn.note{margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--bg);border:2px solid var(--line);color:var(--ink);font-size:14px;line-height:1.55}
+#aikey{width:100%;box-sizing:border-box;margin-top:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:11px 14px;font:inherit;font-size:15px}
+#aikm{margin-top:8px;font-size:13px;line-height:1.55}
+#aiinfo{white-space:pre-line;line-height:1.55}
+/* 引导弹窗（Driver.js 默认是白底黑字，跟主题不搭 → 跟着主题色走）。driver.css 比 style.css 晚加载，所以用 body 前缀提高优先级 */
+body .driver-popover{background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:20px;padding:16px 18px;min-width:260px;max-width:320px;box-shadow:var(--shadow),0 8px 30px rgba(0,0,0,.35)}
+body .driver-popover *{font-family:inherit}
+body .driver-popover-title{font-family:"Patrick Hand","ZCOOL KuaiLe","Nunito",sans-serif;font-size:21px;font-weight:400;color:var(--ink);line-height:1.35;padding-right:26px}
+body .driver-popover-description{font-size:15px;line-height:1.55;color:var(--soft);margin-top:4px}
+body .driver-popover-close-btn{color:var(--soft);top:8px;right:8px;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;font-size:18px}
+body .driver-popover-close-btn:hover,body .driver-popover-close-btn:focus{color:var(--ink);background:var(--bg)}
+body .driver-popover-footer{margin-top:16px}
+body .driver-popover-progress-text{font-size:13px;color:var(--soft)}
+body .driver-popover-footer button{min-height:34px;padding:0 14px;border:2px solid var(--line);border-radius:999px;background:transparent;color:var(--ink);text-shadow:none;font:inherit;font-size:14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+body .driver-popover-footer button:hover,body .driver-popover-footer button:focus{background:var(--bg)}
+body .driver-popover-footer .driver-popover-next-btn,body .driver-popover-footer .driver-popover-done-btn{background:var(--pri);border-color:var(--pri);color:var(--onpri)}
+body .driver-popover-footer .driver-popover-next-btn:hover,body .driver-popover-footer .driver-popover-done-btn:hover{background:var(--pri2);border-color:var(--pri2)}
+body .driver-popover-navigation-btns button+button{margin-left:6px}
+body .driver-popover-arrow-side-left.driver-popover-arrow{border-left-color:var(--card)}
+body .driver-popover-arrow-side-right.driver-popover-arrow{border-right-color:var(--card)}
+body .driver-popover-arrow-side-top.driver-popover-arrow{border-top-color:var(--card)}
+body .driver-popover-arrow-side-bottom.driver-popover-arrow{border-bottom-color:var(--card)}
+#aiolr:not([hidden]){display:flex;flex-direction:column;gap:8px;margin-top:10px}
+#aiolr input{width:100%;box-sizing:border-box;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:10px 14px;font:inherit;font-size:14px}
+#aiolr input:focus{outline:none;border-color:var(--pri)}
+.sec .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
