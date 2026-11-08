@@ -20,7 +20,7 @@
     if(tab===true)tab='photo';else if(!tab)tab='quick';
     q.value='';pq.value='';setTab(tab);
     m.classList.add('show');
-    if(tab==='photo')setTimeout(function(){img.click()},50);else setTimeout(function(){(tab==='plan'?pq:q).focus()},50)}
+    if(tab==='photo')setTimeout(function(){paintEng();img.click()},50);else setTimeout(function(){(tab==='plan'?pq:q).focus()},50)}
   function close(){m.classList.remove('show');stopMic()}
   m.onclick=close;document.getElementById('aix').onclick=close;
   document.getElementById('fxph').onclick=function(){openAI('photo')};
@@ -76,9 +76,31 @@
     say(notes.join(' ')||'勾选要加入的，再点「加入」。');ok.hidden=false}
 
   // ---- 拍照 ----
+  // 识别方式：☁️ AI 看图（Gemini，更准）｜🔤 本机文字识别（Tesseract.js 在浏览器里 OCR，再由文字 AI 整理；不占看图额度）
+  var eng=document.getElementById('aieng'),ocrb=document.getElementById('aiocrb'),ocrl=document.getElementById('aiocrl'),ocrBox=document.getElementById('aiocr'),ocrT=document.getElementById('aiot'),ocrG=document.getElementById('aiog'),OC={plain:'',pos:''};
+  function engPref(){var v='';try{v=localStorage.getItem('ai-photo-eng')||''}catch(e){}return v==='ocr'?'ocr':'ai'}
+  function paintEng(){[].forEach.call(eng.children,function(b){b.classList.toggle('on',b.getAttribute('data-e')===engPref())});ocrb.hidden=engPref()!=='ocr';ocrBox.hidden=true}
+  [].forEach.call(eng.children,function(b){b.onclick=function(){try{localStorage.setItem('ai-photo-eng',b.getAttribute('data-e'))}catch(e){}paintEng()}});
+  (function(){var def={zh:'chi_sim+eng',ms:'msa+eng'}[window.LANG]||'eng',v='';try{v=localStorage.getItem('ai-ocr-lang')||''}catch(e){}ocrl.value=v||def;if(ocrl.value!==(v||def))ocrl.value=def;ocrl.onchange=function(){try{localStorage.setItem('ai-ocr-lang',ocrl.value)}catch(e){}}})();
+  paintEng();
+  async function ocrFlow(f){
+    ocrBox.hidden=true;busy(true,'正在加载文字识别（第一次要下载约 10–20 MB）…');
+    try{
+      var o=await OCR.run(f,ocrl.value,function(p,st){busy(true,p>=0?'识别中 '+p+'%…':'正在准备识别（'+(st||'')+'）…')});
+      busy(false);OC=o;ocrT.value=o.plain;ocrBox.hidden=false;
+      say(o.plain.length<10?'几乎没识别到文字：换一张更清晰的图，或改用「AI 看图」。':'识别完成，请检查文字。');
+      ocrT.focus()}
+    catch(e){busy(false);say('文字识别没成功：'+(e&&e.message||e)+'（可以改用「AI 看图」）')}}
+  ocrG.onclick=async function(){
+    if(S.busy)return;var t=ocrT.value.trim();if(t.length<6){say('文字太少，没法整理。');return}
+    var send=(t===OC.plain.trim()&&OC.pos)?OC.pos:t;           // 没改过就用带位置的版本，改过就用你改的纯文字
+    ocrBox.hidden=true;busy(true,'正在整理成课表…');
+    try{var j=await post({mode:'ocr',text:send});busy(false);S.kind='photo';S.items=j.lessons||[];renderPhoto(j.notes||[])}
+    catch(e){fail(e);ocrBox.hidden=false}};
   img.onchange=async function(){
     var f=img.files&&img.files[0];img.value='';if(!f||S.busy)return;
-    busy(true,'正在压缩图片…');
+    if(engPref()==='ocr'&&window.OCR){ocrFlow(f);return}
+    ocrBox.hidden=true;busy(true,'正在压缩图片…');
     try{
       var b64=await shrink(f);busy(true,'正在识别课表（可能要 10–20 秒）…');
       var j=await post({mode:'photo',image:b64,mime:'image/jpeg'});

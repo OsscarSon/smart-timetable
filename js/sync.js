@@ -7,7 +7,7 @@
   var META={},pushing=false,syncing=false,timer=null,subs=[],changedPending=false;
   try{META=JSON.parse(localStorage.getItem(MK)||'{}')||{}}catch(e){META={}}
   function saveMeta(){try{H.raw.set(MK,JSON.stringify(META))}catch(e){}}
-  function syncKey(k){return k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0}
+  function syncKey(k){return (k.indexOf('mochi-')===0&&k.indexOf('mochi-sync')!==0)||k.indexOf('goals-g:')===0||k==='goals-links'}   // v9.5/9.6：目标本体和排程关联表参与同步；设备 id、偏好仍只在本机（见 docs/v9.6-goals-links-sync.md）
   function emit(){subs.forEach(function(f){try{f(ST)}catch(e){}})}
   function setSt(s,m){ST.state=s;ST.msg=m||'';emit()}
   function hhmm(){var n=new Date();return pad2(n.getHours())+':'+pad2(n.getMinutes())}
@@ -19,7 +19,10 @@
     var m=META[k]||{q:0};m.t=Date.now();m.q=(m.q||0)+1;m.p=1;m.d=del?1:0;META[k]=m;saveMeta();
     if(USER)later(1500)}
   if(H)H.on(touch);
-  function later(ms){clearTimeout(timer);timer=setTimeout(function(){push()},ms)}
+  // 防抖后上传。普通数据直接推；但 Goals 的数据（目标 / 排程关联）要先拉取再合并再推，否则会把别的设备刚写的内容整块盖掉。
+  function later(ms){clearTimeout(timer);timer=setTimeout(function(){
+    var g=Object.keys(META).some(function(k){return META[k].p&&(k==='goals-links'||k.indexOf('goals-g:')===0)});
+    if(g&&!syncing)syncNow();else push()},ms)}
   function localKeys(){var o=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(syncKey(k))o.push(k)}return o}
 
   async function push(){
@@ -47,8 +50,24 @@
   function label(k){      // 冲突提示里给人看的名字
     var m=k.match(/^mochi-wk:[^:]+:(-?\d+)$/);
     if(m){try{var x=dnDate(wsDn(+m[1]));return x.m+'/'+x.d+' 那一周的安排'}catch(e){return '某一周的安排'}}
+    if(k.indexOf('goals-g:')===0||k==='goals-links')return '目标（Goals）';
     var t=k.replace(/^mochi-/,'').replace(/-t[a-z0-9]+$/,'');
     return ({hw:'作业',fx:'固定课程',rp:'重复活动',rm:'提醒',st:'学习计划',sp:'运动计划',set:'设置',tts:'课表列表',dn:'完成记录',hol:'假期'})[t]||k}
+  // 目标的冲突：true = 云端版本赢，false = 本机赢，null = 读不出来（交给通用的冲突提示）。
+  // 目标自带 rev（每次保存 +1，删除也算一次保存，墓碑会赢）和 updatedAt；rev 大的赢，相同再比 updatedAt。
+  function goalConflict(rv,cur){
+    try{var r=JSON.parse(rv),l=JSON.parse(cur),rr=+r.rev||0,lr=+l.rev||0;
+      if(rr!==lr)return rr>lr;
+      var ru=String(r.updatedAt||''),lu=String(l.updatedAt||'');return ru>=lu}
+    catch(e){return null}}
+  // 关联表合并：按 id 取并集；同一 id 取 u（最后修改时间）较新的。被删 / 被改的活动对应的关联读取时会自动判为失效，所以“复活”旧记录是安全的。
+  function mergeLinks(rv,cur){
+    try{var r=JSON.parse(rv),l=JSON.parse(cur),m={},st=function(x){return +x.u||Date.parse(x.at)||0};
+      if(!r||!l||!Array.isArray(r.links)||!Array.isArray(l.links))return null;
+      l.links.concat(r.links).forEach(function(x){if(!x||!x.id)return;var o=m[x.id];if(!o||st(x)>=st(o))m[x.id]=x});
+      var out=Object.keys(m).map(function(i){return m[i]}).sort(function(a,b){return st(a)-st(b)}).slice(-3000);
+      return JSON.stringify({schemaVersion:r.schemaVersion||l.schemaVersion||1,links:out})}
+    catch(e){return null}}
   async function pull(){
     var r=await SB.from('user_data').select('key,value,deleted,updated_at');
     if(r.error)throw r.error;
@@ -71,6 +90,12 @@
             try{var mg=Object.assign({},JSON.parse(rv),JSON.parse(cur));H.raw.set(k,JSON.stringify(mg));
               META[k]={t:Date.now(),b:rt,q:(m.q||0)+1,p:1,d:0};taken[k]=1;changed++}catch(e){conflicts.push(k)}
             return}
+          else if(k==='goals-links'&&rv!==null&&cur!==null&&mergeLinks(rv,cur)!==null){   // 排程关联表：按条合并（并集），两台设备各自新增的排程都保留
+            H.raw.set(k,mergeLinks(rv,cur));META[k]={t:Date.now(),b:rt,q:(m.q||0)+1,p:1,d:0};taken[k]=1;changed++;return}
+          else if(/^goals-g:/.test(k)&&rv!==null&&cur!==null&&goalConflict(rv,cur)!==null){   // 目标：不弹窗，按版本号 rev（再按 updatedAt）自动决定谁赢
+            if(goalConflict(rv,cur))take=true;
+            else{META[k]={t:Date.now(),b:rt,q:(m.q||0)+1,p:1,d:0};return}   // 本机更新：保留，稍后推上去覆盖云端
+          }
           else{conflicts.push(k);return}              // 真冲突：稍后统一问一次
         }else take=rch;
       }
@@ -123,7 +148,7 @@
     signUp:async function(email,pw){var r=await SB.auth.signUp({email:email,password:pw});if(r.error)throw r.error;return r.data},
     signOut:async function(clear){
       await SB.auth.signOut();USER=null;H.raw.del(UK);META={};H.raw.del(MK);
-      if(clear){var ks=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0)ks.push(k)}
+      if(clear){var ks=[];for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf('mochi-')===0||k.indexOf('goals-')===0)ks.push(k)}
         ks.forEach(function(k){H.raw.del(k)});try{indexedDB.deleteDatabase('mochi-files')}catch(e){}}
       setSt('out');
     },

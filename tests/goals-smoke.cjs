@@ -33,14 +33,14 @@ const txt = (page, sel) => page.evaluate(s => { const e = document.querySelector
   // 2 打开 / 横幅 / Buddy 让位
   await page.evaluate(() => openGoals()); await page.waitForTimeout(200);
   rec('打开 Goals，标题与副标题（英文默认）', /Turn goals into time\./.test(await txt(page, '.gl-mask') || '') && /Tell Mochi what you want to achieve\./.test(await txt(page, '.gl-mask')));
-  rec('列表页明确标注仅保存在本设备、不同步', /Saved on this device only[\s\S]*not synced/.test(await txt(page, '.gl-mask')));
+  rec('列表页说明：保存在本设备，登录云同步后跟随到其他设备（v9.5 / v9.6）', /Saved on this device\. When you are signed in[\s\S]*time slots follow you/.test(await txt(page, '.gl-mask')));
   rec('Goals 打开时 Buddy 让位', await page.evaluate(() => { const e = document.querySelector('.bd'); return !e || e.classList.contains('bd-hide'); }));
   rec('空状态提示', /No goals yet/.test(await txt(page, '.gl-mask')));
   // 3 新建（模板）→ 编辑页也有横幅
   await page.click('.gl-primary'); await page.waitForTimeout(100);
   rec('模板页有 3 个模板 + 空白', (await page.$$('.gl-tpl')).length === 4);
   await page.click('text=Prepare for exams'); await page.waitForTimeout(150);
-  rec('编辑页同样标注仅本设备', /Saved on this device only/.test(await txt(page, '.gl-mask')));
+  rec('编辑页同样有同步说明', /Saved on this device\. When you are signed in/.test(await txt(page, '.gl-mask')));
   rec('模板带入 Study 空间与示例标题/步骤', await page.evaluate(() => document.querySelector('.gl-sec input').value === 'Exam revision' && document.querySelectorAll('.gl-step').length === 1));
   // 4 取消 = 零写入
   const goalsBefore = Object.keys(await keys(page, 'goals-')).length;
@@ -66,8 +66,11 @@ const txt = (page, sel) => page.evaluate(s => { const e = document.querySelector
   const saved = gk.length === 1 && JSON.parse(g1[gk[0]]);
   rec('存储：goals-g:<uuid>，含 uuid / rev=1 / updatedAt / schemaVersion / 3 步', saved && /^goals-g:[0-9a-f-]{36}$/.test(gk[0]) && saved.rev === 1 && !!saved.updatedAt && saved.schemaVersion === 1 && saved.steps.length === 3 && saved.steps[1].estimateMaxMin === 90 && saved.steps[1].assumed === true, saved ? JSON.stringify({ rev: saved.rev, n: saved.steps.length, s1: saved.steps[1], key: gk[0] }) : 'none');
   const mochi1 = await keys(page, 'mochi-');
-  rec('旧数据（mochi-*：学习、作业…）与使用 Goals 前逐字节一致', JSON.stringify(mochi0) === JSON.stringify(mochi1));
-  rec('没有写入 mochi-sync-* / 没有把 goals 键放进同步范围', Object.keys(mochi1).every(k => k.indexOf('goals') < 0) && (await page.evaluate(() => typeof window.cloud === 'undefined' || true)));
+  const noMeta = o => { const r = Object.assign({}, o); delete r['mochi-sync-meta']; return r; };
+  rec('旧数据（mochi-*：学习、作业…）与使用 Goals 前逐字节一致（v9.5：同步簿记 mochi-sync-meta 除外）', JSON.stringify(noMeta(mochi0)) === JSON.stringify(noMeta(mochi1)));
+  { const m = k => { try { return Object.keys(JSON.parse((k || {})['mochi-sync-meta'] || '{}')); } catch (e) { return ['?']; } };
+    rec('v9.5：同步簿记里新增的条目只有 goals-g:*（没有别的旧键被牵连）', m(mochi1).filter(k => m(mochi0).indexOf(k) < 0).every(k => k.indexOf('goals-g:') === 0)); }
+  rec('v9.5：只有目标本体（goals-g:*）进入同步范围；goals-meta / goals-links / goals-prefs 不会', await page.evaluate(() => { let ok = true; const bad = ['goals-meta', 'goals-links', 'goals-prefs', 'goals-plan-prefs']; try { const m = JSON.parse(localStorage.getItem('mochi-sync-meta') || '{}'); ok = !Object.keys(m).some(k => bad.indexOf(k) >= 0); } catch (e) {} return ok; }));
   // 7 刷新后仍在（离线可看已存草稿：数据全在 localStorage）
   await page.reload(); await page.waitForTimeout(1200); await page.evaluate(() => openGoals()); await page.waitForTimeout(200);
   rec('刷新后草稿仍在，进度仍为 67%', /SPM revision/.test(await txt(page, '.gl-mask')) && /67% done/.test(await txt(page, '.gl-mask')));
@@ -103,7 +106,7 @@ const txt = (page, sel) => page.evaluate(s => { const e = document.querySelector
   await ctx.close();
 
   // ---- 多语言 ----
-  for (const [lang, re] of [['zh', /把目标变成时间。[\s\S]*只保存在这台设备上/], ['ms', /Jadikan matlamat masa\.[\s\S]*Disimpan pada peranti ini sahaja/]]) {
+  for (const [lang, re] of [['zh', /把目标变成时间。[\s\S]*保存在这台设备上。登录云同步后/], ['ms', /Jadikan matlamat masa\.[\s\S]*Disimpan pada peranti ini\. Apabila anda log masuk/]]) {
     const L = await open(browser, { lang }); await L.page.evaluate(() => openGoals()); await L.page.waitForTimeout(200);
     rec(lang + '：界面与“仅本设备”提示已本地化', re.test(await txt(L.page, '.gl-mask') || ''));
     await L.page.click('.gl-primary'); await L.page.click('.gl-tpl >> nth=0'); await L.page.waitForTimeout(100);

@@ -1,12 +1,12 @@
 // Mochi Goals · Phase 1（草稿 + 步骤 + 工作量，只存本机）。见 docs/v8.9.5-goals-phase1.md
 // 边界：只读写 goals-* 键；唯一读取的旧数据是 mochi-st（科目 / 考试日，只读，用于“添加我的科目”）。
-// 不写日历、不碰 Undo / 云同步 / Study 排程 / Agent。文案全部在 js/lang-goals.js（en / zh / ms）。
+// 不写日历、不碰 Undo / 云同步 / Study 排程 / Agent。排程（Phase 2）全部在 js/goals-plan.js，这里只挂入口。文案全部在 js/lang-goals.js（en / zh / ms）。
 (function (root) {
   'use strict';
   var PFX = 'goals-g:', META = 'goals-meta', PREFS = 'goals-prefs', SCHEMA = 1;
   var SPACES = ['study', 'work', 'life'], STATUS = ['draft', 'active', 'paused', 'done', 'archived'];
   var MAXEST = 6000, MAXSTEPS = 100, MAXGOALS = 200;
-  var KNOWN = { id: 1, schemaVersion: 1, space: 1, title: 1, deadline: 1, targetFinish: 1, status: 1, steps: 1, constraints: 1, createdAt: 1, updatedAt: 1, updatedBy: 1, rev: 1, deletedAt: 1 };
+  var KNOWN = { id: 1, schemaVersion: 1, space: 1, title: 1, deadline: 1, targetFinish: 1, status: 1, steps: 1, constraints: 1, createdAt: 1, updatedAt: 1, updatedBy: 1, rev: 1, deletedAt: 1, planDevice: 1 };
 
   // ---------- 小工具 ----------
   function ls() { try { return root.localStorage || null; } catch (e) { return null; } }
@@ -56,7 +56,8 @@
       steps: (Array.isArray(raw.steps) ? raw.steps : []).slice(0, MAXSTEPS).map(normStep),
       constraints: { maxDailyMin: int(c.maxDailyMin, 30, 720, 180), sessionMin: int(c.sessionMin, 15, 180, 45), breakMin: int(c.breakMin, 0, 60, 10) },
       createdAt: str(raw.createdAt, 40) || nowIso(), updatedAt: str(raw.updatedAt, 40) || '', updatedBy: str(raw.updatedBy, 64),
-      rev: int(raw.rev, 0, 1e9, 0), deletedAt: raw.deletedAt ? str(raw.deletedAt, 40) : null
+      rev: int(raw.rev, 0, 1e9, 0), deletedAt: raw.deletedAt ? str(raw.deletedAt, 40) : null,
+      planDevice: str(raw.planDevice, 64)       // v9.5 遗留字段：v9.6 起不再使用，仅原样保留
     };
     var ids = {}; g.steps.forEach(function (s) { ids[s.id] = 1; });
     g.steps.forEach(function (s) { s.dependencies = s.dependencies.filter(function (d) { return ids[d] && d !== s.id; }); });
@@ -151,7 +152,7 @@
   function enabled() { var s = ls(), p = null; if (!s) return true; try { p = JSON.parse(s.getItem(PREFS) || 'null'); } catch (e) { p = null; } return !(p && p.on === false); }
   function setEnabled(on) { return write(PREFS, { on: !!on }); }
 
-  var core = { uuid: uuid, normGoal: normGoal, listGoals: listGoals, getGoal: getGoal, newGoal: newGoal, saveGoal: saveGoal, deleteGoal: deleteGoal, validate: validate,
+  var core = { deviceId: deviceId, uuid: uuid, normGoal: normGoal, listGoals: listGoals, getGoal: getGoal, newGoal: newGoal, saveGoal: saveGoal, deleteGoal: deleteGoal, validate: validate,
     progress: progress, stepDone: stepDone, exportAll: exportAll, importData: importData, subjectsFromStudy: subjectsFromStudy, daysLeft: daysLeft, fmtMin: fmtMin, isoOk: isoOk, SCHEMA: SCHEMA };
   root.Goals = { core: core, enabled: enabled, setEnabled: setEnabled };
   if (typeof document === 'undefined') return;       // 单元测试（Node）到此为止
@@ -178,7 +179,7 @@
     UI.prev = document.activeElement; UI.view = 'list'; UI.msg = ''; UI.err = '';
     var m = h('div', 'mask full show gl-mask'); m.setAttribute('role', 'dialog'); m.setAttribute('aria-modal', 'true'); m.setAttribute('aria-label', t('title'));
     UI.mask = m; document.body.appendChild(m);
-    UI.key = function (e) { if (e.key === 'Escape') { e.preventDefault(); goBack(); } };
+    UI.key = function (e) { if (e.key === 'Escape') { if (document.querySelector('.gl-plan')) return; e.preventDefault(); goBack(); } };
     document.addEventListener('keydown', UI.key); render();
   }
   function close() {
@@ -231,6 +232,7 @@
     c.appendChild(h('div', 'gl-meta', meta.join(' · ')));
     var p = progress(g), pr = h('progress', 'gl-prog'); pr.max = 100; pr.value = p.pct; pr.setAttribute('aria-label', t('progressLbl', { p: p.pct })); c.appendChild(pr);
     c.appendChild(h('div', 'gl-meta', t('progressLbl', { p: p.pct }) + (p.total ? ' · ' + fmtMin(p.done) + ' / ' + fmtMin(p.total) : '') + (p.missing ? ' · ' + t('needEstN', { n: p.missing }) : '')));
+    var pl = root.GoalsPlan && root.GoalsPlan.cardLine ? root.GoalsPlan.cardLine(g) : ''; if (pl) c.appendChild(h('div', 'gl-meta', pl));
     return c;
   }
 
@@ -317,6 +319,13 @@
       var i = inp('number', k[x[0]], 4); i.min = x[2]; i.max = x[3]; i.inputMode = 'numeric'; i.disabled = ro;
       i.onchange = function () { k[x[0]] = int(i.value, x[2], x[3], k[x[0]]); i.value = k[x[0]]; }; g3.appendChild(field(t(x[1]), i));
     }); s3.appendChild(g3); s3.appendChild(h('div', 'gl-meta', t('limitsNote'))); w.appendChild(s3);
+    var planBox = (!UI.isNew && !ro && root.GoalsPlan && root.GoalsPlan.section) ? root.GoalsPlan.section(g, {
+      isDirty: dirty,
+      onDone: function (note) {       // 关闭预览：没提交 → 回到编辑；提交了 → 回列表并显示结果（目标可能从草稿变成进行中，版本号已变，所以不能继续用旧草稿）
+        if (note) { UI.msg = note; UI.view = 'list'; UI.draft = null; } render();
+      }
+    }) : null;
+    if (planBox) w.appendChild(planBox);
     if (!UI.isNew) w.appendChild(btn('gl-danger', t('delete'), function () {
       if (!confirm(t('confirmDelete'))) return; var r = deleteGoal(g.id); if (!r.ok) { showErr(r.error); return; } UI.msg = t('deleted'); UI.view = 'list'; UI.draft = null; render();
     }));
