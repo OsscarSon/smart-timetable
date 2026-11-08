@@ -1,1 +1,0 @@
-v9.8.2: inverted-U wallpaper framing with quiet central opening, responsive margins; six illustrated choices first in 2 rows, No wallpaper and Use my photo below. Does not alter timetable data. Merge index.html and sw.js carefully with Phase 3 branch. Static checks pass; browser visual regression not run.
