@@ -1,7 +1,7 @@
 {
   "name": "mochi-timetable",
   "private": true,
-  "version": "9.8.0",
+  "version": "9.8.3",
   "description": "Mochi 智能时间表。网页版不需要 npm；只有打包手机 App 才用到下面的脚本。",
   "scripts": {
     "build:www": "node scripts/build-www.mjs",

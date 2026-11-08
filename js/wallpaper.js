@@ -7,7 +7,6 @@
   // Six original Mochi storybook scenes. Existing 'none' and uploaded photo are retained.
   // Legacy IDs are mapped to new scenes so previous selections still work.
   var WP=[
-    ['none','无壁纸',null,null],
     ['forest','晨光森林','url("'+new URL('assets/wp-sunlit-forest.webp',document.baseURI).href+'")','cover'],
     ['reading','森林书屋','url("'+new URL('assets/wp-reading-nook.webp',document.baseURI).href+'")','cover'],
     ['lake','湖畔日出','url("'+new URL('assets/wp-sunrise-lake.webp',document.baseURI).href+'")','cover'],
@@ -61,7 +60,10 @@
   function refresh(){
     if(!sheet)return;var box=sheet.querySelector('.wp-g');box.innerHTML='';
     WP.forEach(function(w){box.appendChild(tile(w[0],w[1],w[2]?[w[2],w[3]]:null))});
-    var u=g(KI,'');box.appendChild(tile('photo','我的照片',u?['url("'+u+'")','cover']:null));
+    var utilities=h('div','wp-utilities');
+    var noneTile=tile('none','No wallpaper',null);noneTile.classList.add('wp-utility');noneTile.querySelector('.wp-p').textContent='⊘';utilities.appendChild(noneTile);
+    var u=g(KI,'');var photoTile=tile('photo','Use my photo',u?['url("'+u+'")','cover']:null);photoTile.classList.add('wp-utility');utilities.appendChild(photoTile);
+    box.appendChild(utilities);
     sheet.querySelector('.wp-rm').hidden=!u;
     sheet.querySelector('.wp-o').hidden=cur==='none';
     sheet.querySelector('.wp-o input').value=op;

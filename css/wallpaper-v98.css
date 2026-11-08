@@ -12,3 +12,28 @@
 html[data-wp]::before{z-index:0!important;inset:0;position:fixed;pointer-events:none}
 html[data-wp] body{position:relative;z-index:1;background:transparent!important;min-height:100vh}
 html[data-wp] body::before{content:none}
+/* v9.8.3 forest frame: scene behind the existing app, transparent decoration around it.
+   No extra hamburger, sidebar, navigation or timetable UI is drawn. */
+html[data-wp]:not([data-wp="photo"])::before{
+  clip-path:none!important; background-position:center center!important;
+  opacity:var(--wp-o,1)!important;
+}
+html[data-wp]:not([data-wp="photo"])::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:2;
+  background:url("../assets/mochi-forest-frame.svg") center center/100% 100% no-repeat;
+  opacity:var(--wp-o,1);
+}
+/* Avoid covering content on compact screens: a thin top foliage strip only. */
+@media(max-width:900px){html[data-wp]:not([data-wp="photo"])::after{
+  background-size:100% 100%;opacity:calc(var(--wp-o,1)*.65);
+}}
+@media(max-width:600px){html[data-wp]:not([data-wp="photo"])::after{
+  background-size:100% 100%;opacity:calc(var(--wp-o,1)*.35);
+}}
+/* Wallpaper picker: six illustrated choices in two rows; utility actions below. */
+#mask-wp .wp-g{grid-template-columns:repeat(3,minmax(0,1fr))}
+#mask-wp .wp-t.wp-utility{min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+#mask-wp .wp-t.wp-utility .wp-p{height:28px;min-height:28px;aspect-ratio:auto;background:none!important;display:grid;place-items:center;font-size:22px}
+#mask-wp .wp-t.wp-utility small{font-size:12px}
+#mask-wp .wp-utilities{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid rgba(255,192,149,.17);padding-top:14px;margin-top:3px}
+@media(max-width:430px){#mask-wp .wp-g{gap:7px}#mask-wp .wp-utilities{gap:7px}#mask-wp .wp-t.wp-utility{min-height:66px}}
