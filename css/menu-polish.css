@@ -56,3 +56,18 @@
 #v-more .mochi-more-heading .mochi-menu-eyebrow{color:#ff9858}
 @media(max-width:640px){.mochi-menu-intro{min-height:84px;padding:13px 15px}.mochi-menu-eyebrow{font-size:9px;letter-spacing:.1em}.mochi-menu-intro p{font-size:11px;max-width:60%}#v-more .mochi-more-heading{min-height:90px;padding:12px 15px}#v-more .mochi-more-heading h2{font-size:20px}#v-more .mochi-more-heading p{font-size:11px}}
 @media(min-width:641px) and (max-width:1024px){#v-more .mochi-more-heading{min-height:98px}}
+
+/* v9.8: responsive illustrated banners; prevent content/image overlap */
+.mochi-menu-intro,#v-more .mochi-more-heading{box-sizing:border-box;overflow:hidden;background-repeat:no-repeat;background-color:#39251f}
+.mochi-menu-intro{background-image:linear-gradient(90deg,#39251f 0%,#39251f 33%,rgba(57,37,31,.76) 52%,rgba(57,37,31,0) 80%),url('../assets/mochi-banner-space.webp');background-position:center,right center;background-size:100% 100%,auto 100%}
+#v-more .mochi-more-heading{background-image:linear-gradient(90deg,#39251f 0%,#39251f 34%,rgba(57,37,31,.82) 55%,rgba(57,37,31,0) 82%),url('../assets/mochi-banner-more.webp');background-position:center,right center;background-size:100% 100%,auto 100%;position:relative}
+#v-more .mochi-more-heading>*{position:relative;z-index:2}
+#v-more .mochi-more-heading h2,#v-more .mochi-more-heading p{max-width:57%;overflow-wrap:anywhere}
+@media(max-width:640px){
+ .mochi-menu-intro{min-height:82px;max-height:104px}
+ #v-more .mochi-more-heading{min-height:88px;max-height:112px}
+ #v-more .mochi-more-heading h2,#v-more .mochi-more-heading p{max-width:58%}
+}
+@media(min-width:641px){
+ #v-more .mochi-more-heading{min-height:112px}
+}

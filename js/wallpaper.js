@@ -4,19 +4,24 @@
   var M=function(a){return 'color-mix(in srgb,var(--pri) '+a+'%,transparent)'};
   var M3=function(a){return 'color-mix(in srgb,var(--pri3) '+a+'%,transparent)'};
   var M2=function(a){return 'color-mix(in srgb,var(--pri2) '+a+'%,transparent)'};
+  // Six original Mochi storybook scenes. Existing 'none' and uploaded photo are retained.
+  // Legacy IDs are mapped to new scenes so previous selections still work.
   var WP=[
     ['none','无壁纸',null,null],
-    ['peach','蜜桃渐变','radial-gradient(60% 45% at 12% 8%,'+M(42)+',transparent 70%),radial-gradient(55% 45% at 95% 22%,'+M3(34)+',transparent 70%),radial-gradient(75% 55% at 45% 105%,'+M2(40)+',transparent 70%)','cover'],
-    ['aurora','极光渐变','linear-gradient(165deg,'+M(30)+' 0%,transparent 38%),radial-gradient(70% 40% at 80% 70%,'+M3(30)+',transparent 70%),radial-gradient(60% 40% at 10% 85%,color-mix(in srgb,var(--sky) 70%,transparent),transparent 70%)','cover'],
-    ['dots','圆点图案','radial-gradient('+M(34)+' 1.7px,transparent 2.2px)','22px 22px'],
-    ['grid','方格图案','linear-gradient('+M(16)+' 1px,transparent 1px),linear-gradient(90deg,'+M(16)+' 1px,transparent 1px)','28px 28px'],
-    ['stripes','斜纹图案','repeating-linear-gradient(135deg,'+M(15)+' 0 9px,transparent 9px 18px)','auto']
+    ['forest','晨光森林','url("assets/wp-sunlit-forest.webp")','cover'],
+    ['reading','森林书屋','url("assets/wp-reading-nook.webp")','cover'],
+    ['lake','湖畔日出','url("assets/wp-sunrise-lake.webp")','cover'],
+    ['picnic','花野野餐','url("assets/wp-picnic-meadow.webp")','cover'],
+    ['rain','雨天小屋','url("assets/wp-rainy-cabin.webp")','cover'],
+    ['moon','月夜萤火','url("assets/wp-moonlit-fireflies.webp")','cover']
   ];
+  var LEGACY={peach:'forest',aurora:'lake',dots:'picnic',grid:'reading',stripes:'moon'};
   var K='ui-wp',KO='ui-wp-o',KI='ui-wp-img';
   function g(k,d){try{var v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}}
   function s(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}}
   function del(k){try{localStorage.removeItem(k)}catch(e){}}
   var cur=g(K,'none'),op=+g(KO,'100')||100;
+  if(LEGACY[cur]){cur=LEGACY[cur];s(K,cur)}
   function h(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 
   function layer(id){
@@ -75,7 +80,7 @@
     var r=document.createElement('input');r.type='range';r.min=25;r.max=100;r.step=5;r.setAttribute('aria-label','Wallpaper strength');
     r.oninput=function(){op=+r.value;s(KO,String(op));apply()};o.appendChild(r);d.appendChild(o);
     var rm=h('button','chip wp-rm','移除照片');rm.onclick=function(){del(KI);if(cur==='photo'){cur='none';s(K,'none')}apply();refresh()};d.appendChild(rm);
-    d.appendChild(h('div','msg','图案颜色会跟着你选的主题色走；照片只保存在这台设备上，不会上传，也不参与云同步。'));
+    d.appendChild(h('div','msg','六幅 Mochi 原创森林插画可离线使用；你上传的照片只保存在本机，不会上传，也不参与云同步。'));
     d.appendChild(fi);sheet.appendChild(d);sheet.onclick=close;document.body.appendChild(sheet)}
   function open(){
     if(window.closeMenu)try{closeMenu()}catch(e){}
@@ -83,7 +88,7 @@
   function close(){if(sheet)sheet.classList.remove('show')}
   document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
   window.openWallpaper=open;
-  window.wpMenuItem=function(){return['🖼️','壁纸','图案、渐变或你自己的照片',open]};
+  window.wpMenuItem=function(){return['🖼️','壁纸','森林插画或你自己的照片',open]};
   window.mkWpRow=function(box){
     if(!box)return;box.innerHTML='';
     var b=h('button','mrow');b.setAttribute('aria-haspopup','dialog');

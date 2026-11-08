@@ -1,0 +1,9 @@
+/* Six illustrated wallpapers: only wallpaper dialog, no data/behavior changes */
+#mask-wp .wp-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#mask-wp .wp-t{min-width:0;overflow:hidden;border-radius:17px}
+#mask-wp .wp-p{aspect-ratio:4/5;background-position:center;background-size:cover;border-radius:13px;transition:transform .2s ease}
+#mask-wp .wp-t:hover .wp-p{transform:scale(1.018)}
+#mask-wp .wp-t small{display:block;white-space:normal;line-height:1.35;padding:5px 1px}
+#mask-wp .wpd{max-height:min(86dvh,790px);overflow-y:auto;overscroll-behavior:contain}
+@media(max-width:410px){#mask-wp .wp-g{gap:8px}#mask-wp .wp-t{border-radius:13px}#mask-wp .wp-p{border-radius:10px}}
+@media(prefers-reduced-motion:reduce){#mask-wp .wp-p{transition:none}}
