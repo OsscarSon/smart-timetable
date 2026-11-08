@@ -1,0 +1,16 @@
+/* Mochi Event Cards Polish — additive visual-only stylesheet for v9.7.1 */
+/* Keep original absolute positioning, event height, time geometry and handlers. */
+.wk-e{padding:2px 3px;gap:0;line-height:1.12;font-size:clamp(9px,.72vw,11px);font-weight:750;border-radius:7px;transition:filter .16s ease,box-shadow .16s ease,outline-color .16s ease;}
+.wk-e .et{font-size:inherit;line-height:inherit;min-width:0;overflow-wrap:anywhere;word-break:normal;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;line-clamp:3;white-space:normal;overflow:hidden;text-overflow:ellipsis;}
+.wk-e .tm2{font-size:clamp(9px,.67vw,10px);line-height:1.1;opacity:.77;font-weight:500;flex:0 0 auto;}
+.wk-e svg.lucide{width:11px;height:11px;vertical-align:-1px;flex-shrink:0;}
+@media (hover:hover) and (pointer:fine){.wk-e:hover{filter:brightness(1.13) saturate(1.04);box-shadow:inset 0 0 0 1px rgba(255,220,185,.34),0 2px 8px rgba(0,0,0,.15);}}
+.wk-e:focus-visible{outline:2px solid #ffad76;outline-offset:-2px;filter:brightness(1.09);}
+.wk-e[aria-selected="true"],.wk-e.is-selected{outline:2px solid #ffad76;outline-offset:-2px;}
+.wk-e.dn{opacity:.58;filter:saturate(.65);}
+.wk-e.dn .et{text-decoration:line-through;text-decoration-thickness:1px;text-decoration-color:currentColor;}
+/* Compact cards: never expand event height or cover the next time slot. */
+.wk-e[style*="height: 2"],.wk-e[style*="height:2"]{padding-block:1px;}
+@media(max-width:720px){.wk-e{font-size:10px;padding:2px 3px}.wk-e .tm2{font-size:9px}.wk-e svg.lucide{width:10px;height:10px}}
+@media(max-width:420px){.wk-e{font-size:9.5px;padding:1px 2px;border-radius:5px}.wk-e .tm2{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.wk-e{transition:none}}
