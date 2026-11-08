@@ -44,3 +44,15 @@
 #v-se .sec button:focus-visible,#v-se .se-idx button:focus-visible,#dwr button:focus-visible,#v-more button:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
 @media(max-width:380px){#dwr{padding-left:12px;padding-right:12px}#dwr .dw-r,#v-more .dw-r{padding:11px 10px}#v-se .se-idx .mrow{padding:12px}}
 @media(prefers-reduced-motion:reduce){#dwr .dw-r,#v-more .dw-r,#v-se .se-idx .mrow{transition:none}}
+
+/* Mochi illustrated banner refresh: art on right, copy remains selectable and translatable. */
+.mochi-menu-intro{min-height:94px;display:flex;flex-direction:column;justify-content:center;padding:16px 19px;background-color:#3a251e;background-image:linear-gradient(90deg,#3a251e 0%,#3a251e 42%,rgba(58,37,30,.12) 78%),url('../assets/mochi-banner-space.webp');background-repeat:no-repeat;background-position:center,right center;background-size:100% 100%,auto 100%;border:1px solid #684331;isolation:isolate}
+.mochi-menu-intro:after{content:none}
+.mochi-menu-eyebrow{color:#ff9858;position:relative;z-index:1;max-width:65%;text-shadow:0 1px 2px #2a1b17}
+.mochi-menu-intro p{color:#d9c0b0;position:relative;z-index:1;max-width:61%;font-size:12px;line-height:1.45;margin-top:7px;text-shadow:0 1px 2px #2a1b17}
+#v-more .mochi-more-heading{min-height:106px;display:flex;flex-direction:column;justify-content:center;border-radius:20px;padding:15px 18px;margin-bottom:13px;background-color:#38241e;background-image:linear-gradient(90deg,#38241e 0%,#38241e 43%,rgba(56,36,30,.12) 80%),url('../assets/mochi-banner-more.webp');background-repeat:no-repeat;background-position:center,right center;background-size:100% 100%,auto 100%;border:1px solid #644132}
+#v-more .mochi-more-heading h2{color:#fff1e6;font-size:22px;position:relative;z-index:1;max-width:65%}
+#v-more .mochi-more-heading p{color:#dec5b5;font-size:12px;position:relative;z-index:1;max-width:63%}
+#v-more .mochi-more-heading .mochi-menu-eyebrow{color:#ff9858}
+@media(max-width:640px){.mochi-menu-intro{min-height:84px;padding:13px 15px}.mochi-menu-eyebrow{font-size:9px;letter-spacing:.1em}.mochi-menu-intro p{font-size:11px;max-width:60%}#v-more .mochi-more-heading{min-height:90px;padding:12px 15px}#v-more .mochi-more-heading h2{font-size:20px}#v-more .mochi-more-heading p{font-size:11px}}
+@media(min-width:641px) and (max-width:1024px){#v-more .mochi-more-heading{min-height:98px}}
