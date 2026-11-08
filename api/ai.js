@@ -23,6 +23,15 @@ t 是科目名（不超过 12 个字，保持图片里的原文，不要加 emoj
 看不清的格子不要猜，跳过，并在 notes 说明。单双周之类的特殊标记，在 notes 里说明即可，不要拆成多条。
 输出格式：{"lessons":[{"day":0,"s":480,"e":525,"t":"数学","room":"A301","teacher":"王老师"}],"notes":["最多 4 条简短中文说明"]}`;
 
+const OCRP = `你是“Mochi”的课表整理助手。下面是 OCR 从一张课表图片里识别出来的文字，可能有错字、漏字、顺序错乱，表格的空格子也不会留空位。
+每一行的每个词前面有 [x]，表示它在图片里的水平位置（0–100，越小越靠左）：用它把单元格对齐到表头的星期列（表头行里“周一 / Mon / Isnin / 星期一”等的 x 位置就是那一天的列中心），不要只靠词的先后顺序。
+把能确定的每一节课整理出来，只输出 JSON。
+坐标：day 0=周一 … 6=周日；s、e 是开始和结束时间，用“当天 0 点起的分钟数”（如 8:00 = 480，9:45 = 585）。
+一门课连续占几节，就合并成一条。如果只有“第几节”而没有具体时间，按 8:00 开始、每节 45 分钟、课间 10 分钟推算，并在 notes 说明。
+t 是科目名（不超过 12 个字，保持原文，不要加 emoji）；room 是教室，teacher 是老师，没有就留空字符串。
+认不准的、对不上星期列的不要猜，跳过，并在 notes 说明。notes 里第一条要提醒：这是文字识别的结果，请逐项核对。
+输出格式：{"lessons":[{"day":0,"s":480,"e":525,"t":"数学","room":"A301","teacher":"王老师"}],"notes":["最多 4 条简短中文说明"]}`;
+
 const { generate, ready } = require('./_llm');
 const { guard, userKey, int, inr, str, iso, COLS } = require('./_lib');
 
@@ -39,6 +48,10 @@ module.exports = async (req, res) => {
     if (!/^image\/(jpeg|png|webp)$/.test(mime || '')) return res.status(400).json({ error: '只支持 jpg / png / webp' });
     system = PHOTO;
     img = { mime, data: image }; user = '请识别这张课表。';
+  } else if (mode === 'ocr') {
+    if (typeof text !== 'string' || text.trim().length < 6 || text.length > 8000) return res.status(400).json({ error: '识别出的文字太少或太长' });
+    system = OCRP;
+    user = '以下是 OCR 文字：\n' + text.trim();
   } else if (mode === 'quick') {
     if (typeof text !== 'string' || !text.trim() || text.length > 300) return res.status(400).json({ error: 'bad text' });
     if (!iso(today)) return res.status(400).json({ error: 'bad today' });
@@ -57,7 +70,7 @@ module.exports = async (req, res) => {
     const notes = (Array.isArray(out.notes) ? out.notes : []).slice(0, 4).map(n => str(n, 80));
 
     // 不信任模型输出：逐项校验、截断，坏的直接丢掉
-    if (mode === 'photo') {
+    if (mode === 'photo' || mode === 'ocr') {
       const lessons = (Array.isArray(out.lessons) ? out.lessons : []).slice(0, 80).map(x => ({
         day: inr(x.day, 0, 6, -1), s: inr(x.s, 0, 1439, -1), e: inr(x.e, 1, 1440, -1),
         t: str(x.t, 20), room: str(x.room, 20), teacher: str(x.teacher, 20),

@@ -21,6 +21,26 @@ if (existsSync('js/goals.js')) {
   const en = ks('en'); for (const l of ['zh', 'ms']) if (ks(l) !== en) fail('lang-goals.js：' + l + ' 与 en 的键不一致');
   for (const m of g.matchAll(/\bt\('([A-Za-z_0-9]+)'/g)) if (!m[1].endsWith('_') && !en.split(',').includes(m[1])) fail('goals.js 用了没有翻译的键：' + m[1]);
 }
+// Goals（Phase 2）边界：goals-plan.js 是目标唯一的“日程写入口”，但只能：读 Sched、写 WK（经 saveWeek）、走 Undo、写 goals-links；
+// 不得碰云同步 / 日历插件 / 固定课程 / 重复活动 / 作业 / Study 排程，也不能出现 mochi-* 键字面量；文案键三语一致。
+if (existsSync('js/goals-plan.js')) {
+  const p = readFileSync('js/goals-plan.js', 'utf8');
+  for (const m of p.matchAll(/['"`](mochi-[A-Za-z0-9:_-]*)/g)) fail('goals-plan.js 不应出现旧键字面量：' + m[1]);
+  for (const w of ['cloud.', 'put2(', 'fxSave', 'rpSave', 'hwSave', 'K_FX', 'K_RP', 'K_HW', 'syscal', 'CapacitorCalendar', 'sync.js', 'FX.', 'RP.', 'HW.', 'ST.topics']) if (p.includes(w)) fail('goals-plan.js 不应使用：' + w);
+  if (!p.includes('Undo.snap()') || !p.includes('Undo.toast(')) fail('goals-plan.js 写入日程前必须走 Undo.snap() / Undo.toast()');
+  const sandbox = {}; new Function('window', readFileSync('js/lang-goals.js', 'utf8'))(sandbox);
+  const L = sandbox.GOALS_I18N.en;
+  for (const m of p.matchAll(/\bt\('([A-Za-z_0-9]+)'/g)) if (!m[1].endsWith('_') && !(m[1] in L)) fail('goals-plan.js 用了没有翻译的键：' + m[1]);
+  for (const m of p.matchAll(/'((?:plan|opt|sug|stat|reason|note|step|exist|err|basis|pace)[A-Za-z_]+)'/g)) if (!m[1].endsWith('_') && !(m[1] in L) && !/^(planBtn|planDone)$/.test(m[1])) fail('goals-plan.js 里的字符串像翻译键但词典里没有：' + m[1]);
+}
+
+// Goals 同步边界（v9.5/9.6）：只有目标本体 goals-g:* 和排程关联表 goals-links 能进云同步；设备 id / 偏好都必须留在本机
+{
+  const sy = readFileSync('js/sync.js', 'utf8') + readFileSync('js/hook.js', 'utf8');
+  for (const k of ['goals-meta', 'goals-prefs', 'goals-plan-prefs']) if (sy.includes(k)) fail('sync.js / hook.js 不应出现本机专用的键：' + k);
+  if (!sy.includes("'goals-g:'")) fail('sync.js / hook.js 里找不到目标本体 goals-g: 的同步规则');
+  if (!sy.includes("'goals-links'") || !sy.includes('mergeLinks')) fail('sync.js 里找不到 goals-links 的同步 / 合并规则（关联表必须按条合并，不能整块覆盖）');
+}
 // 版本号：js/version.js、package.json、sw.js 的缓存名必须一致；菜单等地方不许再写死版本号
 {
   const pv = JSON.parse(readFileSync('package.json', 'utf8')).version;

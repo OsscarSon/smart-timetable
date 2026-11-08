@@ -1,4 +1,10 @@
-# 🐱 Mochi 智能时间表（v9.0）
+# 🐱 Mochi 智能时间表（v9.6）
+
+> **v9.6**：Goals 排程关联表也跨设备同步（按条合并），任何设备都能管排程。见 `docs/v9.6-goals-links-sync.md`。
+> **v9.5**：Goals（目标本体）跨设备同步；排程时段只由“排程的那台设备”管理。见 `docs/v9.5-goals-sync.md`。
+> **v9.4**：修复 Goals 排程的写入一致性（日程 + 关联表同成败），新增跟随移动 / 重新排 / 目标级撤销。见 `docs/v9.4-goals-phase2-fixes.md`。
+>
+> **v9.2**：以 v9.1.0 为底，合并 v8.9.6 的 **Goals Phase 2（把已确认的目标步骤匹配到现有空档：预览、勾选、确认、撤销）**。详见 `docs/v8.9.6-goals-phase2.md` 和 `docs/v9.2-merge.md`。
 
 > **v9.0**：菜单版本号修正（以前写死成 v8.8.1，现在统一读 `js/version.js`）· 新增「给 Mochi 评分」（星星 + 大家的评分统计，需要在 Supabase 运行一次 `supabase/ratings.sql`）· 新增「常见问题与帮助」。详见 `docs/v9.0-about-rate-faq.md`。
 

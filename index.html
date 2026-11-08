@@ -371,7 +371,16 @@
   </div>
   <div class="aip" data-p="photo" hidden>
     <div class="msg">拍一张课表或选一张截图，我来识别每一节课。识别结果会先给你核对，确认后才会写入。</div>
+    <div class="chips pt" id="aieng"><button class="chip on" type="button" data-e="ai">☁️ AI 看图（更准）</button><button class="chip" type="button" data-e="ocr">🔤 本机文字识别（免额度）</button></div>
     <label class="chip as pt">📷 拍照 / 选择课表图片<input type="file" id="aiimg" accept="image/*" hidden></label>
+    <div id="aiocrb" hidden>
+      <select class="sel" id="aiocrl" aria-label="OCR language"><option value="chi_sim+eng">中文 + English</option><option value="eng">English</option><option value="msa+eng">Bahasa Melayu + English</option><option value="chi_sim+msa+eng">中文 + Melayu + English</option></select>
+    </div>
+    <div id="aiocr" hidden>
+      <div class="msg">请检查并修正识别出的文字（错字会影响结果），没问题再点「生成课表」。图片没有上传，只有这段文字会发给 AI 整理。</div>
+      <textarea id="aiot" rows="8" maxlength="8000" spellcheck="false"></textarea>
+      <div class="row wrap"><button class="chip on" type="button" id="aiog">生成课表</button></div>
+    </div>
   </div>
   <div class="aip" data-p="plan" hidden>
     <textarea id="aipl" rows="4" maxlength="400" placeholder="这周有什么特别安排？一行一条，例如：&#10;周六下午三点和朋友打球&#10;周日早上有跑步比赛"></textarea>
@@ -434,6 +443,7 @@
 <script src="js/lang-health.js"></script>
 <script src="js/lang-goals.js"></script>
 <script src="js/lang-onb.js"></script>
+<script src="js/lang-ocr.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/wallpaper.js"></script>
 <script src="js/langrow.js"></script>
@@ -480,6 +490,7 @@
 <script src="js/account.js"></script>
 <script src="js/sched.js"></script>
 <script src="js/undo.js"></script>
+<script src="js/ocr.js"></script>
 <script src="js/ai.js"></script>
 <script src="js/agent.js"></script>
 <script src="js/icsimport.js"></script>
@@ -498,6 +509,7 @@
 <script src="js/faq.js"></script>
 <script src="js/menu.js"></script>
 <script src="js/goals.js"></script>
+<script src="js/goals-plan.js"></script>
 <script src="js/icons.js"></script>
 <script src="js/buddy-art.js"></script>
 <script src="js/buddy.js"></script>

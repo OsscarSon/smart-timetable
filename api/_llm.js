@@ -1,10 +1,14 @@
 // 统一的“文字模型”入口：按顺序尝试多家（免费额度各算各的，一家超额 / 出错就换下一家）。
-//   顺序由环境变量 LLM_ORDER 决定，默认 groq,cerebras,mistral,gemini；没填 key 的那一家自动跳过。
+//   顺序由环境变量 LLM_ORDER 决定，默认 groq,gemini,cloudflare,openrouter；没填 key 的那一家自动跳过。
+//   （cerebras、mistral 仍然支持，要用就写进 LLM_ORDER，比如 groq,gemini,cloudflare,openrouter,cerebras）
 //   看图（拍照导入课表）只走 Gemini；用户自带的 key（X-User-Key）也只走 Gemini。
-// 环境变量：GROQ_API_KEY / CEREBRAS_API_KEY / MISTRAL_API_KEY / GEMINI_API_KEY，
-//   模型名可用 GROQ_MODEL / CEREBRAS_MODEL / MISTRAL_MODEL / GEMINI_MODEL 覆盖（免费模型名常变，请以各家控制台为准）。
+// 环境变量：GROQ_API_KEY / GEMINI_API_KEY / CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN / OPENROUTER_API_KEY（以及可选的 CEREBRAS_API_KEY / MISTRAL_API_KEY），
+//   模型名可用 GROQ_MODEL / GEMINI_MODEL / CF_MODEL / OPENROUTER_MODEL / CEREBRAS_MODEL / MISTRAL_MODEL 覆盖（免费模型名常变，请以各家控制台为准）。
 const TIMEOUT = 20000;
 const OAI = {
+  // Cloudflare Workers AI 的 OpenAI 兼容接口：网址里带账号 ID，所以 url 用函数；key 用 API Token
+  cloudflare: { url: () => `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/v1/chat/completions`, key: 'CLOUDFLARE_API_TOKEN', need: ['CLOUDFLARE_ACCOUNT_ID'], model: () => process.env.CF_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast' },
+  openrouter: { url: 'https://openrouter.ai/api/v1/chat/completions', key: 'OPENROUTER_API_KEY', model: () => process.env.OPENROUTER_MODEL || 'meta-llama/llama-3.3-70b-instruct:free' },
   groq:     { url: 'https://api.groq.com/openai/v1/chat/completions', key: 'GROQ_API_KEY',     model: () => process.env.GROQ_MODEL     || 'llama-3.3-70b-versatile' },
   cerebras: { url: 'https://api.cerebras.ai/v1/chat/completions',     key: 'CEREBRAS_API_KEY', model: () => process.env.CEREBRAS_MODEL || 'llama-3.3-70b' },
   mistral:  { url: 'https://api.mistral.ai/v1/chat/completions',      key: 'MISTRAL_API_KEY',  model: () => process.env.MISTRAL_MODEL  || 'mistral-small-latest' },
@@ -14,7 +18,7 @@ const sig = () => AbortSignal.timeout(TIMEOUT);
 
 async function viaOpenAI(name, o) {
   const p = OAI[name];
-  const mk = (withFmt) => fetch(p.url, {
+  const mk = (withFmt) => fetch(typeof p.url === 'function' ? p.url() : p.url, {
     method: 'POST', signal: sig(),
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + process.env[p.key] },
     body: JSON.stringify({
@@ -58,9 +62,9 @@ function chain(o) {
   if (o.gemKey) return [{ name: 'gemini(own)', run: () => viaGemini(o.gemKey, o) }];
   const gem = process.env.GEMINI_API_KEY;
   if (o.image) return gem ? [{ name: 'gemini', run: () => viaGemini(gem, o) }] : [];
-  return (process.env.LLM_ORDER || 'groq,cerebras,mistral,gemini').split(',').map(s => s.trim()).filter(Boolean).flatMap(n => {
+  return (process.env.LLM_ORDER || 'groq,gemini,cloudflare,openrouter').split(',').map(s => s.trim()).filter(Boolean).flatMap(n => {
     if (n === 'gemini') return gem ? [{ name: n, run: () => viaGemini(gem, o) }] : [];
-    return OAI[n] && process.env[OAI[n].key] ? [{ name: n, run: () => viaOpenAI(n, o) }] : [];
+    return OAI[n] && process.env[OAI[n].key] && (OAI[n].need || []).every(k => process.env[k]) ? [{ name: n, run: () => viaOpenAI(n, o) }] : [];
   });
 }
 const ready = (o) => chain(o).length > 0;

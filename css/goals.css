@@ -45,3 +45,20 @@
 .gl-total{font-size:13px;color:var(--soft)}
 .gl-mask button:focus-visible,.gl-mask input:focus-visible,.gl-mask select:focus-visible,.gl-mask textarea:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
 @media (max-width:360px){.gl-g3{grid-template-columns:1fr}}
+
+/* ---- Phase 2：排程预览 ---- */
+.gl-plan{z-index:26}
+.gl-plan-wrap{padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+.gl-plan-sum{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.gl-kv{display:flex;flex-direction:column;gap:2px;min-width:0}.gl-kv b{font-size:17px}
+.gl-pstep{border:2px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.gl-badge.gl-ok2{background:var(--mint)}.gl-badge.gl-bad{background:var(--pink)}
+.gl-pday{border-top:2px dashed var(--line);padding-top:8px;display:flex;flex-direction:column;gap:2px}
+.gl-pday:first-of-type{border-top:0;padding-top:0}
+.gl-sess{align-items:flex-start;min-height:44px}.gl-sess span{overflow-wrap:anywhere}
+.gl-exist{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:12px;background:var(--bg);font-size:13px;color:var(--soft)}
+.gl-ex.gl-new{color:var(--ink);font-weight:800}
+.gl-bar{position:fixed;left:0;right:0;bottom:0;z-index:4;display:flex;flex-direction:column;gap:6px;max-width:560px;margin:0 auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:2px solid var(--line);box-sizing:border-box}
+.gl-primary:disabled{opacity:.5;cursor:default}
+.gl-plan details summary{cursor:pointer;min-height:36px}
+@media (prefers-reduced-motion:reduce){.gl-plan *{transition:none!important;animation:none!important}}
