@@ -7,3 +7,8 @@
 #mask-wp .wpd{max-height:min(86dvh,790px);overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:410px){#mask-wp .wp-g{gap:8px}#mask-wp .wp-t{border-radius:13px}#mask-wp .wp-p{border-radius:10px}}
 @media(prefers-reduced-motion:reduce){#mask-wp .wp-p{transition:none}}
+
+/* Wallpaper must be above root background but behind all application UI. */
+html[data-wp]::before{z-index:0!important;inset:0;position:fixed;pointer-events:none}
+html[data-wp] body{position:relative;z-index:1;background:transparent!important;min-height:100vh}
+html[data-wp] body::before{content:none}

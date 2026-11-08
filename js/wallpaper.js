@@ -8,12 +8,12 @@
   // Legacy IDs are mapped to new scenes so previous selections still work.
   var WP=[
     ['none','无壁纸',null,null],
-    ['forest','晨光森林','url("assets/wp-sunlit-forest.webp")','cover'],
-    ['reading','森林书屋','url("assets/wp-reading-nook.webp")','cover'],
-    ['lake','湖畔日出','url("assets/wp-sunrise-lake.webp")','cover'],
-    ['picnic','花野野餐','url("assets/wp-picnic-meadow.webp")','cover'],
-    ['rain','雨天小屋','url("assets/wp-rainy-cabin.webp")','cover'],
-    ['moon','月夜萤火','url("assets/wp-moonlit-fireflies.webp")','cover']
+    ['forest','晨光森林','url("'+new URL('assets/wp-sunlit-forest.webp',document.baseURI).href+'")','cover'],
+    ['reading','森林书屋','url("'+new URL('assets/wp-reading-nook.webp',document.baseURI).href+'")','cover'],
+    ['lake','湖畔日出','url("'+new URL('assets/wp-sunrise-lake.webp',document.baseURI).href+'")','cover'],
+    ['picnic','花野野餐','url("'+new URL('assets/wp-picnic-meadow.webp',document.baseURI).href+'")','cover'],
+    ['rain','雨天小屋','url("'+new URL('assets/wp-rainy-cabin.webp',document.baseURI).href+'")','cover'],
+    ['moon','月夜萤火','url("'+new URL('assets/wp-moonlit-fireflies.webp',document.baseURI).href+'")','cover']
   ];
   var LEGACY={peach:'forest',aurora:'lake',dots:'picnic',grid:'reading',stripes:'moon'};
   var K='ui-wp',KO='ui-wp-o',KI='ui-wp-img';
