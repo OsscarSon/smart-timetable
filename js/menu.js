@@ -7,7 +7,7 @@
   var bk=se.querySelector('.back');
   // ---- 设置：index → 二级页 ----
   function buildIdx(){idx.innerHTML='';SECS.forEach(function(s){
-    var b=el('button','mrow'),d=el('div');d.appendChild(el('b',null,s[2]));d.appendChild(el('small',null,s[3]));
+    var b=el('button','mrow'),d=el('div');b.type='button';b.setAttribute('aria-label',s[2]);d.appendChild(el('b',null,s[2]));d.appendChild(el('small',null,s[3]));
     b.appendChild(el('span',null,s[1]));b.appendChild(d);b.appendChild(el('i',null,'›'));b.onclick=function(){setSec(s[0]);window.scrollTo(0,0)};idx.appendChild(b)})}
   function setSec(sec){
     curSec=sec||'';var title='⚙️ 设置';
@@ -57,7 +57,7 @@
     groups().forEach(function(g){
       if(withTitles)box.appendChild(el('div','grp-t',g[0]));
       var gb=el('div','dw-g');
-      g[1].forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);
+      g[1].forEach(function(it){var b=el('button','dw-r'),i=el('i',null,it[0]),d=el('div'),t=el('b',null,it[1]);b.type='button';
         d.appendChild(t);d.appendChild(el('small',null,it[2]));b.appendChild(i);b.appendChild(d);b.appendChild(el('em','dw-ch','›'));b.onclick=it[3];gb.appendChild(b)});
       box.appendChild(gb)})}
   function shareApp(){
@@ -69,15 +69,15 @@
   function verLine(){return el('div','dw-ft','Mochi Schedule · v'+(window.MOCHI_VERSION||'?'))}
   function build(){
     dw.innerHTML='';
-    var top=el('div','dw-top'),h=el('h2',null,'菜单'),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
-    top.appendChild(h);top.appendChild(x);dw.appendChild(top);
+    var top=el('div','dw-top'),h=el('h2',null,loc('Your Mochi','你的 Mochi','Mochi Anda')),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
+    top.appendChild(h);top.appendChild(x);dw.appendChild(top);var intro=el('div','mochi-menu-intro');intro.appendChild(el('span','mochi-menu-eyebrow',loc('YOUR SPACE · YOUR PACE','你的空间 · 你的节奏','Ruang anda · Rentak anda')));intro.appendChild(el('p',null,loc('Everything you need, in one cozy place.','把需要的功能，放在温暖的小角落。','Semua yang anda perlukan, di satu tempat.')));dw.appendChild(intro);
     fill(dw,true);
     dw.appendChild(verLine())}
   // 「更多」页：同一份清单，不再是 4 行
   var mv=document.getElementById('v-more');
   function buildMore(){
     if(!mv)return;
-    mv.innerHTML='';mv.appendChild(el('h2',null,'更多'));
+    mv.innerHTML='';var mh=el('div','mochi-more-heading');mh.appendChild(el('span','mochi-menu-eyebrow',loc('EXPLORE MOCHI','探索 MOCHI','TEROKA MOCHI')));mh.appendChild(el('h2',null,loc('More for you','更多功能','Lagi untuk anda')));mh.appendChild(el('p',null,loc('A little corner for all your tools and preferences.','工具、个性化与设置，都在这里。','Alat dan tetapan anda, semuanya di sini.')));mv.appendChild(mh);
     fill(mv,true);mv.appendChild(verLine())}
   buildMore();
   function openMenu(){build();if(window.applyIcons)applyIcons(dw);dw.classList.add('show');mk.classList.add('show');dw.setAttribute('aria-hidden','false')}

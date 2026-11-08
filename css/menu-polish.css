@@ -1,0 +1,46 @@
+/* Mochi Menu & Settings polish — presentation only. No data or event logic. */
+#dwr{width:min(90vw,370px);padding:calc(18px + env(safe-area-inset-top,0px)) 18px calc(28px + env(safe-area-inset-bottom,0px));gap:14px;background:var(--bg);scrollbar-width:thin}
+#dwr .dw-top{padding:3px 2px 0;min-height:42px}
+#dwr .dw-top h2{font-size:23px;letter-spacing:-.035em;font-weight:850}
+#dwr .ed-x{border-radius:14px}
+.mochi-menu-intro{position:relative;overflow:hidden;border-radius:22px;padding:18px 19px;background:linear-gradient(125deg,color-mix(in srgb,var(--pri) 15%,var(--card)),var(--card) 72%);border:1px solid color-mix(in srgb,var(--pri) 18%,var(--line))}
+.mochi-menu-intro:after{content:'✿';position:absolute;right:12px;bottom:-19px;font-size:88px;opacity:.1;color:var(--pri);pointer-events:none}
+.mochi-menu-eyebrow{display:block;color:var(--pri-ink);font-size:10px;letter-spacing:.15em;font-weight:850;text-transform:uppercase}
+.mochi-menu-intro p{font-size:13px;line-height:1.65;color:var(--soft);margin:7px 0 0;max-width:240px}
+#dwr .grp-t,#v-more .grp-t{padding:12px 8px 4px;font-size:11px;letter-spacing:.12em;color:var(--soft);font-weight:850}
+#dwr .dw-g,#v-more .dw-g{border:1px solid color-mix(in srgb,var(--line) 75%,transparent);border-radius:21px;box-shadow:0 6px 24px rgba(85,58,42,.045);overflow:hidden}
+#dwr .dw-r,#v-more .dw-r{min-height:63px;padding:12px 14px;gap:12px;transition:background .15s,transform .15s}
+#dwr .dw-r:hover,#v-more .dw-r:hover{background:color-mix(in srgb,var(--pri) 6%,var(--card))}
+#dwr .dw-r:active,#v-more .dw-r:active{transform:scale(.99)}
+#dwr .dw-r i,#v-more .dw-r i{height:39px;width:39px;border-radius:13px;font-size:19px;background:color-mix(in srgb,var(--pri) 12%,var(--card));flex-shrink:0}
+#dwr .dw-r b,#v-more .dw-r b{font-size:14px;font-weight:750;letter-spacing:-.01em;line-height:1.35}
+#dwr .dw-r small,#v-more .dw-r small{font-size:11px;line-height:1.55;margin-top:3px}
+#dwr .dw-r+.dw-r::before,#v-more .dw-r+.dw-r::before{left:65px;right:14px;border-top:1px solid var(--line)}
+#dwr .dw-ch,#v-more .dw-ch{opacity:.65}
+#dwr .dw-ft,#v-more .dw-ft{font-size:11px;letter-spacing:.04em;padding:16px 4px 8px}
+#v-more .mochi-more-heading{padding:8px 3px 10px}
+#v-more .mochi-more-heading h2{font-size:26px;letter-spacing:-.04em;margin:7px 0 4px}
+#v-more .mochi-more-heading p{font-size:13px;color:var(--soft);margin:0;line-height:1.6}
+#v-se .mochi-settings-head{padding:6px 2px 8px}
+#v-se .mochi-settings-head h2{font-size:25px;letter-spacing:-.035em;margin:7px 0 5px}
+#v-se .mochi-settings-head p{font-size:12px;line-height:1.6;color:var(--soft);margin:0}
+#v-se.one .mochi-settings-head p{display:none}
+#v-se .se-idx{display:grid;gap:10px}
+#v-se .se-idx .mrow{width:100%;min-height:76px;border:1px solid color-mix(in srgb,var(--line) 80%,transparent);border-radius:19px;box-shadow:0 5px 20px rgba(85,58,42,.045);background:var(--card);padding:14px;gap:13px;transition:background .15s,transform .15s}
+#v-se .se-idx .mrow:hover{background:color-mix(in srgb,var(--pri) 5%,var(--card))}
+#v-se .se-idx .mrow:active{transform:scale(.99)}
+#v-se .se-idx .mrow span{width:44px;height:44px;border-radius:15px;background:color-mix(in srgb,var(--pri) 13%,var(--card));display:grid;place-items:center;font-size:21px}
+#v-se .se-idx .mrow b{font-size:15px;font-weight:800}
+#v-se .se-idx .mrow small{font-size:12px;line-height:1.5;margin-top:4px}
+#v-se .se-idx .mrow i{font-size:21px;opacity:.65}
+#v-se .sec.cur{gap:11px}
+#v-se .sec .hs{font-size:14px;letter-spacing:-.01em;margin-top:18px;padding-bottom:6px}
+#v-se .sec .hs:first-child{margin-top:4px}
+#v-se .sec .tp{border-radius:15px;padding:13px 14px;min-height:52px;gap:12px;background:var(--card);border:1px solid var(--line)}
+#v-se .sec .tp .n{line-height:1.45;font-weight:650}
+#v-se .sec .tp .n small{font-size:11px;line-height:1.55;margin-top:4px;font-weight:400}
+#v-se .sec .msg{line-height:1.65}
+#v-se .sec .chip,#v-se .sec .sel{border-radius:13px}
+#v-se .sec button:focus-visible,#v-se .se-idx button:focus-visible,#dwr button:focus-visible,#v-more button:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+@media(max-width:380px){#dwr{padding-left:12px;padding-right:12px}#dwr .dw-r,#v-more .dw-r{padding:11px 10px}#v-se .se-idx .mrow{padding:12px}}
+@media(prefers-reduced-motion:reduce){#dwr .dw-r,#v-more .dw-r,#v-se .se-idx .mrow{transition:none}}
