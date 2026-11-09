@@ -41,6 +41,26 @@ if (existsSync('js/goals-plan.js')) {
   if (!sy.includes("'goals-g:'")) fail('sync.js / hook.js 里找不到目标本体 goals-g: 的同步规则');
   if (!sy.includes("'goals-links'") || !sy.includes('mergeLinks')) fail('sync.js 里找不到 goals-links 的同步 / 合并规则（关联表必须按条合并，不能整块覆盖）');
 }
+
+// Study Space（v9.7）边界：core 是纯函数（不碰 DOM / 存储 / 写入）；界面层只能通过现有函数写数据，自己只用 studyspace-prefs 一个键；不碰云同步 / Undo / 课表 / Goals 写入；三种语言的键一致
+if (existsSync('js/study-space-core.js') && existsSync('js/study-space.js')) {
+  const c = readFileSync('js/study-space-core.js', 'utf8'), u = readFileSync('js/study-space.js', 'utf8');
+  for (const w of ['document', 'localStorage', 'sessionStorage', 'sv(', 'hwSave', 'srsRate', 'put2(', 'cloud', 'Undo', 'fetch(']) if (c.includes(w)) fail('study-space-core.js 必须是纯函数，不应使用：' + w);
+  for (const m of u.matchAll(/['"`](mochi-[A-Za-z0-9:_-]*|goals-[A-Za-z0-9:_-]*)/g)) fail('study-space.js 不应出现数据键字面量：' + m[1]);
+  for (const m of u.matchAll(/localStorage\.(?:get|set|remove)Item\(\s*([^),]+)/g)) if (m[1].trim() !== 'PK') fail('study-space.js 只允许用 studyspace-prefs（常量 PK）读写本机存储：' + m[1]);
+  if (!/var PK = 'studyspace-prefs'/.test(u)) fail("study-space.js 的偏好键必须是 'studyspace-prefs'（非 mochi-* 键，不参与云同步）");
+  for (const w of ['cloud.', 'put2(', 'saveWeek', 'fxSave', 'rpSave', 'Undo.', 'syscal', 'CapacitorCalendar', 'saveGoal', 'deleteGoal', 'GoalsPlan.commit', 'clearUpcoming', 'followMoved', 'data.push', 'localStorage.clear']) if (u.includes(w)) fail('study-space.js 不应使用：' + w);
+  const sb = { window: {} }; new Function('window', readFileSync('js/lang-study-space.js', 'utf8'))(sb.window);
+  const D = sb.window.SS_I18N, ks = l => Object.keys(D[l]).sort().join(',');
+  for (const l of ['zh', 'ms']) if (ks(l) !== ks('en')) fail('lang-study-space.js：' + l + ' 与 en 的键不一致');
+  const used = new Set([...u.matchAll(/\bt\('([A-Za-z0-9_]+)'/g)].map(m => m[1]));
+  for (const m of u.matchAll(/\btp\('([A-Za-z0-9_]+)'/g)) { used.add(m[1] + '1'); used.add(m[1] + 'N'); }
+  for (const m of u.matchAll(/'(g(?:Active|Draft|Paused|Done)|rate(?:Forgot|Fuzzy|Good))'/g)) used.add(m[1]);
+  for (const k of used) if (!(k in D.en)) fail('study-space.js 用了没有翻译的键：' + k);
+  for (const l of ['en', 'zh', 'ms']) for (const k of Object.keys(D[l])) if (!D[l][k]) fail('lang-study-space.js：' + l + '.' + k + ' 是空的');
+  const css = readFileSync('css/study-space.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/(?:^|\})\s*([^{}@]+)\{/g)) for (const sel of m[1].split(',')) { const x = sel.trim(); if (x && !/^(#v-ss|\.study-space-)/.test(x) && !/^\d+%$/.test(x)) fail('study-space.css 里有没加命名空间的选择器：' + x); }
+}
 // 版本号：js/version.js、package.json、sw.js 的缓存名必须一致；菜单等地方不许再写死版本号
 {
   const pv = JSON.parse(readFileSync('package.json', 'utf8')).version;
