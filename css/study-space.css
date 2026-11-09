@@ -204,3 +204,30 @@
  .study-space-fname{font-size:clamp(20px,5vw,26px);margin:4px 0 2px}
  .study-space-frate-b{min-height:70px}
 }
+
+/* ---- 专注复习：新手空状态（v9.8.1）。只用主题变量，深色 / 主题色自动跟随；类名全部带 fempty / fart / fpick 等前缀，不影响其它界面 ---- */
+.study-space-fempty{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,210px);gap:18px;align-items:center}
+.study-space-fempty-t{display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-width:0}
+.study-space-fpill{display:inline-flex;align-items:center;font-size:12px;font-weight:800;letter-spacing:.02em;border-radius:999px;padding:5px 12px;background:color-mix(in srgb,var(--pri) 16%,var(--card));color:var(--pri-ink);border:1px solid color-mix(in srgb,var(--pri) 30%,var(--line))}
+.study-space-fhead{font-size:clamp(21px,4.6vw,28px);line-height:1.2;letter-spacing:-.01em;overflow-wrap:anywhere}
+.study-space-fpoints{list-style:none;margin:2px 0 4px;padding:0;display:grid;gap:9px;width:100%}
+.study-space-fpoints li{display:flex;align-items:center;gap:10px;font-size:14px;line-height:1.35}
+.study-space-fpoints i{flex:0 0 auto;display:grid;place-items:center;width:28px;height:28px;border-radius:9px;font-style:normal;background:var(--ss-soft)}
+.study-space-fempty-t .study-space-actions{margin-top:6px}
+.study-space-fprimary{min-height:48px;padding:12px 22px;background:linear-gradient(110deg,color-mix(in srgb,var(--pri) 72%,#fff),var(--pri));box-shadow:0 8px 22px color-mix(in srgb,var(--pri) 26%,transparent)}
+.study-space-fart{position:relative;display:flex;align-items:center;justify-content:center;min-height:210px;border-radius:22px;overflow:hidden;background:radial-gradient(circle at 50% 46%,color-mix(in srgb,var(--pri) 24%,transparent),transparent 66%),linear-gradient(150deg,color-mix(in srgb,var(--peach) 50%,var(--card)),var(--ss-soft))}
+.study-space-fart img{width:min(160px,78%);height:auto;object-fit:contain;filter:drop-shadow(0 12px 14px rgba(60,30,20,.22))}
+.study-space-spark{position:absolute;color:var(--pri);font-size:22px;opacity:.8}
+.study-space-spark.study-space-s1{top:16px;left:18px}.study-space-spark.study-space-s2{top:46px;right:20px;font-size:18px}.study-space-spark.study-space-s3{bottom:16px;left:40px;font-size:18px}
+.study-space-fpicks{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.study-space-fpick{display:flex;align-items:center;gap:10px;text-align:left;width:100%;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;min-height:56px;min-width:0}
+.study-space-fready{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--ss-soft);border-radius:14px;padding:10px 12px}
+.study-space-fready .study-space-sub{margin:0;flex:1 1 180px}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){.study-space-fpick{transition:border-color .16s}.study-space-fpick:hover{border-color:var(--pri)}.study-space-fprimary{transition:transform .18s,filter .18s}.study-space-fprimary:hover{transform:translateY(-1px);filter:brightness(1.05)}}
+@media (max-width:700px){
+  .study-space-fempty{grid-template-columns:1fr;gap:10px}
+  .study-space-fart{display:none}                         /* 手机上顶部横幅里已经有 Buddy，不再放第二只，让主按钮留在第一屏 */
+  .study-space-fempty-t .study-space-actions{flex-direction:column;align-items:stretch;width:100%}
+  .study-space-fempty-t .study-space-btn{width:100%}
+}
+@media (max-width:360px){.study-space-fhead{font-size:20px}.study-space-fpoints li{font-size:13px}}

@@ -7,7 +7,7 @@
   var SEC = document.getElementById('v-ss'), C = window.StudySpaceCore;
   if (!SEC || !C) return;
   var PK = 'studyspace-prefs';
-  var S = { view: 'dash', subject: '', tab: 'chapters', msg: '', adding: '', focusHead: false, focusInput: false, focusSub: '', f: null };
+  var S = { view: 'dash', subject: '', tab: 'chapters', msg: '', adding: '', focusHead: false, focusInput: false, focusSub: '', focusPick: false, ret: '', f: null };
 
   // ---------- 小工具 ----------
   function lang() { return window.LANG || 'en'; }
@@ -79,8 +79,11 @@
   function addSubject(name) {
     name = String(name || '').trim().slice(0, 30); if (!name) return false;
     if (ST.subs.indexOf(name) >= 0) { S.msg = t('subjectExists'); render(); return false; }
-    ST.subs.push(name); sv(); S.adding = ''; S.msg = t('subjectAdded'); after(); return true;
+    ST.subs.push(name); sv(); S.adding = ''; S.msg = t('subjectAdded');
+    if (S.ret === 'fsubject') { S.view = 'subject'; S.subject = name; S.tab = 'chapters'; S.adding = 'chapter'; S.ret = 'focus'; S.focusInput = true; }
+    after(); return true;
   }
+  function cancelSubjectAdd() { S.adding = ''; if (S.ret === 'fsubject') S.ret = ''; render(); }
   // 删除科目：科目名单 + 该科目的章节 + 考试日；作业保留，只是去掉科目标签（不会误删作业）
   function deleteSubject(name) {
     if (!window.confirm(t('confirmDeleteSubject', { s: name }))) return false;
@@ -101,7 +104,7 @@
   function newHw(subject) { if (typeof openHw !== 'function') return; openHw(null); if (subject && typeof hwsb !== 'undefined' && hwsb) hwsb.value = subject; }
 
   // ---------- 导航 ----------
-  function go(view, subject, tab) { S.f = null; S.view = view; S.subject = subject || ''; S.tab = tab || 'chapters'; S.msg = ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
+  function go(view, subject, tab) { S.f = null; S.ret = ''; S.view = view; S.subject = subject || ''; S.tab = tab || 'chapters'; S.msg = ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
   function toTimetable() { if (typeof showView === 'function') showView('tt'); }
   function toView(v) { if (typeof showView === 'function') showView(v); }
   function toGoals() { if (window.openGoals) openGoals(); }
@@ -141,7 +144,7 @@
     var c = h('section', 'card empty'); c.appendChild(h('h3', 'h3', t('emptyTitle'))); c.appendChild(h('p', 'sub', t('emptyBody')));
     var a = h('div', 'actions'); a.appendChild(btn('btn', t('addSubject'), function () { S.adding = 'subject'; S.focusInput = true; render(); }));
     a.appendChild(btn('btn ghost', t('newHomework'), function () { newHw(''); })); a.appendChild(btn('btn ghost', t('planWeek'), function () { toView('st'); }));
-    c.appendChild(a); if (S.adding === 'subject') c.appendChild(inlineForm(t('subjectPh'), t('add'), 30, addSubject, function () { S.adding = ''; render(); })); box.appendChild(c);
+    c.appendChild(a); if (S.adding === 'subject') c.appendChild(inlineForm(t('subjectPh'), t('add'), 30, addSubject, cancelSubjectAdd)); box.appendChild(c);
   }
   function stats(box, m) {
     var w = h('div', 'stats'), st = m.stats;
@@ -199,8 +202,8 @@
   }
   function subjectsSection(box, m) {
     var c = h('section', 'sect'), head = h('div', 'head'), tt = h('div'); tt.appendChild(h('h3', 'h3', t('subjectsTitle'))); tt.appendChild(h('p', 'sub', t('subjectsSub'))); head.appendChild(tt);
-    head.appendChild(btn('link', '+ ' + t('addSubject'), function () { S.adding = S.adding === 'subject' ? '' : 'subject'; S.focusInput = true; render(); })); c.appendChild(head);
-    if (S.adding === 'subject') c.appendChild(inlineForm(t('subjectPh'), t('add'), 30, addSubject, function () { S.adding = ''; render(); }));
+    head.appendChild(btn('link', '+ ' + t('addSubject'), function () { if (S.adding === 'subject') { cancelSubjectAdd(); return; } S.adding = 'subject'; S.focusInput = true; render(); })); c.appendChild(head);
+    if (S.adding === 'subject') c.appendChild(inlineForm(t('subjectPh'), t('add'), 30, addSubject, cancelSubjectAdd));
     var g = h('div', 'grid'); m.subjects.forEach(function (s) { g.appendChild(subjectCard(s)); }); c.appendChild(g); box.appendChild(c);
   }
   function dash(box, m) {
@@ -226,6 +229,9 @@
     var cols = h('div', 'cols'), c = h('section', 'card'), head = h('div', 'head');
     head.appendChild(h('h3', 'h3', t('tabChapters'))); head.appendChild(btn('link', '+ ' + t('addChapter'), function () { S.adding = S.adding === 'chapter' ? '' : 'chapter'; S.focusInput = true; render(); })); c.appendChild(head);
     if (S.adding === 'chapter') c.appendChild(inlineForm(t('chapterPh'), t('add'), 20, function (v) { return addChapter(s.name, v); }, function () { S.adding = ''; render(); }));
+    if (S.ret === 'focus' && s.chapters.total > 0) {                                      // 从专注复习空状态来、并且已经有章节了：给一个明确的回去入口
+      var rc = h('div', 'fready'); var rp = h('p', 'sub', t('fReadyHint')); rp.setAttribute('role', 'status'); rc.appendChild(rp); rc.appendChild(btn('btn', t('fOpenFocus'), openFocus)); c.appendChild(rc);
+    }
     if (!s.chapters.list.length) c.appendChild(h('p', 'sub pad', t('chaptersNone')));
     else { var l = h('div', 'list'); s.chapters.list.forEach(function (ch) {
       var row = h('div', 'row static'), body = h('div', 'row-t'), st;
@@ -271,7 +277,7 @@
   function subject(box, m) {
     var s = m.subjects.filter(function (x) { return x.name === S.subject; })[0];
     if (!s) { S.view = 'dash'; dash(box, m); return; }
-    box.appendChild(btn('back', '‹ ' + t('backDash'), function () { go('dash'); }));
+    box.appendChild(S.ret === 'focus' ? btn('back', '‹ ' + t('fBackFocus'), openFocus) : btn('back', '‹ ' + t('backDash'), function () { go('dash'); }));
     var hd = h('section', 'hero sub-hero'), tx = h('div', 'hero-t'); hd.appendChild(tile((Array.from(s.name)[0] || '?').toUpperCase(), s.color || 'peach'));
     tx.appendChild(h('div', 'eyebrow', t('yourSubject'))); tx.appendChild(heading('h2', s.name));
     var bits = []; if (s.exam) bits.push(tp('examIn', s.exam.days)); bits.push(tp('chapters', s.chapters.total)); if (s.hw.open) bits.push(tp('hwOpen', s.hw.open)); tx.appendChild(h('p', 'sub', bits.join(' · '))); hd.appendChild(tx); box.appendChild(hd);
@@ -290,7 +296,7 @@
   // 队列 = 所选科目里“该复习（due）”或“还没学过（fresh）”的章节（和复习队列里能评分的章节一致）；未到期的章节不会被提前评分。
   var FOCUS_MAX = 20;
   function nz(v) { return String(v == null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 80); }
-  function newF() { return { sel: null, queue: [], i: 0, res: [], skipped: 0, t0: 0 }; }
+  function newF() { return { sel: null, queue: [], i: 0, res: [], skipped: 0, t0: 0, pick: false }; }
   function readyOf(s) { return s.chapters.list.filter(function (c) { return c.due || c.fresh; }); }
   function readyAll(m, sel) {
     var q = []; m.subjects.forEach(function (s) { if (sel.indexOf(s.name) >= 0) readyOf(s).forEach(function (c) { q.push({ idx: c.idx, s: s.name, n: c.name, fresh: c.fresh, late: c.late }); }); }); return q;
@@ -304,7 +310,19 @@
     return null;
   }
   function fgo(view, msg) { S.view = view; S.msg = msg || ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
-  function openFocus() { S.f = newF(); fgo('fsetup'); }
+  function openFocus() { S.ret = ''; S.f = newF(); fgo('fsetup'); }
+  // 专注复习空状态里的“添加章节”：全部复用现有的“添加科目 / 科目详情 → 章节 → 添加章节”流程，这里只负责把人带到正确的位置，不写任何数据
+  function enterChapterAdd(name) {
+    var ok0 = C.build(snapshot()).subjects.some(function (x) { return x.name === name; }); if (!ok0) { S.f = null; go('dash'); return; }   // 科目在选择期间被删 / 同步走了：回工作台，不乱选
+    S.f = null; S.ret = 'focus'; S.view = 'subject'; S.subject = name; S.tab = 'chapters'; S.adding = 'chapter'; S.msg = ''; S.focusInput = true; render(); window.scrollTo(0, 0);
+  }
+  function enterSubjectAdd() { S.f = null; S.ret = 'fsubject'; S.view = 'dash'; S.subject = ''; S.tab = 'chapters'; S.adding = 'subject'; S.msg = t('fAddSubjectFirst'); S.focusInput = true; render(); window.scrollTo(0, 0); }
+  function startAddChapter(m) {
+    var subs = m.subjects;
+    if (!subs.length) { enterSubjectAdd(); return; }                                       // 没有科目：走现有“添加科目”，加完自动进章节页
+    if (subs.length === 1) { enterChapterAdd(subs[0].name); return; }                      // 只有一个科目：直接去，不用多点一步
+    S.f.pick = true; S.focusPick = true; render();                                         // 多个科目：必须让用户自己选，绝不替他选第一个
+  }
   function startFocus() {
     var f = S.f, m = C.build(snapshot()), q = readyAll(m, f.sel).slice(0, FOCUS_MAX); if (!q.length) return;
     f.queue = q; f.i = 0; f.res = []; f.skipped = 0; fgo('frun');
@@ -335,8 +353,25 @@
     var w = h('div', 'fwrap'); focusHero(w, t('fTitle'), t('fSub'), 'focus'); note(w);
     var c = h('section', 'card');
     if (!subs.length || !names.length) {
-      c.appendChild(h('h3', 'h3', t('fPick'))); var e = h('p', 'sub pad', subs.length ? t('fNoneDue') : t('fNoChapters')); e.setAttribute('role', 'status'); c.appendChild(e);
-      var a0 = h('div', 'actions'); a0.appendChild(btn('btn ghost', t('fBackStudy'), function () { S.f = null; go('dash'); })); c.appendChild(a0);
+      var none = !subs.length;                                                             // true = 一个章节都没有；false = 有章节，只是现在都不用复习（两种状态文案和引导都不同）
+      if (f.pick) {
+        c.appendChild(h('h3', 'h3', t('fChooseSubject'))); var pp = h('p', 'sub', t('fChooseSubjectSub')); pp.setAttribute('role', 'status'); c.appendChild(pp);
+        var pl = h('div', 'fpicks'); m.subjects.forEach(function (sj) {
+          var b = h('button', 'fpick'); b.type = 'button'; b.dataset.sub = sj.name; var bd = h('div', 'row-t'); bd.appendChild(h('b', 'row-n', sj.name)); bd.appendChild(h('small', 'row-m', tp('chapters', sj.chapters.total)));
+          b.appendChild(tile((Array.from(sj.name)[0] || '?').toUpperCase(), sj.color || 'peach')); b.appendChild(bd); b.appendChild(h('span', 'chev', '›')); b.onclick = function () { enterChapterAdd(sj.name); }; pl.appendChild(b);
+        }); c.appendChild(pl);
+        var pa = h('div', 'actions'); pa.appendChild(btn('btn ghost', t('cancel'), function () { f.pick = false; render(); })); pa.appendChild(btn('link', t('fNewSubject'), enterSubjectAdd)); c.appendChild(pa);
+      } else {
+        var grid = h('div', 'fempty'), tx = h('div', 'fempty-t');
+        tx.appendChild(h('span', 'fpill', t(none ? 'fEmptyPill1' : 'fEmptyPill2'))); tx.appendChild(h('h3', 'h3 fhead', t(none ? 'fEmptyHead1' : 'fEmptyHead2')));
+        var e = h('p', 'sub', none ? t('fNoChapters') : t('fNoneDue')); e.setAttribute('role', 'status'); tx.appendChild(e);
+        if (none) { var ul = h('ul', 'fpoints'); [['📚', 'fPoint1'], ['🧠', 'fPoint2'], ['✨', 'fPoint3']].forEach(function (p) { var li = h('li'), ic = h('i', null, p[0]); ic.setAttribute('aria-hidden', 'true'); li.appendChild(ic); li.appendChild(h('span', null, t(p[1]))); ul.appendChild(li); }); tx.appendChild(ul); }
+        var a0 = h('div', 'actions'); a0.appendChild(btn('btn fprimary', '＋ ' + t(none ? 'fAddFirst' : 'fAddAnother'), function () { startAddChapter(m); })); a0.appendChild(btn('btn ghost', t('fBackStudy'), function () { S.f = null; go('dash'); })); tx.appendChild(a0);
+        grid.appendChild(tx);
+        var art = h('div', 'fart'); art.setAttribute('aria-hidden', 'true'); ['✦', '✧', '✿'].forEach(function (sp, i) { art.appendChild(h('span', 'spark s' + (i + 1), sp)); });
+        var im = h('img'); im.src = 'assets/buddy/focus.svg'; im.alt = ''; im.width = 160; im.height = 160; im.decoding = 'async'; art.appendChild(im); grid.appendChild(art);
+        c.appendChild(grid);
+      }
     } else {
       var all = readyAll(m, f.sel), head = h('div', 'head'); head.appendChild(h('h3', 'h3', t('fPick'))); head.appendChild(h('small', 'row-m', tp('fSelected', f.sel.length))); c.appendChild(head);
       var g = h('div', 'ftogs');
@@ -392,6 +427,7 @@
     if (S.focusInput) { S.focusInput = false; var i = root.querySelector('input.study-space-input'); if (i) i.focus({ preventScroll: true }); }
     else if (S.focusHead) { var hh = root.querySelector('.study-space-h'); if (hh) hh.focus({ preventScroll: true }); }
     S.focusHead = false;
+    if (S.focusPick) { S.focusPick = false; var fp = root.querySelector('.study-space-fpick'); if (fp) fp.focus({ preventScroll: true }); }
     if (S.focusSub) { var fs = S.focusSub; S.focusSub = ''; Array.prototype.some.call(root.querySelectorAll('.study-space-ftog'), function (b) { if (b.dataset.sub === fs) { b.focus({ preventScroll: true }); return true; } return false; }); }
     if (!S.scrollTop && y) window.scrollTo(0, y);
   }
@@ -403,7 +439,7 @@
     window[n] = function () { var r = o.apply(this, arguments); ok(refresh); return r; };
   });
   var _sv = window.showView;
-  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'ss') { S.f = null; S.view = 'dash'; S.subject = ''; S.msg = ''; S.adding = ''; S.focusHead = true; render(); } return r; };
+  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'ss') { S.f = null; S.ret = ''; S.view = 'dash'; S.subject = ''; S.msg = ''; S.adding = ''; S.focusHead = true; render(); } return r; };
 
   // 设置页：目标显示开关（只在设置里，默认开）
   var sw = document.getElementById('ssgoals');

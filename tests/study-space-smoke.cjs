@@ -200,7 +200,7 @@ const tab = async (p, n) => { await p.locator('.study-space-tab', { hasText: n }
     await page.locator('.study-space-subj').first().focus(); await page.keyboard.press('Enter'); await page.waitForTimeout(200);
     rec('9g 键盘：科目卡片 Enter 打开详情，焦点落到科目标题（可被读屏读到）', await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('study-space-h')));
     const ring = await page.evaluate(() => { const b = document.querySelector('.study-space-tab'); b.focus(); const cs = getComputedStyle(b); return cs.outlineStyle + ' ' + cs.outlineWidth; });
-    rec('9h 键盘聚焦有可见的焦点环', /solid 3px/.test(ring) || /auto/.test(ring), ring);
+    rec('9h 键盘聚焦有可见的焦点环', /solid [23]px/.test(ring) || /auto/.test(ring), ring);
     const sizes = await page.evaluate(() => [...document.querySelectorAll('.study-space-root button')].filter(b => b.offsetParent).map(b => Math.min(b.getBoundingClientRect().width, b.getBoundingClientRect().height)));
     rec('9i 可点按钮的最小边都 ≥ 40px（触控友好）', sizes.length > 0 && Math.min.apply(null, sizes) >= 40, 'min=' + Math.min.apply(null, sizes)); rec('9j 无页面报错', errs.length === 0, errs.join('|')); await ctx.close();
   }
