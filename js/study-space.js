@@ -7,7 +7,7 @@
   var SEC = document.getElementById('v-ss'), C = window.StudySpaceCore;
   if (!SEC || !C) return;
   var PK = 'studyspace-prefs';
-  var S = { view: 'dash', subject: '', tab: 'chapters', msg: '', adding: '', focusHead: false, focusInput: false };
+  var S = { view: 'dash', subject: '', tab: 'chapters', msg: '', adding: '', focusHead: false, focusInput: false, focusSub: '', f: null };
 
   // ---------- 小工具 ----------
   function lang() { return window.LANG || 'en'; }
@@ -101,7 +101,7 @@
   function newHw(subject) { if (typeof openHw !== 'function') return; openHw(null); if (subject && typeof hwsb !== 'undefined' && hwsb) hwsb.value = subject; }
 
   // ---------- 导航 ----------
-  function go(view, subject, tab) { S.view = view; S.subject = subject || ''; S.tab = tab || 'chapters'; S.msg = ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
+  function go(view, subject, tab) { S.f = null; S.view = view; S.subject = subject || ''; S.tab = tab || 'chapters'; S.msg = ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
   function toTimetable() { if (typeof showView === 'function') showView('tt'); }
   function toView(v) { if (typeof showView === 'function') showView(v); }
   function toGoals() { if (window.openGoals) openGoals(); }
@@ -206,7 +206,7 @@
   function dash(box, m) {
     hero(box, m); note(box);
     if (m.empty.all) { emptyState(box); return; }
-    stats(box, m);
+    stats(box, m); focusTile(box, m);
     var cols = h('div', 'cols'); cols.appendChild(comingUp(box, m)); cols.appendChild(sideCards(m)); box.appendChild(cols); subjectsSection(box, m);
   }
 
@@ -284,16 +284,115 @@
     var dz = h('div', 'danger-zone'); dz.appendChild(btn('danger', t('deleteSubject'), function () { deleteSubject(s.name); })); box.appendChild(dz);
   }
 
+  // ---------- Focus Revision（v9.9 Phase 3C）：一次一个章节的专注复习 ----------
+  // 复用现有数据：章节 = ST.topics，评分 = srsRate(topic, g, dleft(subject), today()) + sv()（和复习队列里的三个表情按钮完全同一条写入路径）。
+  // 选择 / 进度只存在内存（S.f）：离开页面或刷新就丢弃；已评分的章节在评分当下已写入，不会丢。没有任何新的本机存储键。
+  // 队列 = 所选科目里“该复习（due）”或“还没学过（fresh）”的章节（和复习队列里能评分的章节一致）；未到期的章节不会被提前评分。
+  var FOCUS_MAX = 20;
+  function nz(v) { return String(v == null ? '' : v).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 80); }
+  function newF() { return { sel: null, queue: [], i: 0, res: [], skipped: 0, t0: 0 }; }
+  function readyOf(s) { return s.chapters.list.filter(function (c) { return c.due || c.fresh; }); }
+  function readyAll(m, sel) {
+    var q = []; m.subjects.forEach(function (s) { if (sel.indexOf(s.name) >= 0) readyOf(s).forEach(function (c) { q.push({ idx: c.idx, s: s.name, n: c.name, fresh: c.fresh, late: c.late }); }); }); return q;
+  }
+  function focusTotal(m) { var n = 0; m.subjects.forEach(function (s) { n += readyOf(s).length; }); return n; }
+  // 评分前重新定位章节：先看原下标，对不上（期间云同步 / 别处改动了列表）就按 科目+章节名 找；找不到就跳过，绝不写到别的章节上
+  function focusTopic(it) {
+    var a = ST.topics || [], x = a[it.idx];
+    if (x && nz(x.s) === it.s && nz(x.n) === it.n) return x;
+    for (var i = 0; i < a.length; i++) if (a[i] && nz(a[i].s) === it.s && nz(a[i].n) === it.n) return a[i];
+    return null;
+  }
+  function fgo(view, msg) { S.view = view; S.msg = msg || ''; S.adding = ''; S.focusHead = true; render(); window.scrollTo(0, 0); }
+  function openFocus() { S.f = newF(); fgo('fsetup'); }
+  function startFocus() {
+    var f = S.f, m = C.build(snapshot()), q = readyAll(m, f.sel).slice(0, FOCUS_MAX); if (!q.length) return;
+    f.queue = q; f.i = 0; f.res = []; f.skipped = 0; fgo('frun');
+  }
+  function exitFocus() { var n = S.f ? S.f.res.length : 0; if (S.f) { S.f.queue = []; S.f.i = 0; S.f.res = []; } fgo('fsetup', n ? t('fExited', { n: n }) : ''); }
+  function focusRate(g) {
+    var f = S.f, it = f && f.queue[f.i]; if (!it) return;
+    if (performance.now() - f.t0 < 300) return;                      // 防连点：新卡片刚出现的 0.3 秒内忽略评分，避免双击一下跳过两张
+    var tp0 = focusTopic(it);
+    if (tp0) { srsRate(tp0, g, dleft(tp0.s), today()); sv(); f.res.push(g); } else f.skipped++;
+    f.i++; S.view = f.i >= f.queue.length ? 'fdone' : 'frun'; S.msg = ''; S.focusHead = true; after(); window.scrollTo(0, 0);
+  }
+
+  function focusTile(box, m) {
+    var n = focusTotal(m), b = h('button', 'focus-tile'); b.type = 'button'; b.onclick = openFocus;
+    var body = h('div', 'row-t'); body.appendChild(h('b', 'row-n', t('fTile'))); body.appendChild(h('small', 'row-m', n ? tp('fReady', n) + ' · ' + t('fTileSub') : t('fTileNone')));
+    b.appendChild(tile('📖', 'peach')); b.appendChild(body); b.appendChild(h('span', 'chev', '›')); box.appendChild(b);
+  }
+  function focusHero(box, title, sub, img) {
+    var c = h('section', 'hero'), tx = h('div', 'hero-t'), im = h('img', 'buddy');
+    tx.appendChild(h('div', 'eyebrow', t('fTile'))); tx.appendChild(heading('h2', title)); tx.appendChild(h('p', 'sub', sub));
+    im.src = 'assets/buddy/' + img + '.svg'; im.alt = ''; im.width = 120; im.height = 120; im.decoding = 'async'; c.appendChild(tx); c.appendChild(im); box.appendChild(c);
+  }
+  function focusSetup(box, m) {
+    var f = S.f, subs = m.subjects.filter(function (s) { return s.chapters.total > 0; }), names = subs.filter(function (s) { return readyOf(s).length > 0; }).map(function (s) { return s.name; });
+    f.sel = f.sel ? f.sel.filter(function (n) { return names.indexOf(n) >= 0; }) : names.slice();
+    box.appendChild(btn('back', '‹ ' + t('backDash'), function () { S.f = null; go('dash'); }));
+    var w = h('div', 'fwrap'); focusHero(w, t('fTitle'), t('fSub'), 'focus'); note(w);
+    var c = h('section', 'card');
+    if (!subs.length || !names.length) {
+      c.appendChild(h('h3', 'h3', t('fPick'))); var e = h('p', 'sub pad', subs.length ? t('fNoneDue') : t('fNoChapters')); e.setAttribute('role', 'status'); c.appendChild(e);
+      var a0 = h('div', 'actions'); a0.appendChild(btn('btn ghost', t('fBackStudy'), function () { S.f = null; go('dash'); })); c.appendChild(a0);
+    } else {
+      var all = readyAll(m, f.sel), head = h('div', 'head'); head.appendChild(h('h3', 'h3', t('fPick'))); head.appendChild(h('small', 'row-m', tp('fSelected', f.sel.length))); c.appendChild(head);
+      var g = h('div', 'ftogs');
+      subs.forEach(function (s) {
+        var n = readyOf(s).length, on = f.sel.indexOf(s.name) >= 0, b = h('button', 'ftog'); b.type = 'button'; b.setAttribute('aria-pressed', String(on)); b.dataset.sub = s.name; b.disabled = !n;
+        var body = h('div', 'row-t'); body.appendChild(h('b', 'row-n', s.name)); body.appendChild(h('small', 'row-m', n ? tp('fReady', n) : t('fSubjNone')));
+        b.appendChild(tile((Array.from(s.name)[0] || '?').toUpperCase(), s.color || 'peach')); b.appendChild(body); b.appendChild(h('span', 'ftick', on ? '✓' : ''));
+        b.onclick = function () { var i = f.sel.indexOf(s.name); if (i >= 0) f.sel.splice(i, 1); else f.sel.push(s.name); S.focusSub = s.name; render(); }; g.appendChild(b);
+      }); c.appendChild(g);
+      var q = Math.min(all.length, FOCUS_MAX), line = h('p', 'sub', all.length ? tp('fSession', q) : t('fPickOne')); line.setAttribute('role', 'status'); c.appendChild(line);
+      if (all.length > FOCUS_MAX) c.appendChild(h('p', 'sub', t('fCap', { n: FOCUS_MAX })));
+      var a = h('div', 'actions'), go0 = btn('btn', t('fStart'), startFocus); go0.disabled = !all.length; a.appendChild(go0); a.appendChild(btn('btn ghost', t('fBackStudy'), function () { S.f = null; go('dash'); })); c.appendChild(a);
+    }
+    w.appendChild(c); box.appendChild(w);
+  }
+  function focusRun(box) {
+    var f = S.f, it = f.queue[f.i]; if (!it) { fgo('fsetup'); return; }
+    var w = h('div', 'fwrap'), top = h('div', 'ftop'), tt = h('div'); tt.appendChild(h('div', 'eyebrow', t('fEyebrow'))); tt.appendChild(heading('h2', t('fCard', { a: f.i + 1, b: f.queue.length })));
+    top.appendChild(tt); top.appendChild(btn('btn ghost', '✕ ' + t('fExit'), exitFocus, t('fExitLabel'))); w.appendChild(top);
+    w.appendChild(bar(Math.round(f.i / f.queue.length * 100), t('fProgress')));
+    var cd = h('section', 'fcard'), row = h('div', 'ftop');
+    row.appendChild(pill(it.s)); row.appendChild(pill(it.fresh ? t('notStarted') : it.late > 0 ? tp('lateBy', it.late) : t('dueToday'), it.late > 0 ? 'bad' : '')); cd.appendChild(row);
+    var mid = h('div'); mid.appendChild(h('div', 'eyebrow', t('fChapterEyebrow'))); mid.appendChild(h('p', 'fname', it.n)); mid.appendChild(h('p', 'sub', t('fHint'))); cd.appendChild(mid);
+    var enc = h('div', 'fenc'), im = h('img'); im.src = 'assets/buddy/focus.svg'; im.alt = ''; im.width = 44; im.height = 44; im.decoding = 'async';
+    enc.appendChild(im); enc.appendChild(h('span', null, [t('fEnc1'), t('fEnc2'), t('fEnc3')][f.i % 3])); cd.appendChild(enc); w.appendChild(cd);
+    var rg = h('div', 'frate'); rg.setAttribute('role', 'group'); rg.setAttribute('aria-label', t('rateGroup'));
+    [['😵', 0, t('fAgain'), t('fAgainSub')], ['🤔', 1, t('fOkay'), t('fOkaySub')], ['😎', 2, t('fGot'), t('fGotSub')]].forEach(function (p) {
+      var b = h('button', 'frate-b'); b.type = 'button'; b.dataset.rate = String(p[1]); b.appendChild(h('span', 'fface', p[0])); b.appendChild(h('span', null, p[2])); b.appendChild(h('small', null, p[3]));
+      b.onclick = function () { focusRate(p[1]); }; rg.appendChild(b);
+    }); w.appendChild(rg); box.appendChild(w); f.t0 = performance.now();
+  }
+  function focusDone(box, m) {
+    var f = S.f, n = f.res.length, got = f.res.filter(function (x) { return x === 2; }).length, again = f.res.filter(function (x) { return x === 0; }).length, left = readyAll(m, f.sel).length;
+    var w = h('div', 'fwrap'); focusHero(w, t('fDoneTitle'), t('fDoneSub'), 'happy'); w.querySelector('.study-space-eyebrow').textContent = t('fDoneEyebrow');
+    var st = h('div', 'stats');
+    [[n, t('fReviewed'), 'mint', '✅'], [got, t('fConfident'), 'peach', '😎'], [again, t('fPractice'), 'pink', '😵']].forEach(function (p) {
+      var s = h('div', 'stat'); s.appendChild(tile(p[3], p[2])); var d = h('div', 'stat-t'); d.appendChild(h('b', 'num', String(p[0]))); d.appendChild(h('span', 'lbl', p[1])); s.appendChild(d); st.appendChild(s);
+    }); w.appendChild(st);
+    var c = h('section', 'card'); if (f.skipped) c.appendChild(h('p', 'sub', tp('fSkipped', f.skipped)));
+    var msg = h('p', 'sub', left ? tp('fMoreLeft', left) : t('fCaughtUp')); msg.setAttribute('role', 'status'); c.appendChild(msg);
+    var a = h('div', 'actions'); if (left) a.appendChild(btn('btn', t('fAgainBtn'), startFocus)); a.appendChild(btn(left ? 'btn ghost' : 'btn', t('fBackStudy'), function () { S.f = null; go('dash'); })); c.appendChild(a); w.appendChild(c); box.appendChild(w);
+  }
+
   // ---------- 渲染 ----------
   function render() {
     var root = SEC.querySelector('.study-space-root');
     if (!root) { root = h('div', 'root'); SEC.appendChild(root); }
     var m = C.build(snapshot()), y = window.pageYOffset;
     root.textContent = '';
-    if (S.view === 'reviews') reviews(root, m); else if (S.view === 'subject') subject(root, m); else dash(root, m);
+    if (S.view.charAt(0) === 'f' && !S.f) S.view = 'dash';
+    if (S.view === 'reviews') reviews(root, m); else if (S.view === 'subject') subject(root, m);
+    else if (S.view === 'fsetup') focusSetup(root, m); else if (S.view === 'frun') focusRun(root); else if (S.view === 'fdone') focusDone(root, m); else dash(root, m);
     if (S.focusInput) { S.focusInput = false; var i = root.querySelector('input.study-space-input'); if (i) i.focus({ preventScroll: true }); }
     else if (S.focusHead) { var hh = root.querySelector('.study-space-h'); if (hh) hh.focus({ preventScroll: true }); }
     S.focusHead = false;
+    if (S.focusSub) { var fs = S.focusSub; S.focusSub = ''; Array.prototype.some.call(root.querySelectorAll('.study-space-ftog'), function (b) { if (b.dataset.sub === fs) { b.focus({ preventScroll: true }); return true; } return false; }); }
     if (!S.scrollTop && y) window.scrollTo(0, y);
   }
   function refresh() { if (visible()) render(); }
@@ -304,7 +403,7 @@
     window[n] = function () { var r = o.apply(this, arguments); ok(refresh); return r; };
   });
   var _sv = window.showView;
-  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'ss') { S.view = 'dash'; S.subject = ''; S.msg = ''; S.adding = ''; S.focusHead = true; render(); } return r; };
+  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'ss') { S.f = null; S.view = 'dash'; S.subject = ''; S.msg = ''; S.adding = ''; S.focusHead = true; render(); } return r; };
 
   // 设置页：目标显示开关（只在设置里，默认开）
   var sw = document.getElementById('ssgoals');

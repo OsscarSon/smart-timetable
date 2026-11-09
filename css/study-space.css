@@ -169,3 +169,38 @@
 .study-space-danger-zone{margin-top:22px;padding-top:14px;border-top:1px dashed var(--line);display:flex;justify-content:center}
 .study-space-danger{border:1.5px solid color-mix(in srgb,#d64545 55%,var(--line));background:transparent;color:#d64545;font:inherit;font-weight:800;border-radius:99px;padding:10px 18px;min-height:44px;cursor:pointer}
 .study-space-danger:hover{background:color-mix(in srgb,#d64545 10%,transparent)}
+
+/* v9.9 Phase 3C Focus Revision — presentation only. Colors come from theme variables (follows light / dark / theme color). */
+.study-space-focus-tile{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:linear-gradient(110deg,color-mix(in srgb,var(--peach) 42%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--pri) 28%,var(--line));border-radius:var(--ss-r);padding:11px 14px;min-height:64px;min-width:0}
+.study-space-fwrap{display:flex;flex-direction:column;gap:11px;width:100%;max-width:720px;margin:0 auto;min-width:0}
+.study-space-ftogs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.study-space-ftog{display:flex;align-items:center;gap:10px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:9px 12px;min-height:56px;min-width:0}
+.study-space-ftog[aria-pressed="true"]{border-color:var(--pri);background:var(--ss-soft)}
+.study-space-ftog:disabled{opacity:.55;cursor:default}
+.study-space-ftick{margin-left:auto;flex:0 0 auto;min-width:1em;color:var(--pri-ink);font-weight:800}
+.study-space-ftop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.study-space-fcard{display:flex;flex-direction:column;justify-content:space-between;gap:16px;min-height:240px;padding:20px;border-radius:24px;background:linear-gradient(150deg,color-mix(in srgb,var(--peach) 38%,var(--card)),var(--card));border:1px solid color-mix(in srgb,var(--pri) 26%,var(--line));min-width:0}
+.study-space-fname{margin:6px 0 4px;font-size:clamp(22px,5vw,34px);font-weight:800;line-height:1.25;letter-spacing:-.02em;overflow-wrap:anywhere}
+.study-space-fenc{display:flex;align-items:center;gap:10px;color:var(--soft);font-size:13px;line-height:1.4}
+.study-space-fenc img{flex:0 0 auto;width:44px;height:44px;object-fit:contain}
+.study-space-frate{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.study-space-frate-b{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:78px;padding:10px 4px;border:1.5px solid var(--line);border-radius:16px;background:var(--card);font-weight:800;font-size:14px;line-height:1.25;text-align:center;overflow-wrap:anywhere}
+.study-space-frate-b small{font-weight:600;font-size:11px;color:var(--soft)}
+.study-space-fface{font-size:26px;line-height:1.1}
+.study-space-btn:disabled{opacity:.5;cursor:default}
+@media (prefers-reduced-motion:no-preference){.study-space-bar i{transition:width .3s}}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+ .study-space-focus-tile,.study-space-ftog,.study-space-frate-b{transition:background-color .16s,border-color .16s,transform .16s}
+ .study-space-focus-tile:hover,.study-space-ftog:not(:disabled):hover,.study-space-frate-b:hover{border-color:var(--pri)}
+}
+@media (max-width:420px){
+ .study-space-fcard{padding:16px;min-height:220px;border-radius:20px}
+ .study-space-frate-b{font-size:13px;padding:8px 2px}
+ .study-space-frate-b small{font-size:10.5px}
+}
+/* 矮屏（≤700px 高）：压缩会话卡片，让评分按钮整体上移，避开右下角浮动的 Buddy */
+@media (max-height:700px){
+ .study-space-fcard{min-height:150px;gap:8px;padding:14px}
+ .study-space-fname{font-size:clamp(20px,5vw,26px);margin:4px 0 2px}
+ .study-space-frate-b{min-height:70px}
+}
