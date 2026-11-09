@@ -91,3 +91,10 @@
  #v-more .mochi-more-heading::before{width:56%}
  #v-more .mochi-more-heading h2,#v-more .mochi-more-heading p{max-width:60%}
 }
+
+/* Banner art edge fix: the art box now matches the picture's own aspect ratio, so the fade mask covers the real
+   picture edge (before, the box was wider than the picture and left a hard rectangular edge on wide screens). */
+#v-more .mochi-more-heading::before{width:auto;max-width:60%;aspect-ratio:152/97;background-size:100% 100%;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.35) 22%,#000 60%);mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.35) 22%,#000 60%)}
+.mochi-menu-intro::before{width:auto;max-width:60%;aspect-ratio:190/102;background-size:100% 100%;
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.35) 22%,#000 60%);mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.35) 22%,#000 60%)}

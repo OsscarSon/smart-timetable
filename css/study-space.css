@@ -165,3 +165,7 @@
  .study-space-pill{max-width:90px}
 }
 @media (prefers-reduced-motion:reduce){.study-space-root *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+.study-space-danger-zone{margin-top:22px;padding-top:14px;border-top:1px dashed var(--line);display:flex;justify-content:center}
+.study-space-danger{border:1.5px solid color-mix(in srgb,#d64545 55%,var(--line));background:transparent;color:#d64545;font:inherit;font-weight:800;border-radius:99px;padding:10px 18px;min-height:44px;cursor:pointer}
+.study-space-danger:hover{background:color-mix(in srgb,#d64545 10%,transparent)}
