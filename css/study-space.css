@@ -98,3 +98,70 @@
   .study-space-subj,.study-space-row,.study-space-stat,.study-space-btn{transition:transform .15s,border-color .15s}
   .study-space-subj:hover,.study-space-stat:hover{transform:translateY(-1px);border-color:var(--pri)}
 }
+
+/* v9.8 Study Space visual refinement — presentation only, no data or event logic. */
+#v-ss{--ss-r:18px}
+.study-space-root{gap:11px;font-size:14px;line-height:1.45}
+.study-space-hero{position:relative;isolation:isolate;min-height:112px;padding:17px 20px;border-radius:22px;background:linear-gradient(112deg,color-mix(in srgb,var(--peach) 34%,var(--card)) 0%,color-mix(in srgb,var(--peach) 65%,var(--card)) 100%);border:1px solid color-mix(in srgb,var(--pri) 20%,var(--line));box-shadow:0 3px 16px color-mix(in srgb,var(--pri) 6%,transparent)}
+.study-space-hero::before{content:"";position:absolute;right:-30px;top:-46px;width:185px;height:185px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--peach) 48%,transparent),transparent 72%);z-index:-1;pointer-events:none}
+.study-space-hero-t{position:relative;z-index:1}
+.study-space-eyebrow{font-size:10px;letter-spacing:.13em;line-height:1.5;margin-bottom:5px}
+.study-space-h{font-size:clamp(20px,2.2vw,26px);letter-spacing:-.035em;line-height:1.17;overflow-wrap:anywhere}
+.study-space-sub{font-size:13px;line-height:1.45;margin-top:5px}
+.study-space-buddy{width:100px;height:100px;max-width:30%;filter:drop-shadow(0 5px 8px rgba(98,54,29,.1))}
+/* Focus rings belong to interactive controls; programmatic heading focus should not look like a debug box. */
+.study-space-root h2:focus,.study-space-root h3:focus,.study-space-root [tabindex="-1"]:focus{outline:none}
+.study-space-root button:focus-visible,.study-space-root input:focus-visible,.study-space-root select:focus-visible,.study-space-root textarea:focus-visible,.study-space-root a:focus-visible{outline:2px solid var(--pri);outline-offset:3px}
+.study-space-tabs{gap:6px;padding:1px 1px 4px;scroll-padding-inline:8px}
+.study-space-tab{border-radius:12px;padding:9px 13px;font-size:13px;font-weight:750;min-height:40px;line-height:1.2}
+.study-space-card{padding:15px;gap:10px;border-width:1px;box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 3%,transparent)}
+.study-space-h3{font-size:17px;letter-spacing:-.02em}
+.study-space-row{border-width:1px;padding:10px 11px;gap:9px;border-radius:14px}
+.study-space-row-n{font-size:14px;font-weight:700;line-height:1.35}
+.study-space-row-m{font-size:11.5px;line-height:1.4}
+.study-space-pill{font-size:11px;padding:4px 8px;max-width:100%;white-space:normal;text-align:center;line-height:1.25}
+.study-space-stat{border-width:1px;gap:9px;padding:11px;min-height:68px}
+.study-space-num{font-size:24px;font-variant-numeric:tabular-nums}
+.study-space-lbl{font-size:11.5px;line-height:1.25}
+.study-space-subj{border-width:1px;padding:13px;gap:7px}
+.study-space-rate-b{border-radius:11px;min-width:40px;min-height:40px;font-size:18px}
+@media (hover:hover) and (prefers-reduced-motion:no-preference){
+ .study-space-row,.study-space-tab,.study-space-rate-b,.study-space-subj{transition:background-color .16s,border-color .16s,box-shadow .16s,transform .16s}
+ .study-space-row:hover,.study-space-subj:hover{border-color:color-mix(in srgb,var(--pri) 52%,var(--line));box-shadow:0 5px 16px color-mix(in srgb,var(--pri) 9%,transparent)}
+ .study-space-tab:hover,.study-space-rate-b:hover{border-color:var(--pri)}
+}
+@media (min-width:820px){
+ .study-space-root{gap:15px}.study-space-hero{min-height:140px;padding:22px 26px}.study-space-buddy{width:124px;height:124px}
+ .study-space-cols{gap:15px}.study-space-side{gap:15px}.study-space-grid{gap:12px}
+}
+@media (max-width:600px){
+ #v-ss.card.st{gap:8px}
+ .study-space-root{gap:9px}
+ .study-space-hero{min-height:94px;padding:12px 14px;border-radius:18px;gap:7px}
+ .study-space-h{font-size:19px;letter-spacing:-.025em}
+ .study-space-eyebrow{font-size:9.5px;margin-bottom:3px}
+ .study-space-sub{font-size:12px;margin-top:3px}
+ .study-space-buddy{width:68px;height:68px;max-width:24%}
+ .study-space-tabs{gap:5px}
+ .study-space-tab{padding:8px 10px;font-size:12px;min-height:38px}
+ .study-space-card{padding:12px;gap:8px;border-radius:16px}
+ .study-space-stats{gap:6px}.study-space-stat{padding:9px;min-height:69px;border-radius:15px}
+ .study-space-tile{width:34px;height:34px;border-radius:11px;font-size:16px}
+ .study-space-num{font-size:21px}
+ .study-space-lbl{font-size:11px}
+ .study-space-row{padding:9px;gap:7px;min-height:52px}
+ .study-space-row-n{font-size:13px}
+ .study-space-row-m{font-size:11px}
+ .study-space-pill{font-size:10px;padding:3px 7px}
+ .study-space-h3{font-size:16px}
+ .study-space-grid{grid-template-columns:1fr;gap:8px}
+ .study-space-subj{padding:12px}
+ .study-space-rate-b{width:40px;height:40px}
+}
+@media (max-width:360px){
+ .study-space-hero{padding:11px 12px}.study-space-h{font-size:18px}.study-space-buddy{width:58px;height:58px}
+ .study-space-tab{font-size:11.5px;padding:7px 9px}
+ .study-space-stat{padding:8px}.study-space-num{font-size:20px}
+ .study-space-pill{max-width:90px}
+}
+@media (prefers-reduced-motion:reduce){.study-space-root *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
