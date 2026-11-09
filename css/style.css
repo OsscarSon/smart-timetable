@@ -641,3 +641,9 @@ body .driver-popover-arrow-side-bottom.driver-popover-arrow{border-bottom-color:
 @media (max-width:360px){.top{gap:6px}.ibtn{width:36px;height:36px}}
 .top-t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:420px){.top{gap:7px}.top .ibtn{width:38px;height:38px}}
+/* 作者 IG：小小的亮彩虹渐变按钮 */
+.dw-igw{display:flex;justify-content:center;padding:0 0 14px}
+.dw-ig{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;font-size:11px;font-weight:800;letter-spacing:.02em;text-decoration:none;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45);background:linear-gradient(90deg,#ff2d55,#ff9500,#ffd60a,#30d158,#0a84ff,#bf5af2);box-shadow:0 0 10px rgba(255,149,0,.45),0 1px 4px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent}
+.dw-ig:hover{filter:brightness(1.1) saturate(1.1)}
+.dw-ig:focus-visible{outline:3px solid var(--pri);outline-offset:2px}
+.dw-ig svg{flex:none}

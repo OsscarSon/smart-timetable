@@ -65,19 +65,25 @@
     else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){alert('链接已复制：'+u)},function(){prompt('复制这个链接：',u)});
     else prompt('复制这个链接：',u)}
   // 版本号只从 js/version.js 读（以前写死成 v8.8.1，更新后菜单还是旧号）
+  // 作者 Instagram：版本号下面的小彩虹按钮（新窗口打开）
+  function igLink(){
+    var w=el('div','dw-igw'),a=el('a','dw-ig'),lbl=loc('Creator’s IG','作者的 IG','IG pencipta');
+    a.href='https://www.instagram.com/stz_0506?xtok=MWw1YWNhOXJvazlmdg==';a.target='_blank';a.rel='noopener noreferrer';a.setAttribute('aria-label',lbl+' (Instagram)');
+    a.innerHTML='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".9" fill="currentColor" stroke="none"/></svg>';
+    a.appendChild(document.createTextNode(lbl));w.appendChild(a);return w}
   function verLine(){return el('div','dw-ft','Mochi Schedule · v'+(window.MOCHI_VERSION||'?'))}
   function build(){
     dw.innerHTML='';
     var top=el('div','dw-top'),h=el('h2',null,loc('Your Mochi','你的 Mochi','Mochi Anda')),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;
     top.appendChild(h);top.appendChild(x);dw.appendChild(top);var intro=el('div','mochi-menu-intro');intro.appendChild(el('span','mochi-menu-eyebrow',loc('YOUR SPACE · YOUR PACE','你的空间 · 你的节奏','Ruang anda · Rentak anda')));intro.appendChild(el('p',null,loc('Everything you need, in one cozy place.','把需要的功能，放在温暖的小角落。','Semua yang anda perlukan, di satu tempat.')));dw.appendChild(intro);
     fill(dw,true);
-    dw.appendChild(verLine())}
+    dw.appendChild(verLine());dw.appendChild(igLink())}
   // 「更多」页：同一份清单，不再是 4 行
   var mv=document.getElementById('v-more');
   function buildMore(){
     if(!mv)return;
     mv.innerHTML='';var mh=el('div','mochi-more-heading');mh.appendChild(el('span','mochi-menu-eyebrow',loc('EXPLORE MOCHI','探索 MOCHI','TEROKA MOCHI')));mh.appendChild(el('h2',null,loc('More for you','更多功能','Lagi untuk anda')));mh.appendChild(el('p',null,loc('A little corner for all your tools and preferences.','工具、个性化与设置，都在这里。','Alat dan tetapan anda, semuanya di sini.')));mv.appendChild(mh);
-    fill(mv,true);mv.appendChild(verLine())}
+    fill(mv,true);mv.appendChild(verLine());mv.appendChild(igLink())}
   buildMore();
   function openMenu(){build();if(window.applyIcons)applyIcons(dw);dw.classList.add('show');mk.classList.add('show');dw.setAttribute('aria-hidden','false')}
   function closeMenu(){dw.classList.remove('show');mk.classList.remove('show');dw.setAttribute('aria-hidden','true')}
