@@ -1,5 +1,8 @@
-# 🐱 Mochi 智能时间表（v9.6）
+# 🐱 Mochi 智能时间表（v9.8）
 
+> **v9.8**：把 Phase 3（Study Space）合并进 main（含 Starter Kits、插画横幅、菜单润色），见 `docs/v9.8-merge-and-phase3-audit.md`。
+>
+> **v9.7**：新增 **Study Space 学习工作台**（Phase 3A 工作台 + 3B 科目详情）：点底部“学习”默认进工作台，作业与复习计划仍是明确的子标签；只复用现有的科目 / 章节 / 复习 / 作业 / Goals 数据，不建新系统。另外补了两组 Goals 跨设备同步回归测试（`tests/goals-sync-regress.cjs`）。见 `docs/v9.7-study-space.md` 和 `docs/phase3-integration-report.md`。
 > **v9.6**：Goals 排程关联表也跨设备同步（按条合并），任何设备都能管排程。见 `docs/v9.6-goals-links-sync.md`。
 > **v9.5**：Goals（目标本体）跨设备同步；排程时段只由“排程的那台设备”管理。见 `docs/v9.5-goals-sync.md`。
 > **v9.4**：修复 Goals 排程的写入一致性（日程 + 关联表同成败），新增跟随移动 / 重新排 / 目标级撤销。见 `docs/v9.4-goals-phase2-fixes.md`。

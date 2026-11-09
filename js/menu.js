@@ -3,7 +3,7 @@
   var dw=document.getElementById('dwr'),mk=document.getElementById('dwm'),se=document.getElementById('v-se'),idx=document.getElementById('seidx'),seh=document.getElementById('seh'),curSec='';
   var X='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
   var SECS=[['look','🎨','外观与显示','主题色、深色、日历、视图密度'],['tt','🏫','课表与课程','多个课表、节次、课程、拍照导入'],['hol','🎌','假期','放假期间自动跳过安排'],
-    ['notify','🔔','通知与提醒','课前 / 作业提醒、提示方式、手机权限'],['cloud','☁️','账号与同步','多设备同步、附件'],['data','💾','数据：分享与备份','链接 / .ics 分享、导出 / 导入备份']];
+    ['notify','🔔','通知与提醒','课前 / 作业提醒、提示方式、手机权限'],['cloud','☁️','账号与同步','多设备同步、附件'],['data','💾','数据：分享与备份','链接 / .ics 分享、导出 / 导入备份'],['study','📚','学习空间','学习工作台的显示选项']];
   var bk=se.querySelector('.back');
   // ---- 设置：index → 二级页 ----
   function buildIdx(){idx.innerHTML='';SECS.forEach(function(s){
