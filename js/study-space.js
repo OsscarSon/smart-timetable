@@ -81,6 +81,16 @@
     if (ST.subs.indexOf(name) >= 0) { S.msg = t('subjectExists'); render(); return false; }
     ST.subs.push(name); sv(); S.adding = ''; S.msg = t('subjectAdded'); after(); return true;
   }
+  // 删除科目：科目名单 + 该科目的章节 + 考试日；作业保留，只是去掉科目标签（不会误删作业）
+  function deleteSubject(name) {
+    if (!window.confirm(t('confirmDeleteSubject', { s: name }))) return false;
+    ST.topics = ST.topics.filter(function (x) { return x.s !== name; });
+    var i = ST.subs.indexOf(name); if (i >= 0) ST.subs.splice(i, 1);
+    if (ST.ex) delete ST.ex[name];
+    var hwTouched = false; (typeof HW !== 'undefined' ? HW : []).forEach(function (x) { if (x && (x.sb === name || String(x.sb || '').trim() === name)) { x.sb = ''; hwTouched = true; } });
+    sv(); if (hwTouched && typeof hwSave === 'function') hwSave();
+    S.view = 'dash'; S.subject = ''; S.tab = 'chapters'; S.adding = ''; S.msg = t('subjectDeleted'); after(); return true;
+  }
   function setExam(subject, v) {
     if (v && !C.isoOk(v)) { S.msg = t('badDate'); render(); return; }
     ensureSubject(subject); ST.ex = ST.ex || {}; if (v) ST.ex[subject] = v; else delete ST.ex[subject];
@@ -271,6 +281,7 @@
       b.onclick = function () { S.tab = p[0]; S.msg = ''; S.adding = ''; render(); }; tabs.appendChild(b); });
     box.appendChild(tabs); note(box);
     if (S.tab === 'homework') homeworkTab(box, s, m); else if (S.tab === 'exam') examGoalsTab(box, s, m); else chaptersTab(box, s);
+    var dz = h('div', 'danger-zone'); dz.appendChild(btn('danger', t('deleteSubject'), function () { deleteSubject(s.name); })); box.appendChild(dz);
   }
 
   // ---------- 渲染 ----------

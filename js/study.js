@@ -1,6 +1,6 @@
 // 学习：章节 + 间隔复习 + 考试倒推 + 自动排程
   // ===== 学习：章节 + 间隔复习 + 自动排程 =====
-  var ST={subs:({en:['Chinese','English','Math','Physics','Chemistry'],ms:['Bahasa Cina','Bahasa Inggeris','Matematik','Fizik','Kimia']}[window.LANG]||['华文','英文','数学','物理','化学']),topics:[]},sel=0;
+  var ST={subs:({en:['Chinese','English','Math','Malay','Science'],ms:['Bahasa Cina','Bahasa Inggeris','Matematik','Bahasa Melayu','Sains']}[window.LANG]||['华文','英文','数学','马来文','科学']),topics:[]},sel=0;
   try{var q=JSON.parse(localStorage.getItem('mochi-st')||'null');if(q&&q.subs)ST=q}catch(e){}
   ST.ex=ST.ex||{};
   function sv(){try{localStorage.setItem('mochi-st',JSON.stringify(ST))}catch(e){}}

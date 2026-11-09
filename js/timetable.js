@@ -74,7 +74,7 @@ function drawGrid(){
     layLanes(L);
     L.forEach(function(o){
       var top=(o.s0-H0*60)/60*HR,hh=Math.max(18,(o.e0-o.s0)/60*HR-2),
-          b=el('button','wk-e c-'+o.c+(o.k==='f'?' fx':'')+(o.k==='r'?' rp':'')+(o.dn?' dn':''));
+          b=el('button','wk-e c-'+o.c+(o.k==='f'?' fx':'')+(o.k==='r'?' rp':'')+(o.dn?' dn':'')+(hh<36?' sm':''));
       b.style.top=top+'px';b.style.height=hh+'px';
       b.style.left='calc(2px + (100% - 4px) * '+o.ln+' / '+o.nl+')';b.style.width='calc((100% - 4px) / '+o.nl+' - 1px)';
       var tx=el('span','et'+(/[\u3000-\u9fff\uac00-\ud7af]/.test(o.t)?' cjk':''),o.t);b.appendChild(tx);
