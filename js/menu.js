@@ -38,7 +38,6 @@
     return [
       ['AI 与工具',[['✨','AI 助手','一句话添加 · 拍照导入 · 整周重排',function(){closeMenu();openAI('quick')}],
         ['🤖','问问 Mochi','问日程、让 AI 帮你改（先预览，可撤销）',function(){closeMenu();if(window.openAgent)openAgent()}],
-        ['📷','拍照导入课表','拍一张课表，AI 帮你填',function(){closeMenu();openAI('photo')}],
         ['🔍','搜索','课程、活动、作业、提醒',function(){closeMenu();openSearch()}],
         ['🏃','运动计划','训练安排',function(){go('sp')}],
         ['⚡','Mochi Energy',loc('Plan around your energy','根据精力合理安排','Rancang ikut tenaga anda'),function(){closeMenu();window.MochiNext&&MochiNext.openEnergy()}],

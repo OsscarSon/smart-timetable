@@ -8,6 +8,7 @@
     h:['🐱 Mochi 智能时间表','🐱 Mochi Smart Timetable','🐱 Mochi Jadual Pintar'],
     intro:['适用于学习、工作与生活的智能时间表。AI 帮你安排时间；数据默认保存在设备上，登录后才同步。','A smart timetable for study, work and everyday life. AI helps organize your time. Your data stays on your device unless you sign in to sync.','Jadual pintar untuk belajar, kerja dan kehidupan harian. AI membantu mengatur masa anda. Data kekal pada peranti sehingga anda log masuk untuk segerak.'],
     fh:['功能','Features','Ciri'],
+    tabO:['开源项目','Open source','Sumber terbuka'],
     lh:['用到的开源项目','Open-source projects used','Projek sumber terbuka'],
     note:['AI 整理 / 问答：文字类请求按顺序用 Groq / Cerebras / Mistral / Gemini 的免费额度（都不是开源，需要登录）；拍照识别只用 Gemini。浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Text AI requests use the free tiers of Groq, Cerebras, Mistral and Gemini in turn (none are open source; sign-in required); photo import uses Gemini only. Browser built-in translation is a browser feature.','Permintaan AI teks guna tahap percuma Groq, Cerebras, Mistral dan Gemini secara bergilir (bukan sumber terbuka; perlu log masuk); import foto guna Gemini sahaja. Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
     close:['关闭','Close','Tutup']
@@ -58,12 +59,16 @@
     m=el('div','mask');m.id='mask11';m.onclick=function(){m.classList.remove('show')};
     var d=el('div','dlg ab');d.onclick=function(e){e.stopPropagation()};
     d.appendChild(el('h2',null,t(T.h)));d.appendChild(el('div','msg',t(T.intro)));
-    d.appendChild(el('h3','hs',t(T.fh)));
-    F.forEach(function(f){var r=el('div','ab-r'),i=el('i',null,f[0]),b=el('div');b.appendChild(el('b',null,t(f[1])));b.appendChild(el('small',null,t(f[2])));r.appendChild(i);r.appendChild(b);d.appendChild(r)});
-    d.appendChild(el('h3','hs',t(T.lh)));
+    // 两个栏：功能 / 开源项目
+    var tabs=el('div','seg wide ab-tabs'),pf=el('div','ab-pane'),po=el('div','ab-pane'),bf=el('button','on',t(T.fh)),bo=el('button',null,t(T.tabO));
+    tabs.setAttribute('role','tablist');[bf,bo].forEach(function(b){b.type='button';b.setAttribute('role','tab')});
+    function pick(f){bf.classList.toggle('on',f);bo.classList.toggle('on',!f);bf.setAttribute('aria-selected',f?'true':'false');bo.setAttribute('aria-selected',f?'false':'true');pf.hidden=!f;po.hidden=f;d.scrollTop=0}
+    bf.onclick=function(){pick(true)};bo.onclick=function(){pick(false)};tabs.appendChild(bf);tabs.appendChild(bo);d.appendChild(tabs);
+    F.forEach(function(f){var r=el('div','ab-r'),i=el('i',null,f[0]),b=el('div');b.appendChild(el('b',null,t(f[1])));b.appendChild(el('small',null,t(f[2])));r.appendChild(i);r.appendChild(b);pf.appendChild(r)});
     O.forEach(function(o){var r=el('div','ab-r'),i=el('i',null,'📦'),b=el('div'),a=el('a',null,o[0]);a.href=o[3];a.target='_blank';a.rel='noopener noreferrer';
-      var h=el('b');h.appendChild(a);h.appendChild(document.createTextNode(' · '+o[1]));b.appendChild(h);b.appendChild(el('small',null,t(o[2])));r.appendChild(i);r.appendChild(b);d.appendChild(r)});
-    d.appendChild(el('div','msg',t(T.note)));
+      var h=el('b');h.appendChild(a);h.appendChild(document.createTextNode(' · '+o[1]));b.appendChild(h);b.appendChild(el('small',null,t(o[2])));r.appendChild(i);r.appendChild(b);po.appendChild(r)});
+    po.appendChild(el('div','msg',t(T.note)));
+    d.appendChild(pf);d.appendChild(po);pick(true);
     var ac=el('div','acts'),x=el('button',null,t(T.close));x.onclick=function(){m.classList.remove('show')};ac.appendChild(x);d.appendChild(ac);
     m.appendChild(d);document.body.appendChild(m)}
   window.openAbout=function(){if(!m)build();m.classList.add('show')};

@@ -278,4 +278,17 @@ L("」超过 15MB","” is over 15 MB","” melebihi 15 MB");
 L("这台设备上没有这个文件（登录云同步后可以下载）","This file isn’t on this device (sign in to cloud sync to download it)","Fail ini tiada pada peranti ini (log masuk segerak awan untuk memuat turun)");
 L("处理中…","Processing…","Memproses…");
 L("每周重复；这些时段不会被排进别的活动。","Repeats weekly; nothing else is scheduled into these slots.","Berulang setiap minggu; tiada acara lain disusun pada slot ini.");
+// v9.8.2：AI 助手弹窗（标签页 / 整周重排 / 拍照页）补全三语，避免被机翻成 "One word" "Rehearsal week" 这类怪词
+L("一句话","Quick add","Tambah pantas");
+L("拍照课表","Photo import","Import foto");
+L("整周重排","Re-plan week","Susun semula minggu");
+L("重排整周","Re-plan the week","Susun semula minggu");
+L("说一句话就行，例如：下周三下午三点半数学补习，每周重复 / 周五前交英语作文","Just say it, e.g. Maths tuition next Wednesday 3:30 pm, repeat weekly / English essay due Friday","Cakap sahaja, cth: Tuisyen Matematik Rabu depan 3:30 petang, ulang setiap minggu / esei Bahasa Inggeris sebelum Jumaat");
+L("这周有什么特别安排？一行一条，例如：","Anything special this week? One per line, for example:","Ada apa-apa yang istimewa minggu ini? Satu baris satu, contohnya:");
+L("周六下午三点和朋友打球","Play ball with friends on Saturday at 3 pm","Main bola dengan rakan pada hari Sabtu jam 3 petang");
+L("周日早上有跑步比赛","Running race on Sunday morning","Perlumbaan lari pada pagi Ahad");
+L("我会把它们放进对应时间，把冲突的旧安排挪到空档，并按你的作息重排整周。","I’ll put them at the right times, move any clashing plans into free slots, and re-plan the rest of the week around your routine.","Saya akan letakkan pada masa yang sesuai, alihkan jadual yang bertindih ke slot kosong, dan susun semula minggu mengikut rutin anda.");
+L("💬 改为提问","💬 Ask a question instead","💬 Tanya soalan");
+L("拍一张课表或选一张截图，我来识别每一节课。识别结果会先给你核对，确认后才会写入。","Snap a timetable or pick a screenshot and I’ll read every lesson. You can review the result first; nothing is saved until you confirm.","Ambil gambar jadual atau pilih tangkapan skrin, saya akan baca setiap pelajaran. Anda boleh semak dahulu; tiada apa disimpan sehingga anda sahkan.");
+L("📷 拍照 / 选择课表图片","📷 Take / choose a timetable photo","📷 Ambil / pilih gambar jadual");
 })();

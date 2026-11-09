@@ -117,4 +117,17 @@
   var clr=$('agclr');if(clr)clr.onclick=function(){H=[];render()};
   var ai=$('aiask');if(ai)ai.onclick=function(){$('mask6').classList.remove('show');open()};
   window.openAgent=open;
+  // 顶栏的「问问 Mochi」小按钮：放在安装按钮旁边（安装按钮在已安装 / 独立窗口时不存在，所以这里自己找位置）。
+  (function(){
+    var Lg=window.LANG||'en',tip={zh:'问问 Mochi',ms:'Tanya Mochi'}[Lg]||'Ask Mochi';
+    function addAsk(){
+      var top=document.getElementById('top');if(!top||document.getElementById('askb'))return;
+      var b=document.createElement('button');b.className='ibtn';b.id='askb';b.type='button';b.setAttribute('aria-label',tip);b.title=tip;
+      // 可爱的小兔脸（线条风格，和旁边的图标一致）：两只耳朵、圆圆的脸、两个小眼睛和一个小微笑
+      b.innerHTML='<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9.4C6.6 5.6 6.8 3 8.3 3c1.5 0 2.3 2.5 2.4 5.2"/><path d="M16 9.4c1.4-3.8 1.2-6.4-.3-6.4-1.5 0-2.3 2.5-2.4 5.2"/><path d="M12 8.2c4.6 0 8 2.5 8 6 0 3.1-3.1 5.4-8 5.4s-8-2.3-8-5.4c0-3.5 3.4-6 8-6z"/><circle cx="9" cy="13.6" r=".9" fill="currentColor" stroke="none"/><circle cx="15" cy="13.6" r=".9" fill="currentColor" stroke="none"/><path d="M10.8 16.2c.7.7 1.7.7 2.4 0"/></svg>';
+      b.onclick=function(){if(window.openAgent)openAgent()};
+      var ib=document.getElementById('instb'),sr=document.getElementById('srchb');
+      top.insertBefore(b,ib||sr||null)}
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addAsk);else addAsk();
+  })();
 })();

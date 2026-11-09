@@ -95,7 +95,7 @@
     dotEl = node('i', 'bd-dot'); dotEl.hidden = true;
     root.append(bubble, btn); btn.append(dotEl);
     x.onclick = function () { closeBubble(); };
-    btn.onclick = function () { if (!bubble.hidden) { closeBubble(); return; } openBubble(false); tap(); };
+    btn.onclick = function () { try { if (!bubble.hidden) { closeBubble(); return; } openBubble(false); tap(); } catch (e) { try { closeBubble(); } catch (e2) {} } };
     actB.onclick = function () { var a = ACTS[(snap || {}).act]; closeBubble(); if (a) a[1](); };
     document.body.appendChild(root); applyPrefs(); refresh();
   }
@@ -125,7 +125,7 @@
   function markCool(key) { try { var m = JSON.parse(localStorage.getItem(CK) || '{}'), now = Date.now(); Object.keys(m).forEach(function (k) { if (now - m[k] > COOL_MS) delete m[k]; }); m[key] = now; localStorage.setItem(CK, JSON.stringify(m)); } catch (e) {} }
 
   // ---- 自动让位：弹窗、抽屉、引导、键盘、拖拽、＋ 菜单、全屏时隐藏 ----
-  var BLOCK = '.mask.show,.mn-overlay,.dw.show,.driver-popover,.sort-ghost,.sortable-chosen,.sortable-drag';
+  var BLOCK = '.mask.show,.mn-overlay,.dw.show,.driver-popover,.driver-overlay,.driver-active-element,.sort-ghost,.sortable-chosen,.sortable-drag';
   function blocked() {
     if (document.querySelector(BLOCK)) return true;
     var fm = document.getElementById('fabm'); if (fm && !fm.hidden) return true;
