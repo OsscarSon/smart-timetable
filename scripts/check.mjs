@@ -34,6 +34,15 @@ if (existsSync('js/goals-plan.js')) {
   for (const m of p.matchAll(/'((?:plan|opt|sug|stat|reason|note|step|exist|err|basis|pace)[A-Za-z_]+)'/g)) if (!m[1].endsWith('_') && !(m[1] in L) && !/^(planBtn|planDone)$/.test(m[1])) fail('goals-plan.js 里的字符串像翻译键但词典里没有：' + m[1]);
 }
 
+// 本机 OCR（Tesseract.js）边界：ocr.js 只做“图片 → 候选课程”，不碰任何存储 / 云端 / 日程；库固定版本、只从 jsDelivr 按需加载；写入全在 ai.js（核对后才写）。
+if (existsSync('js/ocr.js')) {
+  const o = readFileSync('js/ocr.js', 'utf8');
+  for (const w of ['localStorage', 'cloud.', 'fetch(', 'XMLHttpRequest', 'sendBeacon', 'FX.', 'fxSave', 'saveWeek', 'Undo.', 'WK[']) if (o.includes(w)) fail('ocr.js 不应使用：' + w);
+  if (!/cdn\.jsdelivr\.net\/npm\/tesseract\.js@\d+\.\d+\.\d+\//.test(o)) fail('ocr.js 里的 Tesseract.js 必须固定到具体版本（@x.y.z）');
+  if (/tesseract\.js@(latest|\^|~)/.test(o)) fail('ocr.js 不能用 latest / 范围版本');
+  if ((o.match(/https?:\/\//g) || []).filter(u => !/jsdelivr\.net/.test(u)).length > 0 && /https?:\/\/(?!cdn\.jsdelivr\.net)[a-z]/.test(o.replace(/\/\/.*$/gm, ''))) fail('ocr.js 里出现了 jsDelivr 以外的网址');
+}
+
 // Goals 同步边界（v9.5/9.6）：只有目标本体 goals-g:* 和排程关联表 goals-links 能进云同步；设备 id / 偏好都必须留在本机
 {
   const sy = readFileSync('js/sync.js', 'utf8') + readFileSync('js/hook.js', 'utf8');
