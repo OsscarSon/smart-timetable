@@ -85,6 +85,7 @@ supabase/schema.sql   Supabase 建表 + 行级安全 + 附件存储桶，运行�
 | @capacitor-community/speech-recognition（手机 App 才用） | 语音输入：弹出系统语音识别窗口 | 网页用浏览器自带语音；都没有就隐藏按钮 |
 | @ebarooni/capacitor-calendar（手机 App 才用，装的是 `latest-7`，对应 Capacitor 7） | 设置 → 数据：写入 / 导入手机系统日历 | 网页版看不到这一块 |
 | 霞鹜文楷 LXGW WenKai（字体，OFL-1.1） | 界面中文字体（常规 + 粗体），按字切片加载 | 退回系统中文字体 |
+| Tesseract.js（拍照识别课表的“本机 OCR”，Apache-2.0） | AI 助手 → 拍照 → 本机 OCR：免费、图片不上传；按需加载 v6.0.1，首次需下载引擎和语言包 | 默认仍是云端 AI（Gemini）；本机 OCR 只在你选了才会加载 |
 
 **部署后先打开 设置 页，最下面“开源库”一行会显示每个库 ✓ / ✗。** 有 ✗ 说明那个 CDN 链接没加载到（版本号或路径不对、或网络问题），去 index.html 改成能用的版本即可。
 

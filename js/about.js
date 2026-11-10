@@ -10,7 +10,7 @@
     fh:['功能','Features','Ciri'],
     tabO:['开源项目','Open source','Sumber terbuka'],
     lh:['用到的开源项目','Open-source projects used','Projek sumber terbuka'],
-    note:['AI 整理 / 问答：文字类请求按顺序用 Groq / Cerebras / Mistral / Gemini 的免费额度（都不是开源，需要登录）；拍照识别只用 Gemini。浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Text AI requests use the free tiers of Groq, Cerebras, Mistral and Gemini in turn (none are open source; sign-in required); photo import uses Gemini only. Browser built-in translation is a browser feature.','Permintaan AI teks guna tahap percuma Groq, Cerebras, Mistral dan Gemini secara bergilir (bukan sumber terbuka; perlu log masuk); import foto guna Gemini sahaja. Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
+    note:['AI 整理 / 问答：文字类请求按顺序用 Groq / Cerebras / Mistral / Gemini 的免费额度（都不是开源，需要登录）；拍照识别默认用 Gemini，也可以改用本机 OCR（Tesseract.js，开源，图片不上传）。浏览器内置翻译和 Gemini Nano 属于浏览器自带功能。','Text AI requests use the free tiers of Groq, Cerebras, Mistral and Gemini in turn (none are open source; sign-in required); photo import uses Gemini by default, or on-device OCR (Tesseract.js, open source, the photo is not uploaded). Browser built-in translation is a browser feature.','Permintaan AI teks guna tahap percuma Groq, Cerebras, Mistral dan Gemini secara bergilir (bukan sumber terbuka; perlu log masuk); import foto guna Gemini secara lalai, atau OCR pada peranti (Tesseract.js, sumber terbuka, foto tidak dimuat naik). Terjemahan terbina dalam pelayar ialah ciri pelayar.'],
     close:['关闭','Close','Tutup']
   };
   var F=[
@@ -48,6 +48,7 @@
     ['@capacitor-community/speech-recognition','MIT',['手机 App 里的语音输入','Voice input in the phone app','Input suara dalam app telefon'],'https://github.com/capacitor-community/speech-recognition'],
     ['@ebarooni/capacitor-calendar','MIT',['读写手机系统日历','Read and write the phone calendar','Baca & tulis kalendar telefon'],'https://github.com/ebarooni/capacitor-calendar'],
     ['Lucide','ISC',['界面图标','Interface icons','Ikon antara muka'],'https://github.com/lucide-icons/lucide'],
+    ['Tesseract.js','Apache-2.0',['拍照识别课表（本机 OCR，图片不上传）','Timetable photo OCR on your device (photo not uploaded)','OCR foto jadual pada peranti (foto tidak dimuat naik)'],'https://github.com/naptha/tesseract.js'],
     ['Capacitor','MIT',['打包成 Android / iOS App','Packages the web app as Android / iOS','Membungkus sebagai app Android / iOS'],'https://github.com/ionic-team/capacitor'],
     ['SortableJS','MIT',['拖动排序（科目、护肤步骤、运动卡片）','Drag-and-drop ordering (subjects, skincare steps, sport cards)','Susun seret (subjek, langkah kulit, kad sukan)'],'https://github.com/SortableJS/Sortable'],
     ['Fuse.js','Apache-2.0',['模糊搜索（打错字也能找到）','Fuzzy search (finds results despite typos)','Carian kabur (jumpa walaupun salah taip)'],'https://github.com/krisk/Fuse'],

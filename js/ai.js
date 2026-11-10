@@ -10,18 +10,20 @@
   function say(t){msg.textContent=t||''}
 
   function setTab(t){
-    S.tab=t;S.items=[];S.kind='';list.innerHTML='';say('');ok.hidden=true;rw.hidden=true;stopMic();
+    leaveReview();S.tab=t;S.items=[];S.kind='';list.innerHTML='';say('');ok.hidden=true;rw.hidden=true;stopMic();
     [].forEach.call(tabs.children,function(b){b.classList.toggle('on',b.getAttribute('data-t')===t)});
     [].forEach.call(m.querySelectorAll('.aip'),function(p){p.hidden=p.getAttribute('data-p')!==t});
-    go.hidden=t==='photo';go.textContent=t==='plan'?'重排整周':'解析'}
+    go.hidden=t==='photo';go.textContent=t==='plan'?'重排整周':'解析';if(t==='photo'&&typeof paintEng==='function')paintEng()}
   [].forEach.call(tabs.children,function(b){b.onclick=function(){setTab(b.getAttribute('data-t'))}});
 
   function openAI(tab){
     if(tab===true)tab='photo';else if(!tab)tab='quick';
     q.value='';pq.value='';setTab(tab);
     m.classList.add('show');
-    if(tab==='photo')setTimeout(function(){paintEng();img.click()},50);else setTimeout(function(){(tab==='plan'?pq:q).focus()},50)}
-  function close(){m.classList.remove('show');stopMic()}
+    if(tab==='photo')setTimeout(function(){img.click()},50);else setTimeout(function(){(tab==='plan'?pq:q).focus()},50)}
+  var dlgEl=m.querySelector('.dlg');
+  function leaveReview(){dlgEl.classList.remove('rv')}
+  function close(){m.classList.remove('show');stopMic();leaveReview();if(thumbUrl){URL.revokeObjectURL(thumbUrl);thumbUrl=null}}
   m.onclick=close;document.getElementById('aix').onclick=close;
   document.getElementById('fxph').onclick=function(){openAI('photo')};
 
@@ -36,7 +38,7 @@
       try{return await LocalAI.quick(body,function(p){say('⬇️ 正在下载内置 AI 模型 '+p+'%')})}
       catch(e2){throw new Error(apiErr(e).slice(0,60)+'；内置 AI 也失败：'+String(e2.message||e2).slice(0,60))}}}
   function busy(b,t){S.busy=b;go.disabled=b;mic.disabled=b;say(b?t:'')}
-  function fail(e){busy(false);say('出错了：'+apiErr(e)+'（云端和内置 AI 都不可用时，手动添加照常可用）')}
+  function fail(e){busy(false);say('出错了：'+apiErr(e)+'（云端和内置 AI 都不可用时，手动添加照常可用）'+(S.tab==='photo'&&window.OCR&&S.engine==='cloud'?' 拍照可以改用上面的「本机 OCR」（免费，图片不上传）。':''))}
 
   // ---- 一句话 / 整周重排 ----
   go.onclick=async function(){
@@ -75,32 +77,69 @@
         if(bad)it.cb.disabled=true}});
     say(notes.join(' ')||'勾选要加入的，再点「加入」。');ok.hidden=false}
 
-  // ---- 拍照 ----
-  // 识别方式：☁️ AI 看图（Gemini，更准）｜🔤 本机文字识别（Tesseract.js 在浏览器里 OCR，再由文字 AI 整理；不占看图额度）
-  var eng=document.getElementById('aieng'),ocrb=document.getElementById('aiocrb'),ocrl=document.getElementById('aiocrl'),ocrBox=document.getElementById('aiocr'),ocrT=document.getElementById('aiot'),ocrG=document.getElementById('aiog'),OC={plain:'',pos:''};
-  function engPref(){var v='';try{v=localStorage.getItem('ai-photo-eng')||''}catch(e){}return v==='ocr'?'ocr':'ai'}
-  function paintEng(){[].forEach.call(eng.children,function(b){b.classList.toggle('on',b.getAttribute('data-e')===engPref())});ocrb.hidden=engPref()!=='ocr';ocrBox.hidden=true}
-  [].forEach.call(eng.children,function(b){b.onclick=function(){try{localStorage.setItem('ai-photo-eng',b.getAttribute('data-e'))}catch(e){}paintEng()}});
-  (function(){var def={zh:'chi_sim+eng',ms:'msa+eng'}[window.LANG]||'eng',v='';try{v=localStorage.getItem('ai-ocr-lang')||''}catch(e){}ocrl.value=v||def;if(ocrl.value!==(v||def))ocrl.value=def;ocrl.onchange=function(){try{localStorage.setItem('ai-ocr-lang',ocrl.value)}catch(e){}}})();
-  paintEng();
-  async function ocrFlow(f){
-    ocrBox.hidden=true;busy(true,'正在加载文字识别（第一次要下载约 10–20 MB）…');
+  // ---- 拍照识别的两种方式：云端 AI（默认）/ 本机 OCR（开源 Tesseract.js，图片不上传；结果只是候选，必须逐项核对）----
+  var eng=document.getElementById('aieng'),ocrl=document.getElementById('aiocrl'),engnote=document.getElementById('aiengnote'),thumbUrl=null;
+  function lsget(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}}
+  function lsset(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  S.engine=lsget('ai-photo-engine','cloud');S.ocrLang=lsget('ai-ocr-lang',window.LANG==='zh'?'zh':'latin');
+  function paintEng(){
+    [].forEach.call(eng.children,function(b){var on=b.getAttribute('data-e')===S.engine;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')});
+    [].forEach.call(ocrl.querySelectorAll('[data-l]'),function(b){var on=b.getAttribute('data-l')===S.ocrLang;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false')});
+    ocrl.hidden=S.engine!=='ocr';
+    engnote.textContent=S.engine==='ocr'?'本机 OCR 免费，图片只在这台设备上处理，不会上传；第一次要下载识别引擎。对“星期在上、时间在左”的网格课表最有效。识别难免出错，所以每一项都要你核对，也可以直接修改。':''}
+  [].forEach.call(eng.children,function(b){b.onclick=function(){S.engine=b.getAttribute('data-e');lsset('ai-photo-engine',S.engine);paintEng()}});
+  [].forEach.call(ocrl.querySelectorAll('[data-l]'),function(b){b.onclick=function(){S.ocrLang=b.getAttribute('data-l');lsset('ai-ocr-lang',S.ocrLang);paintEng()}});
+  if(!window.OCR){eng.hidden=true;S.engine='cloud'}
+  function ocrConsent(){
+    var k='ocr-ok-'+S.ocrLang;if(lsget(k,'')==='1')return true;
+    if(!confirm('本机 OCR 第一次使用要下载识别引擎和语言包（约 10–15 MB，只下载一次，之后可离线用）。图片始终只在这台设备上处理，不会上传。现在开始吗？'))return false;
+    lsset(k,'1');return true}
+  async function runOcr(f){
+    if(S.busy)return;if(!ocrConsent()){say('已取消。');return}
+    busy(true,'正在准备本机 OCR…');
     try{
-      var o=await OCR.run(f,ocrl.value,function(p,st){busy(true,p>=0?'识别中 '+p+'%…':'正在准备识别（'+(st||'')+'）…')});
-      busy(false);OC=o;ocrT.value=o.plain;ocrBox.hidden=false;
-      say(o.plain.length<10?'几乎没识别到文字：换一张更清晰的图，或改用「AI 看图」。':'识别完成，请检查文字。');
-      ocrT.focus()}
-    catch(e){busy(false);say('文字识别没成功：'+(e&&e.message||e)+'（可以改用「AI 看图」）')}}
-  ocrG.onclick=async function(){
-    if(S.busy)return;var t=ocrT.value.trim();if(t.length<6){say('文字太少，没法整理。');return}
-    var send=(t===OC.plain.trim()&&OC.pos)?OC.pos:t;           // 没改过就用带位置的版本，改过就用你改的纯文字
-    ocrBox.hidden=true;busy(true,'正在整理成课表…');
-    try{var j=await post({mode:'ocr',text:send});busy(false);S.kind='photo';S.items=j.lessons||[];renderPhoto(j.notes||[])}
-    catch(e){fail(e);ocrBox.hidden=false}};
+      var res=await OCR.recognize(f,{lang:S.ocrLang,onProgress:function(st,p){say(st==='lib'?'正在加载识别引擎…':st==='data'?'正在下载识别数据 '+p+'%（只下载一次）…':'正在识别 '+p+'%…')}});
+      busy(false);S.kind='photo';S.ocr=res;
+      S.items=res.lessons.map(function(l){return {day:l.day,s:l.s,e:l.e,t:l.t,room:l.room||'',teacher:l.teacher||'',low:!!l.low,guess:!!l.guessedTime,conf:l.conf}});
+      if(thumbUrl)URL.revokeObjectURL(thumbUrl);thumbUrl=URL.createObjectURL(f);renderOcr(res)}
+    catch(e){busy(false);say(String(e&&e.message)==='ocr-lib'?'识别引擎没能加载（第一次需要联网下载）。请检查网络，或改用云端 AI。':'本机 OCR 出错了：'+String((e&&e.message)||e).slice(0,80)+'。可以改用云端 AI，或手动添加。')}}
+  function toHM(m){return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')}
+  function fromHM(v){var m=/^(\d{1,2}):(\d{2})$/.exec(v||'');return m?+m[1]*60+(+m[2]):null}
+  function ocrNote(res){
+    var n=[];
+    if(res.notes.indexOf('noTimes')>=0)n.push('没找到时间栏，时间是我猜的，请务必改成正确的。');
+    if(res.notes.indexOf('list')>=0)n.push('这张图按“一行一节”来识别。');
+    if(res.notes.indexOf('merged')>=0||res.notes.indexOf('spanned')>=0)n.push('相邻同名或跨行的课已合并成一节。');
+    if(res.notes.indexOf('fewWords')>=0)n.push('图里认出的文字太少。');
+    return n.join(' ')+(n.length?' ':'')}
+  function ocrRow(it){
+    var r=el('div','tp ai-it ocr-it'+(it.low||it.guess?' low':'')),lab=el('label','ocr-ck'),cb=el('input');cb.type='checkbox';cb.checked=!(it.low||it.guess);lab.setAttribute('aria-label','加入这一节');lab.appendChild(cb);it.cb=cb;
+    var f=el('div','n ocr-f'),r1=el('div','ocr-r1'),r2=el('div','ocr-r2');
+    var ds=el('select');ds.setAttribute('aria-label','星期');DAYS.forEach(function(d,i){var o=el('option',null,'周'+d);o.value=i;if(i===it.day)o.selected=true;ds.appendChild(o)});ds.onchange=function(){it.day=+ds.value};
+    var ti=el('input');ti.type='time';ti.step=300;ti.value=toHM(it.s);ti.setAttribute('aria-label','开始时间');ti.onchange=function(){var v=fromHM(ti.value);if(v!==null)it.s=v};
+    var te=el('input');te.type='time';te.step=300;te.value=toHM(it.e);te.setAttribute('aria-label','结束时间');te.onchange=function(){var v=fromHM(te.value);if(v!==null)it.e=v};
+    var tt=el('input');tt.type='text';tt.maxLength=40;tt.value=it.t;tt.setAttribute('aria-label','课程名称');tt.oninput=function(){it.t=tt.value.trim()};
+    var tr=el('input');tr.type='text';tr.maxLength=20;tr.value=it.room;tr.placeholder='教室';tr.setAttribute('aria-label','教室');tr.oninput=function(){it.room=tr.value.trim()};
+    r1.appendChild(ds);r1.appendChild(ti);r1.appendChild(el('span',null,'–'));r1.appendChild(te);r2.appendChild(tt);r2.appendChild(tr);f.appendChild(r1);f.appendChild(r2);
+    if(it.guess)f.appendChild(el('small','w','时间是猜的，请改成正确的'));else if(it.low)f.appendChild(el('small','w','识别把握较低（'+it.conf+'%），请核对'));
+    r.appendChild(lab);r.appendChild(f);return r}
+  function renderOcr(res){
+    list.innerHTML='';
+    var im=el('img','ocr-thumb');im.src=thumbUrl;im.alt='你选的课表图片';im.onclick=function(){im.classList.toggle('big')};list.appendChild(im);
+    if(!S.items.length){say(ocrNote(res)+'没识别到课程。拍得再正、再清楚一点，或改用云端 AI。');ok.hidden=true;rw.hidden=true;return}
+    S.items.sort(function(a,b){return a.day-b.day||a.s-b.s});
+    dlgEl.classList.add('rv');      // 核对模式：收起页签和说明，让列表占满、按钮始终可见
+    var back=el('button','chip as','← 重新选择图片');back.type='button';back.onclick=function(){leaveReview();list.innerHTML='';S.items=[];ok.hidden=true;rw.hidden=true;say('')};list.insertBefore(back,list.firstChild);
+    S.items.forEach(function(it){list.appendChild(ocrRow(it))});
+    if(res.unplaced&&res.unplaced.length){var d=el('details','ocr-un');d.appendChild(el('summary',null,'没有放进课表的文字（'+res.unplaced.length+'）'));d.appendChild(el('div','msg',res.unplaced.join(' · ')));list.appendChild(d)}
+    rep.checked=false;rw.hidden=!FX.length;
+    say('识别到 '+S.items.length+' 节课（平均把握 '+res.stats.avgConf+'%）。'+ocrNote(res)+'请对照上面的图片逐项核对，可以直接修改；把握较低的已经取消勾选。');ok.hidden=false}
+
+  // ---- 拍照 ----
   img.onchange=async function(){
     var f=img.files&&img.files[0];img.value='';if(!f||S.busy)return;
-    if(engPref()==='ocr'&&window.OCR){ocrFlow(f);return}
-    ocrBox.hidden=true;busy(true,'正在压缩图片…');
+    if(S.engine==='ocr'&&window.OCR){runOcr(f);return}
+    busy(true,'正在压缩图片…');
     try{
       var b64=await shrink(f);busy(true,'正在识别课表（可能要 10–20 秒）…');
       var j=await post({mode:'photo',image:b64,mime:'image/jpeg'});
@@ -129,10 +168,14 @@
     var pick=S.items.filter(function(it){return it.cb&&it.cb.checked&&!it.cb.disabled});
     if(!pick.length){say('还没有勾选任何一项');return}
     if(S.kind==='photo'){
+      var bad=pick.filter(function(it){return !it.t||!(it.e>it.s)||it.s<0||it.e>1440});      // 核对时可能改坏：名称不能空，结束要晚于开始
+      [].forEach.call(list.querySelectorAll('.ai-it.bad'),function(n){n.classList.remove('bad')});
+      if(bad.length){bad.forEach(function(it){var n=it.cb&&it.cb.closest&&it.cb.closest('.ai-it');if(n)n.classList.add('bad')});say(bad.length+' 节课的名称或时间不对（结束要晚于开始）。请先改好，或取消勾选。');return}
       if(rep.checked&&FX.length&&!confirm('会先清空现有的 '+FX.length+' 节固定课程，确定？'))return;
+      var psnap=Undo.snap();
       if(rep.checked)FX=[];
       pick.forEach(function(it){FX.push({id:uid(),day:it.day,s:it.s,e:it.e,t:it.t,room:it.room,teacher:it.teacher,type:'课',wk:null,c:subjCol(it.t)})});
-      fxSave();rFx();draw()}
+      fxSave();rFx();draw();Undo.toast('已加入 '+pick.length+' 节课',psnap)}
     else{
       var snap=Undo.snap(),touched={};
       pick.forEach(function(it){

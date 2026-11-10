@@ -18,7 +18,7 @@ window.AISRC=(function(){
       var b=document.createElement('button');b.className='chip'+(o.pref()===x[0]?' on':'');b.textContent=x[1];   // 这个脚本比 core.js 先加载，不能用 el()
       b.onclick=function(){o.setPref(x[0]);paint()};chips.appendChild(b)});
     msg.textContent=o.key()?'✓ 已设置自己的 key：AI 请求会用它，不占站长额度，也不需要登录。key 只存在这台设备，不会同步；它会经过本站的后端转发给 Google，不会被保存。':
-      '智能：一句话添加用本机 AI，整周重排用云端。本机 AI = Chrome 内置 Gemini Nano、WebLLM 小模型，电脑上还可以用 Ollama（免额度，数据不出设备；WebLLM 首次要下载约 1GB）。拍照识别只能走云端。也可以填自己的 Gemini API key（aistudio.google.com/apikey 免费申请）。'}
+      '智能：一句话添加用本机 AI，整周重排用云端。本机 AI = Chrome 内置 Gemini Nano、WebLLM 小模型，电脑上还可以用 Ollama（免额度，数据不出设备；WebLLM 首次要下载约 1GB）。拍照识别默认走云端，也可以在「拍照」里改用本机 OCR（免费，图片不上传）。也可以填自己的 Gemini API key（aistudio.google.com/apikey 免费申请）。'}
   // 本机 AI 状态 / 下载 / Ollama 设置
   var chk=document.getElementById('ailchk'),dl=document.getElementById('ailwl'),info=document.getElementById('aiinfo'),olu=document.getElementById('aiolu'),olm=document.getElementById('aiolm'),olr=document.getElementById('aiolr');
   if(chk&&info){
