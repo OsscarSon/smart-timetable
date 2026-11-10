@@ -641,3 +641,33 @@ body .driver-popover-arrow-side-bottom.driver-popover-arrow{border-bottom-color:
 @media (max-width:360px){.top{gap:6px}.ibtn{width:36px;height:36px}}
 .top-t small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:420px){.top{gap:7px}.top .ibtn{width:38px;height:38px}}
+
+/* ===== 本机 OCR：识别方式选择 + 可编辑的核对列表 ===== */
+#aieng,#aiocrl{gap:8px;margin:8px 0}
+.ocr-thumb{display:block;max-width:100%;max-height:120px;border-radius:12px;border:2px solid var(--line);margin:0 auto 8px;cursor:zoom-in;object-fit:contain;background:#fff}
+.ocr-thumb.big{max-height:60vh;cursor:zoom-out}
+.ocr-it{align-items:flex-start;gap:8px}
+.ocr-it.low{border-color:var(--danger)}
+.ocr-it.bad{outline:2px solid var(--danger);outline-offset:-2px}
+.ocr-ck{display:grid;place-items:center;min-width:36px;min-height:44px;cursor:pointer}
+.ocr-f{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.ocr-r1,.ocr-r2{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.ocr-f select,.ocr-f input[type=time],.ocr-f input[type=text]{min-height:38px;box-sizing:border-box;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:6px 8px;font:inherit;font-size:14px}
+.ocr-r2 input[type=text]:first-child{flex:2 1 120px;min-width:0}.ocr-r2 input[type=text]+input{flex:1 1 70px;min-width:0}
+.ocr-f input:focus,.ocr-f select:focus{outline:none;border-color:var(--pri)}
+.ocr-un{margin-top:8px;font-size:13px;color:var(--soft)}.ocr-un summary{cursor:pointer;min-height:32px}
+
+/* 核对模式（本机 OCR）：收起页签 / 说明，列表占满剩余高度并自己滚动，底部按钮不动 */
+.dlg.aid.rv{overflow:hidden}
+.dlg.aid.rv #aitabs,.dlg.aid.rv .aip{display:none}
+.dlg.aid.rv #ail{flex:1 1 auto;min-height:160px;max-height:none}
+.dlg.aid.rv #aimsg{max-height:84px;overflow:auto}
+/* 核对行更紧凑：星期 + 开始 – 结束 在一行（窄屏自动换行）；去掉时间框的时钟图标省宽度 */
+.ocr-f select{width:66px;padding:6px 4px}
+.ocr-f input[type=time]{width:94px;padding:6px 4px;font-size:13px}
+.ocr-f input[type=time]::-webkit-calendar-picker-indicator{display:none}
+.ocr-ck{min-width:32px}
+.ocr-it{padding:8px 10px}
+.ocr-r1{display:grid;grid-template-columns:66px minmax(0,1fr) 10px minmax(0,1fr);align-items:center;gap:6px}
+.ocr-r1 input[type=time]{width:100%;min-width:0;padding:6px 2px 6px 6px}
+@media (max-width:380px){.ocr-r1{grid-template-columns:58px minmax(0,1fr) 8px minmax(0,1fr);gap:4px}.ocr-f input[type=time]{font-size:12px}.ocr-f select{width:58px;font-size:13px;padding:6px 2px}}
