@@ -229,13 +229,16 @@
       <div id="cloud"></div>
       <details class="oss"><summary>开源库加载状态</summary><div class="libs" id="libs"></div></details>
       <h3 class="hs">🧠 AI 来源（只对这台设备生效）</h3>
-      <div class="chips" id="aisrc"></div>
       <div class="msg note" id="aikn">💡 建议填你自己的 Gemini key：这样不受作者额度影响，也不需要登录。留空也能用，只是会走作者后端的 key（额度有限，用完当天就不能用了）。</div>
       <input id="aikey" class="ft" type="password" autocomplete="off" spellcheck="false" maxlength="80" placeholder="（可选）粘贴你自己的 Gemini API key" aria-label="Gemini API key">
       <div class="msg" id="aikm"></div>
+      <details class="oss" id="ailocal"><summary>⚙️ 高级：本机 AI（可选）</summary>
+        <div class="msg" id="aimd">本机 AI = Chrome 内置 Gemini Nano、WebLLM 小模型，电脑上还可以用 Ollama（免额度，数据不出设备；WebLLM 首次要下载约 1GB）。选下面的「智能」或「全部优先本机」才会用到。</div>
+        <div class="chips" id="aisrc"></div>
       <div class="chips"><button class="chip" id="ailchk">🔍 检查本机 AI</button><button class="chip" id="ailwl">⬇️ 下载 WebLLM 模型</button><button class="chip" id="ailtest">▶️ 测试</button><button class="chip" id="ailauto"></button></div>
-      <div class="msg" id="aiinfo"></div>
+        <div class="msg" id="aiinfo"></div>
       <div id="aiolr"><input id="aiolu" placeholder="Ollama 地址（默认 http://localhost:11434）" maxlength="80" spellcheck="false"><input id="aiolm" placeholder="Ollama 模型名，如 qwen2.5:3b（留空用第一个）" maxlength="60" spellcheck="false"></div>
+      </details>
     </div>
 
     <div class="sec" data-sec="data" data-t="数据：分享与备份">

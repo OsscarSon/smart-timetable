@@ -671,3 +671,6 @@ body .driver-popover-arrow-side-bottom.driver-popover-arrow{border-bottom-color:
 .ocr-r1{display:grid;grid-template-columns:66px minmax(0,1fr) 10px minmax(0,1fr);align-items:center;gap:6px}
 .ocr-r1 input[type=time]{width:100%;min-width:0;padding:6px 2px 6px 6px}
 @media (max-width:380px){.ocr-r1{grid-template-columns:58px minmax(0,1fr) 8px minmax(0,1fr);gap:4px}.ocr-f input[type=time]{font-size:12px}.ocr-f select{width:58px;font-size:13px;padding:6px 2px}}
+
+/* v9.8.6：AI 设置里“高级：本机 AI”折叠区 */
+#ailocal{margin-top:12px}#ailocal>.msg,#ailocal>.chips,#ailocal>#aiolr{margin-top:10px}

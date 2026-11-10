@@ -1,24 +1,24 @@
 // AI 来源（只存在这台设备，键名不以 mochi- 开头，所以不会同步 / 不进备份 / 不会被分享出去）：
-//   smart = 默认：一句话添加优先用本机 AI，整周重排仍云端优先（小模型排整周容易排坏）
-//   auto  = 全部云端优先，不可用时再用本机 AI
+//   auto  = 默认：全部云端优先（本站后端提供 AI，不用安装/下载任何东西），不可用时再用本机 AI
+//   smart = 一句话添加优先用本机 AI，整周重排仍云端优先（小模型排整周容易排坏）
 //   local = 一句话添加和整周重排都优先用本机 AI（Chrome 内置 Gemini Nano / WebLLM / 电脑上的 Ollama），失败再用云端；拍照识别仍要云端
 //   另外可以填自己的 Gemini API key：请求会带上它，后端用你的 key 调用，不占站长的额度，也不要求登录。
 window.AISRC=(function(){
   var P='ai-src',K='ai-own-key';
   function g(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
   function s(k,v){try{if(v)localStorage.setItem(k,v);else localStorage.removeItem(k)}catch(e){}}
-  var o={pref:function(){var v=g(P);return v==='local'||v==='auto'?v:'smart'},setPref:function(v){s(P,v==='smart'?'':v)},
+  var o={pref:function(){var v=g(P);return v==='local'||v==='smart'?v:'auto'},setPref:function(v){s(P,v==='auto'?'':v)},
     key:function(){var k=g(K).trim();return /^[\w-]{20,80}$/.test(k)?k:''},setKey:function(v){s(K,String(v||'').trim())},
     preferLocal:function(kind){var p=o.pref();return !o.key()&&(p==='local'||(p==='smart'&&kind==='quick'))}};
   var chips=document.getElementById('aisrc'),inp=document.getElementById('aikey'),msg=document.getElementById('aikm');
   if(!chips||!inp)return o;
   function paint(){
     chips.innerHTML='';
-    [['smart','智能（推荐）'],['auto','云端优先'],['local','全部优先本机']].forEach(function(x){
+    [['auto','云端优先（推荐）'],['smart','智能（简单任务用本机）'],['local','全部优先本机']].forEach(function(x){
       var b=document.createElement('button');b.className='chip'+(o.pref()===x[0]?' on':'');b.textContent=x[1];   // 这个脚本比 core.js 先加载，不能用 el()
       b.onclick=function(){o.setPref(x[0]);paint()};chips.appendChild(b)});
     msg.textContent=o.key()?'✓ 已设置自己的 key：AI 请求会用它，不占站长额度，也不需要登录。key 只存在这台设备，不会同步；它会经过本站的后端转发给 Google，不会被保存。':
-      '智能：一句话添加用本机 AI，整周重排用云端。本机 AI = Chrome 内置 Gemini Nano、WebLLM 小模型，电脑上还可以用 Ollama（免额度，数据不出设备；WebLLM 首次要下载约 1GB）。拍照识别默认走云端，也可以在「拍照」里改用本机 OCR（免费，图片不上传）。也可以填自己的 Gemini API key（aistudio.google.com/apikey 免费申请）。'}
+      '默认由本站后端提供 AI，不用安装或下载任何东西，直接可用。拍照识别也走云端，也可以在「拍照」里改用本机 OCR（免费，图片不上传）。想不受额度限制，可以填自己的 Gemini API key（aistudio.google.com/apikey 免费申请）。'}
   // 本机 AI 状态 / 下载 / Ollama 设置
   var chk=document.getElementById('ailchk'),dl=document.getElementById('ailwl'),info=document.getElementById('aiinfo'),olu=document.getElementById('aiolu'),olm=document.getElementById('aiolm'),olr=document.getElementById('aiolr');
   if(chk&&info){
