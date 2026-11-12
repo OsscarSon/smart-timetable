@@ -70,6 +70,20 @@ if (existsSync('js/study-space-core.js') && existsSync('js/study-space.js')) {
   const css = readFileSync('css/study-space.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   for (const m of css.matchAll(/(?:^|\})\s*([^{}@]+)\{/g)) for (const sel of m[1].split(',')) { const x = sel.trim(); if (x && !/^(#v-ss|\.study-space-)/.test(x) && !/^\d+%$/.test(x)) fail('study-space.css 里有没加命名空间的选择器：' + x); }
 }
+// Work / Life Space（v9.8.8）：聚合层必须是纯函数；界面层不许建自己的数据、不许直接读写本机存储；三语键一致；CSS 全部带命名空间
+if (existsSync('js/spaces-core.js') && existsSync('js/spaces.js')) {
+  const c = readFileSync('js/spaces-core.js', 'utf8'), u = readFileSync('js/spaces.js', 'utf8');
+  for (const w of ['document', 'localStorage', 'sessionStorage', 'put2(', 'cloud', 'Undo', 'fetch(']) if (c.includes(w)) fail('spaces-core.js 必须是纯函数，不应使用：' + w);
+  for (const m of u.matchAll(/['"`](mochi-[A-Za-z0-9:_-]*|goals-[A-Za-z0-9:_-]*)/g)) fail('spaces.js 不应出现数据键字面量：' + m[1]);
+  for (const w of ['localStorage', 'sessionStorage', 'cloud.', 'put2(', 'saveWeek', 'fxSave', 'rpSave', 'Undo.', 'syscal', 'saveGoal', 'deleteGoal', 'GoalsPlan.commit', 'data.push', 'fetch(']) if (u.includes(w)) fail('spaces.js 不应使用：' + w);
+  const sb = { window: {} }; new Function('window', readFileSync('js/lang-spaces.js', 'utf8'))(sb.window);
+  const D = sb.window.SPACES_I18N, ks = l => Object.keys(D[l]).sort().join(',');
+  for (const l of ['zh', 'ms']) if (ks(l) !== ks('en')) fail('lang-spaces.js：' + l + ' 与 en 的键不一致');
+  for (const m of u.matchAll(/\bt\('([A-Za-z0-9_]+)'/g)) if (!(m[1] in D.en)) fail('spaces.js 用了没有翻译的键：' + m[1]);
+  for (const l of ['en', 'zh', 'ms']) for (const k of Object.keys(D[l])) if (!D[l][k]) fail('lang-spaces.js：' + l + '.' + k + ' 是空的');
+  const css = readFileSync('css/spaces.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/(?:^|\})\s*([^{}@]+)\{/g)) for (const sel of m[1].split(',')) { const x = sel.trim(); if (x && !/^(#v-wk|#v-lf|\.spc-)/.test(x)) fail('spaces.css 里有没加命名空间的选择器：' + x); }
+}
 // 版本号：js/version.js、package.json、sw.js 的缓存名必须一致；菜单等地方不许再写死版本号
 {
   const pv = JSON.parse(readFileSync('package.json', 'utf8')).version;

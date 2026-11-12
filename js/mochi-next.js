@@ -27,7 +27,7 @@
   function tx(k){return (COPY[window.LANG]||COPY.en)[k]||k}
   function modes(){var v=prof.modes;if(!Array.isArray(v))v=prof.mode==='both'?['study','work']:[prof.mode||'study'];return ['study','work','life'].filter(function(k){return v.indexOf(k)>=0})}
   function mode(){var m=modes();return m.length===1?m[0]:m.indexOf('study')>=0&&m.indexOf('work')>=0?'both':m[0]||'study'}
-  function selectMode(m){var a=Array.isArray(m)?m:[m];prof.modes=['study','work','life'].filter(function(k){return a.indexOf(k)>=0});if(!prof.modes.length)prof.modes=['study'];prof.mode=mode();save(PROFILE,prof);applyMode()}
+  function selectMode(m){var a=Array.isArray(m)?m:[m];prof.modes=['study','work','life'].filter(function(k){return a.indexOf(k)>=0});if(!prof.modes.length)prof.modes=['study'];prof.mode=mode();save(PROFILE,prof);applyMode();fire('mochi:modes')}
   function makeModeCards(into){
     into.querySelectorAll('.mn-mode-grid').forEach(function(e){e.remove()});
     var wrap=node('div','mn-mode-grid');
@@ -45,12 +45,14 @@
     var m=modes();document.body.dataset.mochiMode=m.join('-');
     // Do not rewrite existing labels: source app i18n and feature-specific terminology stay intact.
   }
+  function fire(n){try{document.dispatchEvent(new CustomEvent(n))}catch(e){}}   // v9.8.8：通知 Work / Life Space 刷新（只读，不带数据）
+  function energyToday(){var e=energy[today()];return e&&e.level||''}   // 今天没记录就返回空，不套默认值
   function dayEnergy(day){return energy[day]&&energy[day].level||'medium'}
   function openEnergy(){var m=modal('⚡ Mochi Energy');var key=today();
     var intro=node('p','mn-hint',tx('energyIntro'));m.panel.append(intro);
     var wrap=node('div','mn-energy-grid');m.panel.append(wrap);
     [['high','⚡ '+tx('high'),tx('highDesc')],['medium','🌤 '+tx('medium'),tx('mediumDesc')],['low','🌙 '+tx('low'),tx('lowDesc')]].forEach(function(v){
-      var b=button(v[1]+'\n'+v[2],function(){energy[key]={level:v[0],updated:Date.now()};save(ENERGY,energy);refresh()},'mn-energy-option');b.dataset.energy=v[0];wrap.append(b);
+      var b=button(v[1]+'\n'+v[2],function(){energy[key]={level:v[0],updated:Date.now()};save(ENERGY,energy);refresh();fire('mochi:energy')},'mn-energy-option');b.dataset.energy=v[0];wrap.append(b);
     });
     var result=node('div','mn-suggest');m.panel.append(result);
     function refresh(){wrap.querySelectorAll('button').forEach(function(b){b.classList.toggle('selected',b.dataset.energy===dayEnergy(key))});
@@ -145,7 +147,7 @@
       hint.textContent=found&&!isNaN(found.valueOf())?tx('chronoFound')+': '+found.toLocaleString()+' · '+tx('chronoNext'):tx('chronoMissing');}
     q.addEventListener('input',function(){clearTimeout(timer);timer=setTimeout(check,220)});hint.textContent=tx('chronoEmpty');
   }
-  window.MochiNext={mode:mode,modes:modes,selectMode:selectMode,mountWizardChoices:mountWizardChoices,openModes:openModes,openEnergy:openEnergy,openWrapped:openWrapped,startTour:startTour};
+  window.MochiNext={energyToday:energyToday,mode:mode,modes:modes,selectMode:selectMode,mountWizardChoices:mountWizardChoices,openModes:openModes,openEnergy:openEnergy,openWrapped:openWrapped,startTour:startTour};
   document.addEventListener('DOMContentLoaded',function(){applyMode();mountWrapped();connectChrono();});
   // 向导走完会重载页面并留下标记：这里接上第二层——先跑 driver.js 引导，引导结束后弹出「学习 / 工作 / 生活」模式选择。
   window.addEventListener('load',function(){
