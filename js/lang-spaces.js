@@ -2,6 +2,7 @@
 // 这里只放界面文字；任何数字、活动名、目标名都来自用户自己的真实数据。
 window.SPACES_I18N = {
   en: {
+    tabWork: 'Work', tabLife: 'Life', tabSpaces: 'Spaces',
     swAria: 'Choose a space',
     swStudy: 'Study', swWork: 'Work', swLife: 'Life',
     wEyebrow: 'Your work space', wTitle: 'Make room for your best work ✨',
@@ -33,6 +34,7 @@ window.SPACES_I18N = {
     err: 'Could not load this page.', retry: 'Try again'
   },
   zh: {
+    tabWork: '工作', tabLife: '生活', tabSpaces: '空间',
     swAria: '选择空间',
     swStudy: '学习', swWork: '工作', swLife: '生活',
     wEyebrow: '你的工作空间', wTitle: '给最好的工作留出空间 ✨',
@@ -64,6 +66,7 @@ window.SPACES_I18N = {
     err: '这一页暂时加载不了。', retry: '重试'
   },
   ms: {
+    tabWork: 'Kerja', tabLife: 'Hidup', tabSpaces: 'Ruang',
     swAria: 'Pilih ruang',
     swStudy: 'Belajar', swWork: 'Kerja', swLife: 'Hidup',
     wEyebrow: 'Ruang kerja anda', wTitle: 'Beri ruang untuk kerja terbaik anda ✨',

@@ -49,7 +49,7 @@ const rows = page => page.evaluate(() => { const g = [...document.querySelectorA
       // FAQ
       await page.evaluate(() => openFaq()); await page.waitForTimeout(200);
       const f1 = await page.evaluate(() => ({ n: document.querySelectorAll('#mask-faq .fq-i').length, shown: document.getElementById('mask-faq').classList.contains('show'), ver: document.querySelector('#mask-faq .fq-v').textContent }));
-      rec(tag + 'FAQ 打开，15 条问答，显示版本号', f1.shown && f1.n === 15 && f1.ver.includes(PKG), JSON.stringify(f1));
+      rec(tag + 'FAQ 打开，39 条问答，显示版本号', f1.shown && f1.n === 39 && f1.ver.includes(PKG), JSON.stringify(f1));
       await page.click('#mask-faq .fq-q'); 
       const ex = await page.evaluate(() => { const a = document.querySelector('#mask-faq .fq-a'); const b = document.querySelector('#mask-faq .fq-q'); return { vis: !a.hidden, exp: b.getAttribute('aria-expanded'), left: /\{\w+\}/.test(a.textContent), txt: a.textContent.slice(0, 60) } });
       rec(tag + '点问题展开答案，占位符都被替换', ex.vis && ex.exp === 'true' && !ex.left, ex.txt);

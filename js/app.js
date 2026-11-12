@@ -10,7 +10,7 @@ function showView(v){
   if(window.fabClose)fabClose();
   window.scrollTo(0,0)}
 document.querySelectorAll('.tabbar button').forEach(function(b){b.onclick=function(){var g=b.getAttribute('data-v');   // v9.7：从别的页面点“学习”→ 落在学习工作台；已经在学习分组里（作业 / 复习计划）就留在原处
-  if(g==='hw'){showView(GRP[document.body.getAttribute('data-view')]==='hw'?LAST.hw:'ss');return}
+  if(g==='hw'){showView(GRP[document.body.getAttribute('data-view')]==='hw'?LAST.hw:(window.mochiSpaceHome?mochiSpaceHome():'ss'));return}
   showView(LAST[g]||g)}});
 // 学习 / 健康：每个分组顶部一条分段按钮（作业｜复习计划；运动｜美容｜饮食）
 [[['ss','🏠 工作台'],['hw','📝 作业'],['st','📚 复习计划']],[['sp','🏃 运动'],['bt','💄 美容'],['di','🥗 饮食']]].forEach(function(g){g.forEach(function(it){var s=document.getElementById('v-'+it[0]),bar=el('div','seg');g.forEach(function(o){var b=el('button',o[0]===it[0]?'on':null,o[1]);b.onclick=function(){showView(o[0])};bar.appendChild(b)});s.insertBefore(bar,s.firstChild)})});

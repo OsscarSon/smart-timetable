@@ -208,9 +208,9 @@ const tab = async (p, n) => { await p.locator('.study-space-tab', { hasText: n }
   {
     const { ctx, page, errs } = await open(browser, seedFull()); 
     await page.evaluate(() => MochiNext.selectMode(['work'])); await tabStudy(page);
-    rec('10 Work 模式：学习标签仍进工作台，模式属性（data-mochi-mode）不变，不报错', (await view(page)) === 'ss' && (await page.evaluate(() => document.body.dataset.mochiMode)) === 'work' && !!(await page.$('.study-space-hero')));
+    rec('10 Work 模式（v9.8.8）：底部那格改名 Work 并进 Work Space，模式属性（data-mochi-mode）不变；学习空间仍能从切换条进入', (await view(page)) === 'wk' && /Work/.test(await page.innerText('.tabbar [data-v="hw"]')) && (await page.evaluate(() => document.body.dataset.mochiMode)) === 'work' && await (async () => { await page.locator('#v-wk .spc-swb', { hasText: 'Study' }).click(); await page.waitForTimeout(250); return !!(await page.$('.study-space-hero')); })());
     await page.evaluate(() => MochiNext.selectMode(['life'])); await page.evaluate(() => showView('tt')); await tabStudy(page);
-    rec('10b Life 模式同样', (await view(page)) === 'ss' && (await page.evaluate(() => document.body.dataset.mochiMode)) === 'life');
+    rec('10b Life 模式同样：进 Life Space，模式属性不变', (await view(page)) === 'lf' && /Life/.test(await page.innerText('.tabbar [data-v="hw"]')) && (await page.evaluate(() => document.body.dataset.mochiMode)) === 'life');
     await page.evaluate(() => showView('tt')); await page.waitForTimeout(150);
     rec('10c 课表页正常：周 / 日视图、＋ 按钮只在课表页显示', (await page.locator('#fab').isVisible()) && (await tabStudy(page), !(await page.locator('#fab').isVisible())));
     for (const v of ['sp', 'sta', 'more', 'se', 'st', 'hw', 'tt']) { await page.evaluate(x => showView(x), v); await page.waitForTimeout(80); }

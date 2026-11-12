@@ -123,26 +123,41 @@ const DEMO = /Portfolio refresh|Client proposal|Team check-in|Morning planning|P
     await ctx.close();
   }
 
-  // ===== 3 模式切换：落点不变，切换条随模式出现 =====
+  // ===== 3 模式切换：底部那格的名字 / 落点 / 切换条 =====
   {
-    const cases = [[['study'], 0, 'Study'], [['work'], 2, 'Study|Work'], [['life'], 2, 'Study|Life'], [['work', 'life'], 3, 'Study|Work|Life'], [['study', 'work', 'life'], 3, 'Study|Work|Life']];
-    for (const [modes, nsw, names] of cases) {
+    // [模式, 标签, 落点, 切换条]
+    const cases = [[['study'], /Study/, 'ss', ''], [['work'], /Work/, 'wk', 'Study|Work'], [['life'], /Life/, 'lf', 'Study|Life'], [['work', 'life'], /Spaces/, 'wk', 'Study|Work|Life'], [['study', 'work'], /Spaces/, 'ss', 'Study|Work'], [['study', 'work', 'life'], /Spaces/, 'ss', 'Study|Work|Life']];
+    for (const [modes, tabRe, land, names] of cases) {
       const { ctx, page, errs } = await open(browser, seed({ modes }));
       await tab(page, 'hw');
-      const label = (await text(page, '.tabbar [data-v="hw"]')).trim(), bar = await page.$$eval('#v-ss .spc-swb', b => b.map(x => x.textContent.replace(/^\S+\s/, '').trim()).join('|'));
-      rec('3 模式 [' + modes + ']：底部“学习”照旧落在学习空间，标签仍是 Study，切换条 = ' + (nsw ? names : '无'), (await view(page)) === 'ss' && /Study/i.test(label) && (nsw ? bar === names : bar === '') && !!(await page.$('.study-space-hero')) && errs.length === 0, 'view=' + (await view(page)) + ' bar=' + bar + ' ' + errs.join('|'));
+      const label = (await text(page, '.tabbar [data-v="hw"]')).trim(), v = await view(page), vid = v === 'ss' ? '#v-ss' : v === 'wk' ? '#v-wk' : '#v-lf';
+      const bar = await page.$$eval(vid + ' .spc-swb', b => b.map(x => x.textContent.replace(/^\S+\s/, '').trim()).join('|'));
+      rec('3 模式 [' + modes + ']：标签 “' + label + '”，落在 ' + v + '，切换条 ' + (names || '无'), v === land && tabRe.test(label) && bar === names && errs.length === 0, 'view=' + v + ' bar=' + bar + ' ' + errs.join('|'));
       await ctx.close();
     }
     const { ctx, page } = await open(browser, seed({ modes: ['study'] }));
     await tab(page, 'hw');
-    rec('3.6 只选学习：没有切换条（和 v9.8.7 一样）', (await page.$$('#v-ss .spc-swb')).length === 0);
+    rec('3.7 只选学习：标签、落点、没有切换条都和 v9.8.7 一样', /Study/.test(await text(page, '.tabbar [data-v="hw"]')) && (await view(page)) === 'ss' && (await page.$$('#v-ss .spc-swb')).length === 0);
     await page.evaluate(() => MochiNext.selectMode(['work']));
-    rec('3.7 运行中改成 Work：学习空间顶部立刻出现切换条', (await page.$$('#v-ss .spc-swb')).length === 2);
-    await switchTo(page, /Work/);
-    rec('3.8 从切换条进入 Work，再点底部“学习”仍留在学习分组（不会跳走）', (await view(page)) === 'wk' && (await (async () => { await tab(page, 'hw'); return view(page); })()) === 'wk');
+    rec('3.8 运行中改成只选 Work：标签立刻变 Work，学习空间顶部出现切换条', /Work/.test(await text(page, '.tabbar [data-v="hw"]')) && (await page.$$('#v-ss .spc-swb')).length === 2);
+    await page.evaluate(() => MochiNext.selectMode(['work', 'life']));
+    rec('3.9 改成选两个：标签变 Spaces', /Spaces/.test(await text(page, '.tabbar [data-v="hw"]')));
+    await tab(page, 'tt'); await tab(page, 'hw'); await switchTo(page, /Life/);
     await tab(page, 'tt'); await tab(page, 'hw');
-    rec('3.9 从别的标签回来点“学习”：先进学习空间', (await view(page)) === 'ss');
+    rec('3.10 选了两个：点“Spaces”回到这次用过的空间（Life），不是固定的第一个', (await view(page)) === 'lf');
+    await page.evaluate(() => MochiNext.selectMode(['study']));
+    rec('3.11 改回只选学习：标签恢复为 Study（原样的图标和文字）', /Study/.test(await text(page, '.tabbar [data-v="hw"]')) && /📚/.test(await text(page, '.tabbar [data-v="hw"]')) && (await page.$$('#v-ss .spc-swb')).length === 0);
     await ctx.close();
+  }
+  {
+    const { ctx, page } = await open(browser, seed({ modes: ['work', 'life'] }), { lang: 'zh' });
+    rec('3.12 中文：两个模式的标签是“空间”', /空间/.test(await text(page, '.tabbar [data-v="hw"]')));
+    await page.evaluate(() => MochiNext.selectMode(['life']));
+    rec('3.13 中文：只选生活，标签“生活”', /生活/.test(await text(page, '.tabbar [data-v="hw"]')));
+    await ctx.close();
+    const m = await open(browser, seed({ modes: ['work'] }), { lang: 'ms' });
+    rec('3.14 马来文：只选工作，标签“Kerja”', /Kerja/.test(await text(m.page, '.tabbar [data-v="hw"]')));
+    await m.ctx.close();
   }
 
   // ===== 4 空数据：空状态都有去处 =====

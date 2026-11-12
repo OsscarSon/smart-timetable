@@ -65,7 +65,8 @@
     else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){alert('链接已复制：'+u)},function(){prompt('复制这个链接：',u)});
     else prompt('复制这个链接：',u)}
   // 版本号只从 js/version.js 读（以前写死成 v8.8.1，更新后菜单还是旧号）
-  function verLine(){return el('div','dw-ft','Mochi Schedule · v'+(window.MOCHI_VERSION||'?'))}
+  function verLine(){var d=el('div','dw-ft','Mochi Schedule · v'+(window.MOCHI_VERSION||'?'));
+    if(window.mochiCreatorLink){var w=el('div','dw-by');w.appendChild(window.mochiCreatorLink());d.appendChild(w)}return d}
   function build(){
     dw.innerHTML='';
     var top=el('div','dw-top'),h=el('h2',null,loc('Your Mochi','你的 Mochi','Mochi Anda')),x=el('button','ed-x');x.innerHTML=X;x.setAttribute('aria-label','关闭菜单');x.onclick=closeMenu;

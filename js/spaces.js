@@ -34,6 +34,19 @@
   function visible() { var v = view(); return v === 'wk' || v === 'lf'; }
   function modes() { var m = ok(function () { return MochiNext.modes(); }); return Array.isArray(m) && m.length ? m : ['study']; }
 
+  // ---------- 底部那一格（原来的「学习」）：名字和落点跟着模式走 ----------
+  // 只选学习：和 v9.8.7 完全一样。只选一个别的模式：那一格就叫它（工作 / 生活），点进去就是它。
+  // 选了两个或三个：那一格叫「空间」，点进去回到这次用过的那个空间（没用过就按 学习 → 工作 → 生活 的顺序取第一个已选的），顶部切换条在几个空间之间跳。
+  // “这次用过的”只记在内存里，不写任何存储。学习空间永远能从切换条进（所以没选学习的人也不会丢掉作业 / 复习）。
+  var ROUTE = { study: 'ss', work: 'wk', life: 'lf' };
+  window.mochiSpaceHome = function () {
+    var m = modes();
+    if (m.length > 1 && S.last && m.indexOf(S.last) >= 0) return ROUTE[S.last];
+    var order = ['study', 'work', 'life'];
+    for (var i = 0; i < order.length; i++) if (m.indexOf(order[i]) >= 0) return ROUTE[order[i]];
+    return 'ss';
+  };
+
   // ---------- 只读快照（全部来自现有数据）----------
   function snapshot() {
     var now = new Date(), s = { todayDn: dayNum(now), nowMin: now.getHours() * 60 + now.getMinutes(), items: [], goals: [], goalsOn: false, weekFrom: 0, weekTo: 0 };
@@ -230,7 +243,7 @@
     if (y && !S.focusHead) window.scrollTo(0, y);
   }
 
-  // ---------- 空间切换条 ----------
+  // ---------- 空间切换条（学习永远在；工作 / 生活按已选的出现；只选学习时不出现）----------
   var SW = [['study', '📚', 'swStudy', 'ss', 'v-ss'], ['work', '💼', 'swWork', 'wk', 'v-wk'], ['life', '🌿', 'swLife', 'lf', 'v-lf']];
   function mountSwitch() {
     var ms = modes();
@@ -247,16 +260,25 @@
       sec.insertBefore(bar, sec.firstChild);
     });
   }
+  var tabBtn = document.querySelector('.tabbar [data-v="hw"]'), tabOrig = tabBtn ? Array.prototype.map.call(tabBtn.childNodes, function (n) { return n.cloneNode(true); }) : null;
+  function applyTab() {
+    if (!tabBtn || !tabOrig) return;
+    var ms = modes(); tabBtn.textContent = '';
+    if (ms.length === 1 && ms[0] === 'study') { tabOrig.forEach(function (n) { tabBtn.appendChild(n.cloneNode(true)); }); return; }
+    var one = ms.length === 1, ico = !one ? '🌈' : ms[0] === 'work' ? '💼' : '🏡', key = !one ? 'tabSpaces' : ms[0] === 'work' ? 'tabWork' : 'tabLife';
+    var sp = document.createElement('span'); sp.textContent = ico; tabBtn.appendChild(sp); tabBtn.appendChild(document.createTextNode(t(key)));
+  }
+
   // ---------- 接入现有页面：只“包装”，不改原函数 ----------
   ['draw', 'rBt', 'rDi'].forEach(function (n) {
     var o = window[n]; if (typeof o !== 'function') return;
     window[n] = function () { var r = o.apply(this, arguments); if (visible()) ok(render); return r; };
   });
   var _sv = window.showView;
-  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'wk' || v === 'lf') { S.focusHead = true; render(); } return r; };
-  document.addEventListener('mochi:modes', function () { mountSwitch(); if (visible()) render(); });
+  if (typeof _sv === 'function') window.showView = function (v) { var r = _sv.apply(this, arguments); if (v === 'ss') S.last = 'study'; if (v === 'wk' || v === 'lf') { S.last = v === 'wk' ? 'work' : 'life'; S.focusHead = true; render(); } return r; };
+  document.addEventListener('mochi:modes', function () { applyTab(); mountSwitch(); if (visible()) render(); });
   document.addEventListener('mochi:energy', function () { if (visible()) render(); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden && visible()) render(); });
 
-  mountSwitch();
+  applyTab(); mountSwitch();
 })();
