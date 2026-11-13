@@ -90,7 +90,7 @@
         out.push({hol:true,dn:o.dn,dnEnd:o.dnEnd,t:t,dup:dup});return}
       var wd=dnDate(o.dn).wd,w=Sched.weekOf(o.dn);
       if(hiddenDay(wd)){skipHid++;return}
-      var st=Math.max(o.s,H0*60),en=Math.min(o.e,H1*60);
+      var st=Math.max(o.s,D0*60),en=Math.min(o.e,D1*60);
       if(en<=st){skipOut++;return}
       var arr=(w===curW?data:WK[w])||[],dup=arr.some(function(x){return x.day===wd&&x.s===st&&x.t===t});
       var clash=Sched.dayItems(o.dn,C).filter(function(x){return st<x.e&&x.s<en})[0];
@@ -110,7 +110,7 @@
         c.dup?'已经有同样的安排，跳过':c.clash?'⚠️ 和「'+c.clash+'」时间重叠':c.cut?'原时间 '+tmin(c.os)+'–'+tmin(c.oe)+'，超出显示范围，已截短':'',!c.dup,c.dup)});
     var notes=[];
     if(total>CAND.length)notes.push('只显示前 '+MAXROWS+' 项，其余 '+(total-CAND.length)+' 项没列出（把范围改小可以看到）');
-    if(skipOut)notes.push(skipOut+' 个事件不在课表显示的时间范围（'+hm(H0)+'–'+hm(H1)+'）里，已跳过');
+    if(skipOut)notes.push(skipOut+' 个事件的时间无效，已跳过');
     if(skipHid)notes.push(skipHid+' 个落在隐藏的周末，已跳过');
     if(unsup)notes.push(unsup+' 个事件用了内置解析不支持的重复规则，只导入了第一次');
     if(RAW.skipped)notes.push(RAW.skipped+' 个单次修改的重复事件没导入');

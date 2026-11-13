@@ -5,7 +5,7 @@
   // ---------- .ics ----------
   function esc(s){return String(s==null?'':s).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n')}
   function fold(l){var o=[];while(l.length>72){o.push(l.slice(0,72));l=' '+l.slice(72)}o.push(l);return o.join('\r\n')}
-  function dts(dn,min){var x=dnDate(dn);return x.y+pad2(x.m)+pad2(x.d)+'T'+pad2(Math.floor(min/60))+pad2(min%60)+'00'}
+  function dts(dn,min){if(min>1440){dn+=1;min-=1440}var x=dnDate(dn);return x.y+pad2(x.m)+pad2(x.d)+'T'+pad2(Math.floor(min/60))+pad2(min%60)+'00'}
   function ev(o){        // o: {id,dn,s,e,t,loc,desc,rr,ex[]}
     var L=['BEGIN:VEVENT','UID:'+o.id+'@mochi','DTSTAMP:'+new Date().toISOString().replace(/[-:]|\.\d+/g,''),
       'DTSTART:'+dts(o.dn,o.s),'DTEND:'+dts(o.dn,o.e),'SUMMARY:'+esc(o.t)];

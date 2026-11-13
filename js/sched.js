@@ -9,6 +9,7 @@ var Sched=(function(){
     arr.forEach(function(x,i){if(x.day===wd)out.push({k:'m',ref:'m'+w+'_'+i,t:x.t,s:x.s,e:x.e,done:!!DN[kk(x,w)]})});
     B.rp.forEach(function(b){if(b.dn===dn)out.push({k:'r',t:b.t,s:b.s,e:b.e})});
     B.fx.forEach(function(b){if(b.dn===dn)out.push({k:'f',t:b.t,s:b.s,e:b.e})});
+    spillBlocks(dn).forEach(function(b){out.push({k:'r',t:b.t,s:0,e:b.e})});   // 前一天跨午夜延伸过来的部分：只读占位
     return out.sort(function(a,b){return a.s-b.s||a.e-b.e})}
   // 空闲时段：显示范围（H0–H1）里扣掉所有安排；from 之前的不算（今天已过去的时间）；短于 minLen 分钟的丢掉。
   function freeWindows(items,from,minLen){

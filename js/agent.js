@@ -20,7 +20,7 @@
     function timeErr(dn,t){
       if(dn===null)return '日期不对';
       if(hiddenDay(dnDate(dn).wd))return '那天是隐藏的周末列';
-      if(t.s<H0*60||t.e>H1*60)return '时间超出课表显示范围（'+hm(H0)+'–'+hm(H1)+'）';
+      if(t.s<D0*60||t.e>D1*60)return '时间超出课表显示范围（'+hm(D0)+'–'+hm(D1)+'）';
       return ''}
     if(a.tool==='add_event'){
       dn=dnFromIso(a.date);t=span(a.start,a.dur);

@@ -59,7 +59,7 @@
       evs.forEach(function(e){
         var a=new Date(e.startDate),b=new Date(e.endDate),dn=dayNum(a),endDn=dayNum(b);
         var s=a.getHours()*60+a.getMinutes(),en=endDn===dn?b.getHours()*60+b.getMinutes():(endDn===dn+1&&b.getHours()===0&&b.getMinutes()===0?1440:-1);
-        if(en<=s||s<H0*60||en>H1*60){skip++;return}
+        if(en<=s||s<D0*60||en>D1*60){skip++;return}
         var t=String(e.title||'').replace(/\s+/g,' ').trim().slice(0,20)||'（无标题）',wd=dnDate(dn).wd,w=Math.floor((dn+3-SET.ws)/7);
         var list=(w===curW?data:WK[w])||[];
         if(list.some(function(x){return x.day===wd&&x.s===s&&x.e===en&&x.t===t})){skip++;return}

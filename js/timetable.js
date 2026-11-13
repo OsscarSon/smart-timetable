@@ -41,7 +41,7 @@ function fitText(){
 if(window.ResizeObserver)new ResizeObserver(function(){fitText()}).observe(document.getElementById('grid')||document.body);
 window.addEventListener('resize',fitText);
 function drawGrid(){
-  var vd=visDays(),n=H1-H0,Ht=n*HR,mini=function(wd){return !!SET.wkc&&wd>=5&&vd.length>5};
+  var vd=visDays(),n=D1-D0,Ht=n*HR,mini=function(wd){return !!SET.wkc&&wd>=5&&vd.length>5};
   grid.innerHTML='';
   grid.className='grid wk'+(vd.some(mini)?' wkc':'');
   grid.style.setProperty('--hr',HR+'px');
@@ -56,33 +56,38 @@ function drawGrid(){
   grid.appendChild(hd);
   // 主体：时间轴 + 每天一列
   var body=el('div','wk-b'),gut=el('div','wk-g');body.style.height=Ht+'px';
-  for(var h=H0;h<H1;h++){var t=el('span','wk-tl'+(h===H0?' first':''),hm(h));t.style.top=((h-H0)*HR)+'px';gut.appendChild(t)}
+  for(var h=D0;h<D1;h++){var t=el('span','wk-tl'+(h===D0?' first':''),hm(h));t.style.top=((h-D0)*HR)+'px';gut.appendChild(t)}
+  var tz=el('span','wk-tl last',hm(D1));tz.style.top=Ht+'px';gut.appendChild(tz);
   body.appendChild(gut);
   var items=weekItems();
   vd.forEach(function(wd){
     var c=el('div','wk-c'+(curW===thisW&&wd===todayIdx?' td':'')+(mini(wd)?' mini':''));
     c.onclick=function(ev){if(ev.target!==c)return;
       var y=ev.clientY-c.getBoundingClientRect().top,sn=SET.snap||15,
-          s=H0*60+Math.floor(y/HR*60/sn)*sn;
-      s=Math.max(H0*60,Math.min(s,H1*60-sn));
-      var e=Math.min(s+60,H1*60);
+          s=D0*60+Math.floor(y/HR*60/sn)*sn;
+      s=Math.max(D0*60,Math.min(s,D1*60-sn));
+      var e=Math.min(s+60,D1*60);
       items.forEach(function(o){if(o.day===wd&&o.s>s&&o.s<e)e=o.s});
-      if(e-s<sn)e=Math.min(s+sn,H1*60);
+      if(e-s<sn)e=Math.min(s+sn,D1*60);
       openDlg({day:wd,s:s,e:e,t:'',c:'pink'},true)};
-    var L=items.filter(function(o){return o.day===wd&&o.e>H0*60&&o.s<H1*60});
-    L.forEach(function(o){o.s0=Math.max(o.s,H0*60);o.e0=Math.min(o.e,H1*60)});
+    var L=items.filter(function(o){return o.day===wd});
+    // 前一天跨午夜延伸过来的尾巴（00:00 到结束时间），点它会打开原活动
+    spillBlocks(dnOf(curW,wd)).forEach(function(b){
+      L.push({k:b.k,sp:b.w,day:wd,s:0,e:b.e,t:'↩ '+b.t,c:b.c,x:b.x,dn:!!DN[kk(b.x,b.w)],full:tmin(b.x.s)+'–'+tmin(b.x.e)})});
+    // 一天只画到 24:00；跨午夜的活动在今天只画到午夜，剩下的在次日那一列画
+    L.forEach(function(o){o.s0=Math.max(o.s,D0*60);o.e0=Math.min(o.e,D1*60)});
     layLanes(L);
     L.forEach(function(o){
-      var top=(o.s0-H0*60)/60*HR,hh=Math.max(18,(o.e0-o.s0)/60*HR-2),
+      var top=(o.s0-D0*60)/60*HR,hh=Math.max(18,(o.e0-o.s0)/60*HR-2),
           b=el('button','wk-e c-'+o.c+(o.k==='f'?' fx':'')+(o.k==='r'?' rp':'')+(o.dn?' dn':'')+(hh<36?' sm':''));
       b.style.top=top+'px';b.style.height=hh+'px';
       b.style.left='calc(2px + (100% - 4px) * '+o.ln+' / '+o.nl+')';b.style.width='calc((100% - 4px) / '+o.nl+' - 1px)';
       var tx=el('span','et'+(/[\u3000-\u9fff\uac00-\ud7af]/.test(o.t)?' cjk':''),o.t);b.appendChild(tx);
-      if(hh>=58){var tm=el('span','tm2',tmin(o.s)+'–'+tmin(o.e));b.appendChild(tm)}
+      if(hh>=58){var tm=el('span','tm2',o.sp!==undefined?o.full:tmin(o.s)+'–'+tmin(o.e));b.appendChild(tm)}
       if(o.sub&&hh>=74)b.appendChild(el('span','tm2',o.sub));
-      b.title=o.t+' '+tmin(o.s)+'–'+tmin(o.e)+(o.les&&o.les.teacher?' · '+o.les.teacher:'');
+      b.title=o.t+' '+(o.sp!==undefined?o.full:tmin(o.s)+'–'+tmin(o.e))+(o.les&&o.les.teacher?' · '+o.les.teacher:'');
       b.setAttribute('aria-label',b.title);
-      b.onclick=function(ev){ev.stopPropagation();if(o.k==='f')openLesson(o.les);else openDlg(o.x,false)};
+      b.onclick=function(ev){ev.stopPropagation();if(o.k==='f')openLesson(o.les);else openItem(o.x,o.sp)};
       c.appendChild(b)});
     body.appendChild(c)});
   if(typeof isBlank==='function'&&isBlank()){var cta=emptyCTA();cta.classList.add('over');body.appendChild(cta)}
@@ -93,14 +98,14 @@ function drawGrid(){
 function nowLine(){          // 当前时间线（只在看本周时出现）：整周一条淡线 + 今天那一列加粗发光 + 时间轴上的时间标签
   grid.querySelectorAll('.wk-now,.wk-now-d,.wk-nt').forEach(function(e){e.remove()});
   var body=grid.querySelector('.wk-b');if(!body||curW!==thisW)return;
-  var m=nowMin();if(m<H0*60||m>=H1*60)return;
-  var y=((m-H0*60)/60*HR)+'px';
+  var m=nowMin();if(m<D0*60||m>=D1*60)return;
+  var y=((m-D0*60)/60*HR)+'px';
   var ln=el('div','wk-now');ln.style.top=y;body.appendChild(ln);
   var td=body.querySelector('.wk-c.td');if(td){var d=el('div','wk-now-d');d.style.top=y;td.appendChild(d)}
   var g=body.querySelector('.wk-g');if(g){var t=el('span','wk-nt',tmin(m));t.style.top=y;g.appendChild(t)}}
-function wkScrollNow(){      // 周视图可见时，把页面滚到“现在”附近（只在切到周视图 / 点今天时调用）
+function wkScrollNow(){      // 周视图可见时，把页面滚到“现在”附近（只在切到周视图 / 点今天时调用）；网格始终是完整的 00:00–24:00，这里只决定滚到哪
   var b=grid.querySelector('.wk-b');if(!b||!b.offsetParent)return;
-  var m=curW===thisW?nowMin():9*60,y=b.getBoundingClientRect().top+window.scrollY+(Math.max(m,H0*60)-H0*60)/60*HR-window.innerHeight*.3;
+  var m=curW===thisW?nowMin():Math.max(D0*60,H0*60-30),y=b.getBoundingClientRect().top+window.scrollY+(m-D0*60)/60*HR-window.innerHeight*.3;
   window.scrollTo(0,Math.max(0,y))}
 
 function draw(){
@@ -117,20 +122,41 @@ function paint(){[].forEach.call(sw.children,function(i,x){i.classList.toggle('o
 var isNew=false;
 var dday=document.getElementById('dday'),dh=document.getElementById('dh'),de=document.getElementById('de'),ddur=document.getElementById('ddur'),
     drp=document.getElementById('drp'),dun=document.getElementById('dun'),drw=document.getElementById('drw'),dxh=document.getElementById('dxh'),dxr=document.getElementById('dxr');
-var DURS=[[30,'30 分'],[45,'45 分'],[60,'1 小时'],[90,'1.5 小时'],[120,'2 小时'],[180,'3 小时']];
-function durPaint(){
-  var s=t2min(dh.value),e=t2min(de.value),dur=e-s;ddur.innerHTML='';
+var DURS=[[30,'30 分'],[45,'45 分'],[60,'1 小时'],[90,'1.5 小时'],[120,'2 小时'],[180,'3 小时'],[480,'8 小时']];
+var dnxc=document.getElementById('dnxc'),dtdv=document.getElementById('dtdv'),dtdw=document.getElementById('dtdw');
+// 读编辑器里的开始 / 结束 / “结束于次日”：e = 以开始那天 00:00 为起点的结束分钟（跨午夜时 > 1440）。
+// 不会自己猜“结束早于开始就是次日”：必须勾选。err: empty 没填全 / equal 相同 / rev 结束早于开始 / long 超过 24 小时
+function edTimes(){
+  var s=t2min(dh.value),t=t2min(de.value);
+  if(isNaN(s)||isNaN(t))return {err:'empty'};
+  var e=dnxc.checked?1440+t:t,d=e-s;
+  if(!dnxc.checked&&e===s)return {err:'equal',s:s,e:e};
+  if(e<s)return {err:'rev',s:s,e:e};
+  if(d>1440)return {err:'long',s:s,e:e};
+  return {s:s,e:e,d:d}}
+var ED_ERR={empty:'请选择开始和结束时间',equal:'开始和结束时间不能相同。如果活动跨午夜，请勾选「结束于次日」',
+  rev:'结束时间早于开始时间。如果活动跨午夜（例如 22:00 → 次日 06:00），请勾选「结束于次日」',long:'活动最长 24 小时'};
+function edSetEnd(e){            // 把“结束分钟 e”写回结束时间框 + 次日开关（e=1440 即次日 00:00）
+  dnxc.checked=e>=1440;de.value=min2t(e>=1440?e-1440:e)}
+function durPaint(){             // 自动算时长 + 跨午夜提示 + 撞车提示 + 快捷时长
+  var r=edTimes(),dur=r.d;ddur.innerHTML='';
   DURS.forEach(function(p){var b=el('button','chip'+(dur===p[0]?' on':''),p[1]);b.type='button';
-    b.onclick=function(){var s2=t2min(dh.value);if(isNaN(s2))return;de.value=min2t(Math.min(1440,s2+p[0]));durPaint()};ddur.appendChild(b)})}
+    b.onclick=function(){var s2=t2min(dh.value);if(isNaN(s2))return;var tot=s2+p[0];if(tot>1440+1439){tot=1440+1439}edSetEnd(tot);durPaint()};ddur.appendChild(b)});
+  dtdv.className=r.err?'bad':'';dtdw.className=r.err?'bad':'';
+  if(r.err){dtdv.textContent=r.err==='empty'?'--':'请选择有效时间';dtdw.textContent=ED_ERR[r.err];return}
+  dtdv.textContent=fmtDur(r.d);
+  var c=clashOf(+dday.value,r.s,r.e,cur);
+  dtdw.textContent=tmin(r.s)+' → '+tmin(r.e)+(c?' · ⚠ 与「'+c.t+'」重叠':'');
+  if(c)dtdw.className='bad'}
 var lastS=null;
-dh.onchange=function(){      // 改开始时间：结束时间跟着顺延，保持原来的时长
-  var s=t2min(dh.value),e=t2min(de.value);
-  if(!isNaN(s)){
-    var dur=(lastS!==null&&!isNaN(e)&&e>lastS)?e-lastS:(cur?cur.e-cur.s:60);
-    de.value=min2t(Math.min(1440,s+dur));lastS=s}
+dh.onchange=function(){      // 改开始时间：没勾“次日”时，结束时间跟着顺延、保持原来的时长（只在不会越过午夜时；越过午夜必须由你自己勾选）
+  var s=t2min(dh.value),e0=t2min(de.value);
+  if(!isNaN(s)&&!dnxc.checked&&!isNaN(e0)&&lastS!==null&&e0>lastS){
+    var tot=s+(e0-lastS);if(tot<1440)de.value=min2t(tot)}
+  if(!isNaN(s))lastS=s;
   durPaint()};
-de.onchange=durPaint;
-dday.onchange=function(){moLabels()};
+de.onchange=durPaint;de.oninput=durPaint;dh.oninput=durPaint;dnxc.onchange=durPaint;
+dday.onchange=function(){moLabels();durPaint()};
 drp.onchange=function(){var on=drp.value!=='0';drw.hidden=!on;dxr.hidden=!on};
 function moLabels(){                       // “每月第 N 个周X”的文字跟着所选日期变
   var wd=+dday.value,n=nthOf(dnOf(curW,wd));
@@ -139,7 +165,7 @@ function moLabels(){                       // “每月第 N 个周X”的文字
 function openDlg(x,nw){
   cur=x;isNew=nw;col=x.c;dn.value=x.t;
   dday.innerHTML='';for(var p=0;p<7;p++){var wd=posDay(p);if(hiddenDay(wd)&&wd!==x.day)continue;var o=el('option',null,'周'+DAYS[wd]);o.value=wd;dday.appendChild(o)}
-  dday.value=x.day;dh.value=min2t(x.s);de.value=min2t(x.e);lastS=x.s;durPaint();
+  dday.value=x.day;dh.value=min2t(x.s);edSetEnd(x.e);lastS=x.s;durPaint();
   var r=x.rp;moLabels();drp.value=r?(r.mo?(r.mo===-1?'ml':'m'):String(r.ev)):'0';dun.value=r&&r.un!=null?isoOf(r.un):'';drw.hidden=!r;
   dxh.checked=r?!!r.xh:true;dxr.hidden=!r;
   if(!rrOK()){[].forEach.call(drp.querySelectorAll('option[value=m],option[value=ml]'),function(o){o.disabled=true})}
@@ -154,11 +180,11 @@ function close(){mask.classList.remove('show')}
 mask.onclick=close;document.getElementById('dx').onclick=close;
 document.getElementById('ds').onclick=function(){
   var t=dn.value.trim();if(!t){dn.focus();return}
-  var nd=+dday.value,s=t2min(dh.value),e=t2min(de.value),rv=drp.value,un=dun.value?dnFromIso(dun.value):null,xh=dxh.checked;
-  if(isNaN(s)||isNaN(e)||e<=s){alert('请填好开始和结束时间（结束要晚于开始）');return}
-  if(s<H0*60||e>H1*60){alert('时间要在 '+H0+':00–'+H1+':00 之内。（可以在 设置 → 外观与显示 里改课表的时间范围）');return}
+  var nd=+dday.value,s,e,rv=drp.value,un=dun.value?dnFromIso(dun.value):null,xh=dxh.checked;
+  var tm=edTimes();if(tm.err){alert(ED_ERR[tm.err]);return}
+  s=tm.s;e=tm.e;
   var ev=(rv==='m'||rv==='ml')?0:+rv,mo=rv==='m'?nthOf(dnOf(curW,nd)):rv==='ml'?-1:0,rep=ev||mo;
-  if(!free(nd,s,e,cur)){alert('那个时间已经有安排啦～');return}
+  if(!free(nd,s,e,cur,true)){alert('那个时间已经有安排啦～');return}
   var dn0=dnOf(curW,nd);
   if(rep&&un!==null&&un<dn0){alert('“重复到”的日期不能早于这次活动的日期');return}
   var r=cur.rp;
@@ -180,6 +206,9 @@ document.getElementById('dd').onclick=function(){
   save();draw();close()};
 document.getElementById('ddo').onclick=function(){
   var r=cur.rp;if(!r)return;(r.sk=r.sk||[]).push(cur.dn);rpSave();draw();close()};
+
+// 点一个“前一天跨午夜延伸过来的尾巴”：原活动可能在上一周，先切到那一周再编辑（保证保存到正确的周）
+function openItem(x,w){if(w!==undefined&&w!==curW)go2(w);openDlg(x,false)}
 
 // ---- 切换周 / 跳到某一天 ----
 function go2(w){gotoWeek(w);draw()}

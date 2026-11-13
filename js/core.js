@@ -16,7 +16,9 @@ var SET={h0:8,h1:22,fx:true,lead:10,ws:0,hw:false,h24:true,theme:'system',acc:''
 var FRESH=['mochi-set','mochi-wk','mochi-fx','mochi-st','mochi-tt','mochi-tts'].every(function(k){return localStorage.getItem(k)===null})&&
   !(function(){for(var i=0;i<localStorage.length;i++)if(localStorage.key(i).indexOf('mochi-wk:')===0)return true;return false})();
 try{var s0=JSON.parse(localStorage.getItem('mochi-set')||'null');if(s0)for(var sk in s0)SET[sk]=s0[sk]}catch(e){}
-var DAYS=['一','二','三','四','五','六','日'],H0=SET.h0,H1=SET.h1,COLS=['pink','mint','sky','lemon','peach'];
+// H0/H1 = 「常用时间」（设置里选的）：只用于默认滚动位置和 AI / 自动排程的可用范围。
+// D0/D1 = 课表真正显示和可编辑的范围，固定为完整一天 00:00–24:00。
+var DAYS=['一','二','三','四','五','六','日'],H0=SET.h0,H1=SET.h1,D0=0,D1=24,COLS=['pink','mint','sky','lemon','peach'];
 var HR={compact:44,std:56,roomy:72}[SET.dens]||56;     // 周视图每小时的高度(px)
 
 // ---- 日期工具：dayNum = 本地日期对应的“天序号”（1970-01-01 为 0，周四）----
@@ -38,7 +40,7 @@ function posDay(p){return (SET.ws+p)%7}                     // 第 p 列是星�
 function hiddenDay(wd){return !!SET.hw&&wd>=5}
 function visDays(){var o=[];for(var p=0;p<7;p++){var wd=posDay(p);if(!hiddenDay(wd))o.push(wd)}return o}
 // 12/24 小时制
-function tmin(m){var H=Math.floor(m/60),M=m%60;if(SET.h24)return pad2(H)+':'+pad2(M);return ((H%12)||12)+':'+pad2(M)+(H%24<12?'am':'pm')}
+function tmin(m){if(m>1440)return (window.LANG==='en'?'next day ':window.LANG==='ms'?'hari berikutnya ':'次日')+tmin(m-1440);var H=Math.floor(m/60),M=m%60;if(SET.h24)return pad2(H)+':'+pad2(M);return ((H%12)||12)+':'+pad2(M)+(H%24<12?'am':'pm')}
 function hm(h){return SET.h24?h+':00':((h%12)||12)+(h%24<12?'am':'pm')}
 function snapMin(m,s){s=s||SET.snap||15;return Math.round(m/s)*s}
 function min2t(m){return pad2(Math.floor(m/60))+':'+pad2(m%60)}                       // 给 <input type=time>
@@ -108,8 +110,33 @@ function fxHit(day,s,e,ign){
   var q={s:s,e:e};
   if(FXW.some(function(x){return x.day===day&&ovl(x,q)}))return true;
   return RPW.some(function(x){return !(ign&&ign.rp&&x.rp===ign.rp)&&x.day===day&&ovl(x,q)})}
-function free(day,s,e,ignore){            // day 这天 s–e（分钟）有没有空；ignore 是正在编辑的那一项
-  if(hiddenDay(day)||!(e>s)||s<H0*60||e>H1*60)return false;
-  if(fxHit(day,s,e,ignore))return false;
-  var q={s:s,e:e};
-  return !data.some(function(x){return x!==ignore&&x.day===day&&ovl(x,q)})}
+// ---- 跨午夜活动：e 可以大于 1440（= 次日 e-1440 分），仍存放在“开始那一天”。旧数据 e≤1440，完全不受影响，不需要迁移 ----
+function weekOfDn(dn){return Math.floor((dn+3-SET.ws)/7)}
+// 前一天跨午夜延伸到 dn 这一天的活动（手动 + 重复）：[{k:'m'|'r',x,w,s:0,e,t,c}]；w 是它“开始那一天”所在的周
+function spillBlocks(dn){
+  var p=dn-1,pw=weekOfDn(p),pd=dnDate(p).wd,out=[];
+  ((pw===curW?data:WK[pw])||[]).forEach(function(x){if(x.day===pd&&x.e>1440)out.push({k:'m',x:x,w:pw,s:0,e:x.e-1440,t:x.t,c:x.c})});
+  (pw===curW?RPW:rpBlocks(pw)).forEach(function(b){if(b.dn===p&&b.e>1440)out.push({k:'r',x:b,rp:b.rp,w:pw,s:0,e:b.e-1440,t:b.t,c:b.c})});
+  return out}
+// 某个日历日（dn）上所有被占用的时间段：当天的手动 / 重复 / 固定课（只算到 24:00），加上前一天跨午夜延伸过来的部分
+function occ(dn){
+  var w=weekOfDn(dn),wd=dnDate(dn).wd,out=[];
+  ((w===curW?data:WK[w])||[]).forEach(function(x){if(x.day===wd)out.push({s:x.s,e:Math.min(x.e,1440),x:x,t:x.t})});
+  (w===curW?RPW:rpBlocks(w)).forEach(function(b){if(b.dn===dn)out.push({s:b.s,e:Math.min(b.e,1440),rp:b.rp,t:b.t})});
+  (w===curW?FXW:fxBlocks(w)).forEach(function(b){if(b.dn===dn)out.push({s:b.s,e:b.e,t:b.t})});
+  spillBlocks(dn).forEach(function(b){out.push({s:0,e:b.e,x:b.k==='m'?b.x:null,rp:b.rp,t:b.t})});
+  return out}
+// day 这天 s–e（分钟，e 可大于 1440 = 跨午夜）撞上的第一项；没有撞车返回 null。ignore 是正在编辑的那一项（连同它的重复系列和跨午夜尾巴）
+function clashOf(day,s,e,ignore){
+  var dn=dnOf(curW,day);
+  function hit(d,a,b){
+    var r=null;occ(d).forEach(function(o){
+      if(r||(ignore&&((o.x&&o.x===ignore)||(o.rp&&ignore.rp&&o.rp===ignore.rp))))return;
+      if(a<o.e&&o.s<b)r=o});
+    return r}
+  return hit(dn,s,Math.min(e,1440))||(e>1440?hit(dn+1,0,e-1440):null)}
+// any=true：不限制在「常用时间」内（手动编辑器用，整天都能排）；默认保持原来的行为（自动排程只用常用时间）
+function free(day,s,e,ignore,any){            // day 这天 s–e（分钟）有没有空；ignore 是正在编辑的那一项
+  if(hiddenDay(day)||!(e>s))return false;
+  if(!any&&(s<H0*60||e>H1*60))return false;
+  return !clashOf(day,s,e,ignore)}

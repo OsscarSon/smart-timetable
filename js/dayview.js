@@ -22,6 +22,8 @@ function itemsOf(wd){
   RPW.forEach(function(x){if(x.day!==wd)return;out.push({s:x.s,e:x.e,t:'🔁 '+x.t,c:x.c,kind:'r',x:x,done:!!DN[kk(x)]})});
   FXW.forEach(function(x){if(x.day!==wd)return;var l=x.les;
     out.push({s:l.s,e:l.e,t:(l.type==='考试'?'📝 ':'🏫 ')+x.t,c:l.c,kind:'f',les:l,meta:lessonMeta(l)})});
+  // 前一天跨午夜延伸过来的部分（00:00 到结束时间）；sp=true 让统计不重复计时长
+  spillBlocks(dnOf(curW,wd)).forEach(function(b){out.push({s:0,e:b.e,t:'↩ '+b.t,c:b.c,kind:b.k,x:b.x,sp:true,w:b.w,done:!!DN[kk(b.x,b.w)]})});
   out.sort(function(a,b){return a.s-b.s||a.e-b.e});return out}
 
 function greet(){
@@ -84,9 +86,9 @@ function drawList(){
     tx.appendChild(el('b',null,i.t));if(i.meta)tx.appendChild(el('small',null,i.meta));cd.appendChild(tx);
     if(i.kind!=='f'){
       var ck=el('button','ck',i.done?'✓':'');ck.setAttribute('aria-label','完成');
-      ck.onclick=function(ev){ev.stopPropagation();if(DN[kk(i.x)])delete DN[kk(i.x)];else DN[kk(i.x)]=1;put2(K_DN,DN);draw()};
+      ck.onclick=function(ev){ev.stopPropagation();var dk=i.sp?kk(i.x,i.w):kk(i.x);if(DN[dk])delete DN[dk];else DN[dk]=1;put2(K_DN,DN);draw()};
       cd.appendChild(ck)}
-    cd.onclick=function(){if(i.kind==='f')openLesson(i.les);else openDlg(i.x,false)};
+    cd.onclick=function(){if(i.kind==='f')openLesson(i.les);else openItem(i.x,i.sp?i.w:undefined)};
     r.appendChild(tm);r.appendChild(cd);box.appendChild(r)})}
 
 // 课表页右侧 / 底部的「近期作业」小结（点一下去作业页）

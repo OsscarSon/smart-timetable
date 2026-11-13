@@ -40,8 +40,8 @@ function redrawAll(){draw();rFx();rPer();if(typeof rHw==='function')rHw();if(typ
 hwk.onchange=function(){SET.hw=hwk.checked;saveSet();redrawAll()};
 h24.onchange=function(){SET.h24=h24.checked;saveSet();redrawAll()};
 var sh0=document.getElementById('sh0'),sh1=document.getElementById('sh1');
-[6,7,8].forEach(function(h){var o=el('option',null,'从 '+h+':00 开始');o.value=h;sh0.appendChild(o)});sh0.value=SET.h0;
-[22,23,24].forEach(function(h){var o=el('option',null,'到 '+h+':00 结束');o.value=h;sh1.appendChild(o)});sh1.value=SET.h1;
+[6,7,8].forEach(function(h){var o=el('option',null,'常用时间 从 '+h+':00');o.value=h;sh0.appendChild(o)});sh0.value=SET.h0;
+[22,23,24].forEach(function(h){var o=el('option',null,'到 '+h+':00');o.value=h;sh1.appendChild(o)});sh1.value=SET.h1;
 sh0.onchange=sh1.onchange=function(){SET.h0=+sh0.value;SET.h1=+sh1.value;saveSet();location.reload()};
 
 

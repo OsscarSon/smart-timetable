@@ -58,4 +58,21 @@ L("保存","Save","Simpan");L("已经有这个科目了","This subject already e
 L("删除这个科目（不影响已有课程）","Delete this subject (existing lessons stay)","Padam subjek ini (kelas sedia ada kekal)");
 L("从科目库选","Pick from subject library","Pilih dari pustaka subjek");
 L("分钟"," min"," min");L(" 分钟"," min"," min");L(" 小时"," h"," j");L(" 分"," min"," min");
+// 24 小时时间编辑器 / 完整 00:00–24:00 课表
+L("结束于次日（跨午夜）","Ends next day (overnight)","Tamat hari berikutnya (lepas tengah malam)");
+L("例如 22:00 → 次日 06:00","e.g. 22:00 → next day 06:00","cth. 22:00 → hari berikutnya 06:00");
+L("时长（自动计算）","Duration (calculated automatically)","Tempoh (dikira automatik)");
+L("快捷时长（可选，点一下 = 从开始时间往后算）","Quick durations (optional — tap to count from the start time)","Tempoh pantas (pilihan — ketik untuk kira dari masa mula)");
+L("请选择有效时间","Please choose a valid time","Sila pilih masa yang sah");
+L("请选择开始和结束时间","Please choose a start and an end time","Sila pilih masa mula dan masa tamat");
+L("开始和结束时间不能相同。如果活动跨午夜，请勾选「结束于次日」","Start and end can't be the same. If the activity runs past midnight, tick “Ends next day”.","Masa mula dan tamat tidak boleh sama. Jika aktiviti melepasi tengah malam, tandakan “Tamat hari berikutnya”.");
+L("结束时间早于开始时间。如果活动跨午夜（例如 22:00 → 次日 06:00），请勾选「结束于次日」","The end is earlier than the start. If the activity runs past midnight (e.g. 22:00 → next day 06:00), tick “Ends next day”.","Masa tamat lebih awal daripada masa mula. Jika aktiviti melepasi tengah malam (cth. 22:00 → hari berikutnya 06:00), tandakan “Tamat hari berikutnya”.");
+L("活动最长 24 小时","An activity can be 24 hours at most","Aktiviti maksimum 24 jam");
+L("结束时间要晚于开始时间","The end must be later than the start","Masa tamat mesti lebih lewat daripada masa mula");
+L(" · ⚠ 与「"," · ⚠ overlaps “"," · ⚠ bertindih dengan “");
+L("常用时间 从 ","Usual hours from ","Waktu biasa dari ");
+L("课表始终显示完整的 00:00–24:00 并可上下滚动。这里选的是「常用时间」：课表默认滚动到的位置，以及 AI 自动安排时使用的时间范围。","The timetable always shows the full 00:00–24:00 and scrolls up and down. “Usual hours” is where it scrolls to by default, and the range the AI uses when it plans for you.","Jadual sentiasa memaparkan penuh 00:00–24:00 dan boleh digulung. “Waktu biasa” ialah kedudukan gulungan lalai, dan julat yang digunakan AI semasa merancang untuk anda.");
+L("常用时间开始","Usual hours start","Waktu biasa mula");
+L("常用时间结束","Usual hours end","Waktu biasa tamat");
+L("个事件的时间无效，已跳过"," events have an invalid time and were skipped"," acara mempunyai masa tidak sah dan dilangkau");
 })();

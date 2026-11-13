@@ -159,7 +159,8 @@
       <label class="tp"><div class="n">一周从哪天开始</div><select id="wsel" class="sel"></select></label>
       <label class="tp"><input type="checkbox" id="hwk"><div class="n">隐藏周末<small>课表只显示周一到周五</small></div></label>
       <label class="tp"><input type="checkbox" id="h24"><div class="n">24 小时制<small>关闭后显示 8am / 2pm</small></div></label>
-      <div class="mv"><select id="sh0" class="sel" aria-label="课表开始时间"></select><select id="sh1" class="sel" aria-label="课表结束时间"></select></div>
+      <div class="mv"><select id="sh0" class="sel" aria-label="常用时间开始"></select><select id="sh1" class="sel" aria-label="常用时间结束"></select></div>
+      <div class="msg">课表始终显示完整的 00:00–24:00 并可上下滚动。这里选的是「常用时间」：课表默认滚动到的位置，以及 AI 自动安排时使用的时间范围。</div>
 
       <h3 class="hs">👀 视图</h3>
       <label class="tp"><div class="n">视图密度<small>周视图每小时的高度、日视图卡片的松紧</small></div><select id="vdens" class="sel"><option value="compact">紧凑</option><option value="std">标准</option><option value="roomy">宽松</option></select></label>
@@ -312,10 +313,12 @@
     <div class="ed-card">
       <label class="er"><span>星期</span><select id="dday"></select></label>
       <div class="ed-2">
-        <label class="er"><span>开始时间</span><input type="time" id="dh" step="300"></label>
-        <label class="er"><span>结束时间</span><input type="time" id="de" step="300"></label>
+        <label class="er"><span>开始时间</span><input type="time" id="dh" step="60"></label>
+        <label class="er"><span>结束时间</span><input type="time" id="de" step="60"></label>
       </div>
-      <div class="er"><span>时长（点一下 = 从开始时间往后算）</span><div class="chips" id="ddur"></div></div>
+      <label class="er tgl" id="dnx"><input type="checkbox" id="dnxc"><div class="n">结束于次日（跨午夜）<small>例如 22:00 → 次日 06:00</small></div></label>
+      <div class="er tdur" aria-live="polite"><span>时长（自动计算）</span><b id="dtdv"></b><small id="dtdw"></small></div>
+      <div class="er"><span>快捷时长（可选，点一下 = 从开始时间往后算）</span><div class="chips" id="ddur"></div></div>
     </div>
     <div class="ed-card">
       <label class="er"><span>重复</span><select id="drp"><option value="0">不重复</option><option value="1">每周重复</option><option value="2">每 2 周重复</option><option value="3">每 3 周重复</option><option value="4">每 4 周重复</option><option value="m">每月第几个周几</option><option value="ml">每月最后一个周几</option></select></label>
@@ -358,6 +361,7 @@
       <label class="er"><span>开始节次</span><select id="lsp0"></select></label>
       <label class="er"><span>结束节次</span><select id="lsp1"></select></label>
       <div class="ed-2"><label class="er"><span>开始时间</span><input type="time" id="lst0"></label><label class="er"><span>结束时间</span><input type="time" id="lst1"></label></div>
+      <div class="er tdur" aria-live="polite"><span>时长（自动计算）</span><b id="lstdv"></b></div>
     </div>
     <div class="ed-card">
       <div class="ed-2"><label class="er"><span>开始日期（留空 = 不限）</span><input type="date" id="lsd0"></label><label class="er"><span>结束日期（留空 = 不限）</span><input type="date" id="lsd1"></label></div>

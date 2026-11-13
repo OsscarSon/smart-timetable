@@ -65,7 +65,7 @@
     if(!Array.isArray(l))return null;var out=[];
     for(var i=0;i<l.length;i++){var x=l[i]||{},day=+x.day,s,e;
       if(x.s!=null){s=Math.round(+x.s);e=Math.round(+x.e)}else{s=Math.round(+x.h*60);e=s+Math.round(+x.len*60)}
-      if(!(day>=0&&day<=6)||day%1||!isFinite(s)||!isFinite(e)||e<=s||e-s>240||s<H0*60||e>H1*60||!x.t||hiddenDay(day))return null;
+      if(!(day>=0&&day<=6)||day%1||!isFinite(s)||!isFinite(e)||e<=s||e-s>240||s<D0*60||e>D1*60||!x.t||hiddenDay(day))return null;
       if(fxHit(day,s,e))return null;
       var o={day:day,s:s,e:e,t:str14(x.t),c:COLS.indexOf(x.c)>=0?x.c:'peach'};
       if(out.some(function(y){return y.day===o.day&&ovl(y,o)}))return null;out.push(o)}
