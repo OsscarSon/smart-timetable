@@ -84,6 +84,25 @@ if (existsSync('js/spaces-core.js') && existsSync('js/spaces.js')) {
   const css = readFileSync('css/spaces.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   for (const m of css.matchAll(/(?:^|\})\s*([^{}@]+)\{/g)) for (const sel of m[1].split(',')) { const x = sel.trim(); if (x && !/^(#v-wk|#v-lf|\.spc-)/.test(x)) fail('spaces.css 里有没加命名空间的选择器：' + x); }
 }
+// Health Space（v9.9.1）：聚合层必须是纯函数；界面层不许有自己的数据键 / 本机存储，写入只走现有函数（btSave / diSave / ssv / addSp / 课表勾选 DN）；不碰云同步 / Undo / 课表结构 / Goals；三语键一致；CSS 全部带命名空间
+if (existsSync('js/health-space-core.js') && existsSync('js/health-space.js')) {
+  const c = readFileSync('js/health-space-core.js', 'utf8'), u = readFileSync('js/health-space.js', 'utf8');
+  for (const w of ['document', 'localStorage', 'sessionStorage', 'put2(', 'cloud', 'Undo', 'fetch(']) if (c.includes(w)) fail('health-space-core.js 必须是纯函数，不应使用：' + w);
+  for (const m of u.matchAll(/['"`](mochi-[A-Za-z0-9:_-]*|goals-[A-Za-z0-9:_-]*)/g)) fail('health-space.js 不应出现数据键字面量：' + m[1]);
+  for (const w of ['localStorage', 'sessionStorage', 'cloud.', 'saveWeek', 'fxSave', 'rpSave', 'Undo.', 'syscal', 'CapacitorCalendar', 'saveGoal', 'deleteGoal', 'GoalsPlan.commit', 'data.push', 'WK[thisW].push']) if (u.includes(w)) fail('health-space.js 不应使用：' + w);
+  for (const m of u.matchAll(/\bput2\(\s*([^),]+)/g)) if (m[1].trim() !== 'K_DN') fail('health-space.js 只允许用 put2(K_DN, DN) 写课表勾选（其余写入必须走 btSave / diSave / ssv）：put2(' + m[1] + ')');
+  for (const m of u.matchAll(/fetch\(\s*'([^']+)/g)) if (!/^https:\/\/world\.openfoodfacts\.org\/cgi\/search\.pl\?/.test(m[1])) fail('health-space.js 只允许请求 Open Food Facts：' + m[1]);
+  const sb = { window: {} }; new Function('window', readFileSync('js/lang-health-space.js', 'utf8'))(sb.window);
+  const D = sb.window.HS_I18N, ks = l => Object.keys(D[l]).sort().join(',');
+  for (const l of ['zh', 'ms']) if (ks(l) !== ks('en')) fail('lang-health-space.js：' + l + ' 与 en 的键不一致');
+  const used = new Set([...u.matchAll(/\bt\('([A-Za-z0-9_]+)'/g)].map(m => m[1]));
+  for (const p of ['ov', 'mv', 'sk', 'fd']) for (const x of ['Title', 'Sub', 'Eyebrow']) used.add(p + x);
+  for (const m of u.matchAll(/'(tab(?:Dash|Move|Skin|Food)|m(?:Breakfast|Lunch|Dinner|Snack)|stepsLeft[1N]|upSkin(?:Am|Pm))'/g)) used.add(m[1]);
+  for (const k of used) if (!(k in D.en)) fail('health-space.js 用了没有翻译的键：' + k);
+  for (const l of ['en', 'zh', 'ms']) for (const k of Object.keys(D[l])) if (!D[l][k]) fail('lang-health-space.js：' + l + '.' + k + ' 是空的');
+  const css = readFileSync('css/health-space.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of css.matchAll(/(?:^|\})\s*([^{}@]+)\{/g)) for (const sel of m[1].split(',')) { const x = sel.trim(); if (x && !/^(#v-hs|\.health-space-)/.test(x)) fail('health-space.css 里有没加命名空间的选择器：' + x); }
+}
 // 版本号：js/version.js、package.json、sw.js 的缓存名必须一致；菜单等地方不许再写死版本号
 {
   const pv = JSON.parse(readFileSync('package.json', 'utf8')).version;
